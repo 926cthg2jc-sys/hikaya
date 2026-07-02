@@ -73,7 +73,7 @@ body:not(.admin-login) .qrcode-btn{
     padding-left: 4px;
 }
 /* 登录弹窗 */
-.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-content{max-width:350px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);text-align:center;}
 .login-content h3{margin-bottom:20px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px;}
 .login-form-group{margin:15px 0;text-align:left;}
@@ -100,7 +100,7 @@ body:not(.admin-login) .qrcode-btn{
 .read-btn.book{background:linear-gradient(135deg,#4caf50,#81c784);}
 .read-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0.15);}
 /* 音频播放弹窗（优化关闭/返回） */
-.audio-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.6);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
+.audio-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.6);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
 .audio-modal.show{display:flex;}
 .audio-box{background:var(--card-bg);border-radius:20px;padding:30px;width:100%;max-width:450px;text-align:center;box-shadow:var(--shadow-hover);cursor:default;}
 .audio-title{margin-bottom:20px;font-size:18px;}
@@ -328,7 +328,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         </div>
     </div>
 </div>
-<!-- 音频播放弹窗（新增返回/关闭功能，支持点击蒙层关闭） -->
+<!-- 音频播放弹窗（优化关闭/返回） -->
 <div class="audio-modal" id="audioModal" onclick="closeAudioModal()">
     <div class="audio-box" onclick="event.stopPropagation()">
         <h3 class="audioTitle" id="audioTitle"></h3>
@@ -466,12 +466,10 @@ window.onload = async ()=>{
     await initDB();
     await getAllBooks();
 
-    // 固定内置书籍：爱的如诉muhabbat uzi sozlaydu
-    const targetBookTitle = "爱的如诉muhabbat uzi sozlaydu";
-    const hasBook = allBooks.some(b => b.title === targetBookTitle);
-    if (!hasBook) {
-        const presetBook = {
-            title: targetBookTitle,
+    // 预设书籍列表，新增老人与海
+    const presetBooks = [
+        {
+            title: "爱的如诉muhabbat uzi sozlaydu",
             cate: "Roman",
             desc: "",
             tags: "爱的如诉、muhabbat uzi sozlaydu、小说",
@@ -479,10 +477,27 @@ window.onload = async ()=>{
             cover: "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
             bookFile: "",
             audioFile: ""
-        };
-        await addBookToDB(presetBook);
-        await getAllBooks();
+        },
+        {
+            title: "老人与海",
+            cate: "Roman",
+            desc: "",
+            tags: "老人与海、boway wa degiz、小说",
+            link: "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437",
+            cover: "https://ts1.tc.mm.bing.net/th/id/R-C.f7f77c73e490819892c884872a0a1540?rik=Y0h5kDSM%2b9n7RA&riu=http%3a%2f%2fp2.itc.cn%2fimages03%2f20200530%2f3687e9c3460c442983309a0b80ab2b5c.jpeg&ehk=cPsRX5GtfR03VAniJR5vNdKEvu5%2bxEmVZ3Gkee1C7ZI%3d&risl=&pid=ImgRaw&r=0",
+            bookFile: "",
+            audioFile: ""
+        }
+    ];
+
+    // 循环添加不存在的预设书籍
+    for(let book of presetBooks){
+        const exists = allBooks.some(b => b.title === book.title);
+        if(!exists){
+            await addBookToDB(book);
+        }
     }
+    await getAllBooks();
     
     renderBooks();
     initTab();
@@ -675,7 +690,7 @@ function openBookFile(){
     a.click();
     document.body.removeChild(a);
 }
-// 播放有声书 + 关闭返回（核心修复）
+// 播放有声书 + 关闭返回
 function openAudioPlayer(){
     if(!currentBook.audioFile) return;
     document.getElementById('audioTitle').innerText = currentBook.title;
@@ -683,7 +698,6 @@ function openAudioPlayer(){
     document.getElementById('audioModal').classList.add('show');
 }
 function closeAudioModal(){
-    // 停止音频 + 关闭弹窗 + 返回上一级（书籍详情页）
     const audio = document.getElementById('bookAudio');
     audio.pause();
     audio.src = "";
