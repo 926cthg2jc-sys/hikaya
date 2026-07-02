@@ -19,7 +19,6 @@
     --border:#333;--shadow:0 2px 12px rgba(0,0,0.3);--shadow-hover:0 12px 30px rgba(0,0,0.5);
 }
 body{background:var(--bg);color:var(--text-color);padding:20px;min-height:100vh;overflow-x:hidden;}
-
 /* 欢迎弹窗 二维码区域 */
 .welcome-modal{
     position:fixed;top:0;left:0;width:100%;height:100vh;
@@ -66,7 +65,6 @@ body:not(.admin-login) .qrcode-btn{
     font-size:15px;cursor:pointer;
 }
 .close-welcome:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(141,110,99,0.3);}
-
 /* 文件提示文字 */
 .file-tip {
     font-size: 12px;
@@ -74,9 +72,8 @@ body:not(.admin-login) .qrcode-btn{
     margin-top: 4px;
     padding-left: 4px;
 }
-
 /* 登录弹窗 */
-.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-content{max-width:350px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);text-align:center;}
 .login-content h3{margin-bottom:20px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px;}
 .login-form-group{margin:15px 0;text-align:left;}
@@ -85,7 +82,6 @@ body:not(.admin-login) .qrcode-btn{
 .login-btn{width:100%;margin-top:20px;padding:12px;background:var(--primary-gradient);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
 .login-error{color:#ff5252;font-size:14px;margin-top:10px;height:20px;}
-
 /* 阅读弹窗 */
 .read-page{position:fixed;top:0;left:0;width:100%;height:100vh;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;}
 .read-page.show{display:flex;animation:fadeIn 0.4s ease;}
@@ -103,7 +99,6 @@ body:not(.admin-login) .qrcode-btn{
 .read-btn.audio{background:linear-gradient(135deg,#7b4397,#dc2430);}
 .read-btn.book{background:linear-gradient(135deg,#4caf50,#81c784);}
 .read-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0.15);}
-
 /* 音频播放弹窗（优化关闭/返回） */
 .audio-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.6);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
 .audio-modal.show{display:flex;}
@@ -119,9 +114,8 @@ audio{width:100%;margin-top:10px;margin-bottom:20px;}
 }
 .close-audio-btn:hover{
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0,0,0.15);
 }
-
 /* 置顶按钮 */
 .top-btn{position:absolute;top:45px;right:10px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(255,152,0,0.4);}
 .untop-btn{background:linear-gradient(135deg,#9e9e9e,#e0e0e0);}
@@ -129,7 +123,6 @@ audio{width:100%;margin-top:10px;margin-bottom:20px;}
 .top-btn:hover{transform:scale(1.15) !important;}
 .top-tag{position:absolute;top:10px;left:45px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;font-size:10px;padding:2px 8px;border-radius:6px;z-index:2;box-shadow:0 2px 4px rgba(255,152,0,0.3);}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
 /* 顶部栏 */
 .top-bar{max-width:1200px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;}
 .header h1{font-size:34px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;font-weight:700;letter-spacing:2px;animation:titleGlow 3s ease-in-out infinite alternate;}
@@ -138,31 +131,26 @@ audio{width:100%;margin-top:10px;margin-bottom:20px;}
 #logoutBtn{background:linear-gradient(135deg,#ff5252,#ff1744);}
 #darkToggle:hover,#loginBtn:hover,#logoutBtn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(141,110,99,0.4);}
 #logout:hover{box-shadow:0 6px 20px rgba(255,82,82,0.4);}
-
 /* 搜索框 */
 .search-box{max-width:400px;width:100%;margin:0 auto 20px;position:relative;}
 #searchInput{width:100%;padding:14px 20px 14px 45px;border:1px solid var(--border);border-radius:30px;font-size:14px;background:var(--card-bg);color:var(--text-color);}
 #searchInput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(141,110,99,0.2);}
 .search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--sub-text);}
-
 /* 分类标签 */
 .category-tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
 .tab{padding:10px 20px;background:var(--primary-light);border:none;border-radius:30px;font-size:14px;cursor:pointer;color:var(--text-color);font-weight:500;position:relative;overflow:hidden;}
 .tab::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s ease;}
 .tab:hover::before{left:100%;}
 .tab.active{background:var(--primary-gradient);color:#fff;box-shadow:0 4px 15px rgba(141,110,99,0.4);transform:scale(1.05);}
-
 /* 排序控件 */
 .sort-box{max-width:1200px;margin:0 auto 20px;text-align:center;}
 .sort-box select{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-color);font-size:14px;cursor:pointer;}
 .sort-box select:focus{outline:none;border-color:var(--primary);}
-
 /* 上传折叠按钮 */
 .upload-toggle-box{max-width:600px;margin:0 auto 10px;text-align:center;}
 #uploadToggle{padding:8px 24px;border-radius:25px;border:none;background:var(--primary-gradient);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(141,110,0.25);display:none;}
 #uploadToggle.show{display:inline-block;}
 #uploadToggle:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
-
 /* 上传面板 */
 .upload-box{max-width:600px;margin:0 auto 35px;padding:24px;background:var(--card-bg);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;max-height:2000px;opacity:1;visibility:visible;transition:all 0.4s ease;display:none;}
 .upload-box.show{display:block;}
@@ -176,7 +164,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .save-btn{background:linear-gradient(135deg,#4caf50,#81c784);}
 .add-btn:hover,.save-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(141,110,99,0.45);}
 .save-btn:hover{box-shadow:0 8px 25px rgba(76,175,80,0.45);}
-
 /* 书架网格 */
 .bookshelf{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
 .book-card{background:var(--card-bg);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);position:relative;border:1px solid var(--border);cursor:pointer;}
@@ -196,14 +183,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .admin-btns-show .del-btn,.admin-btns-show .edit-card-btn,.admin-btns-show .top-btn{display:block;}
 .empty-tip{grid-column:1/-1;text-align:center;padding:80px 0;color:var(--sub-text);font-size:18px;animation:fadeIn 1s ease;}
 .hide{display:none !important;}
-
 /* 编辑弹窗 */
 .edit-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
 .edit-modal.show{display:flex;animation:fadeIn 0.4s ease;}
 .edit-content{max-width:500px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);position:relative;}
 .close-edit-btn{position:absolute;top:15px;right:15px;background:transparent;border:none;color:var(--sub-text);font-size:20px;cursor:pointer;}
 .close-edit-btn:hover{color:var(--text-color);}
-
 /* 响应式适配 */
 @media (max-width:768px){
     .top-bar{flex-direction:column;}
@@ -219,7 +204,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 </style>
 </head>
 <body>
-
 <!-- 首页欢迎弹窗 + 二维码 -->
 <div class="welcome-modal" id="welcomeModal">
     <div class="welcome-box">
@@ -232,7 +216,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <button class="close-welcome" onclick="closeWelcome()">进入主页</button>
     </div>
 </div>
-
 <div class="top-bar">
     <div class="header"><h1>Hekaya小故事</h1></div>
     <div>
@@ -241,7 +224,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <button id="darkToggle" onclick="toggleDark()">🌙 暗黑模式</button>
     </div>
 </div>
-
 <!-- 登录弹窗 -->
 <div class="login-modal" id="loginModal" style="display:none;">
     <div class="login-content">
@@ -258,13 +240,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <button class="login-btn" onclick="doLogin()">登录</button>
     </div>
 </div>
-
 <!-- 搜索框 -->
 <div class="search-box">
     <span class="search-icon">🔍</span>
     <input type="text" id="searchInput" placeholder="搜索书名/标签/分类..." oninput="filterBooks()">
 </div>
-
 <!-- 分类标签 -->
 <div class="category-tabs">
     <button class="tab active" data-cate="all">全部</button>
@@ -274,7 +254,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
     <button class="tab" data-cate="Adibiy Aser">Adibiy Aser</button>
     <button class="tab" data-cate="Awazlik">Awazlik</button>
 </div>
-
 <!-- 排序控件 -->
 <div class="sort-box">
     <select id="sortSelect" onchange="sortBooks()">
@@ -284,11 +263,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <option value="cate-asc">分类升序</option>
     </select>
 </div>
-
 <div class="upload-toggle-box">
     <button id="uploadToggle" onclick="toggleUploadBox()">📁 展开/隐藏上传区域</button>
 </div>
-
 <!-- 上传面板 -->
 <div class="upload-box" id="uploadBox">
     <h3>添加新图书</h3>
@@ -314,7 +291,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
     <div class="form-group">
         <input type="text" id="book-link" placeholder="填写阅读链接/本地文件地址（选填）">
     </div>
-
     <div class="form-group">
         <input type="text" id="cover-url" placeholder="封面图片网络链接（选填）">
     </div>
@@ -322,24 +298,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <input type="file" id="cover-input" accept="image/*" onchange="showCoverFileName(this)">
         <div class="file-tip" id="coverFileTip">未选择封面图片</div>
     </div>
-
     <div class="form-group">
         <input type="file" id="book-file" accept=".txt,.pdf,.epub" onchange="showBookFileName(this)">
         <label style="font-size:12px;color:var(--sub-text)">上传电子书（txt/pdf/epub）</label>
         <div class="file-tip" id="bookFileTip">未选择电子书</div>
     </div>
-
     <div class="form-group">
         <input type="file" id="audio-file" accept="audio/*" onchange="showAudioFileName(this)">
         <label style="font-size:12px;color:var(--sub-text)">上传有声读物（mp3/wav）</label>
         <div class="file-tip" id="audioFileTip">未选择音频文件</div>
     </div>
-
     <button class="add-btn" onclick="addBook()">加入书架</button>
 </div>
-
 <div class="bookshelf" id="bookshelf"></div>
-
 <!-- 阅读弹窗 -->
 <div class="read-page" id="readPage">
     <button class="read-back-btn" onclick="closeReadPage()">← 返回书架</button>
@@ -357,7 +328,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         </div>
     </div>
 </div>
-
 <!-- 音频播放弹窗（新增返回/关闭功能，支持点击蒙层关闭） -->
 <div class="audio-modal" id="audioModal" onclick="closeAudioModal()">
     <div class="audio-box" onclick="event.stopPropagation()">
@@ -366,7 +336,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <button class="close-audio-btn" onclick="closeAudioModal()">关闭并返回</button>
     </div>
 </div>
-
 <!-- 编辑弹窗 -->
 <div class="edit-modal" id="editModal">
     <div class="edit-content">
@@ -396,7 +365,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <div class="form-group">
             <input type="text" id="edit-book-link" placeholder="阅读链接/本地文件地址（选填）">
         </div>
-
         <div class="form-group">
             <input type="text" id="edit-cover-url" placeholder="封面网络链接">
         </div>
@@ -407,21 +375,17 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         <div class="form-group">
             <img id="edit-cover-preview" style="width:100px;height:130px;object-fit:cover;border-radius:8px;">
         </div>
-
         <div class="form-group">
             <input type="file" id="edit-book-file" accept=".txt,.pdf,.epub" onchange="showEditBookFileName(this)">
             <div class="file-tip" id="editBookFileTip">未选择新电子书</div>
         </div>
-
         <div class="form-group">
             <input type="file" id="edit-audio-file" accept="audio/*" onchange="showEditAudioFileName(this)">
             <div class="file-tip" id="editAudioFileTip">未选择新音频</div>
         </div>
-
         <button class="save-btn" onclick="saveEditBook()">保存修改</button>
     </div>
 </div>
-
 <script>
 let db = null;
 let uploadBoxShow = true;
@@ -429,7 +393,6 @@ let allBooks = [];
 let currentEditBook = null;
 let currentBook = null;
 let isAdminLogin = false;
-
 // 初始化数据库
 function initDB(){
     return new Promise(resolve=>{
@@ -447,7 +410,6 @@ function initDB(){
         req.onerror = e=>{console.error('数据库初始化失败',e);};
     });
 }
-
 // 读取配置
 async function getConfig(key){
     return new Promise(resolve=>{
@@ -458,7 +420,6 @@ async function getConfig(key){
         req.onerror = ()=>resolve("");
     });
 }
-
 // 保存配置
 async function setConfig(key,value){
     return new Promise(resolve=>{
@@ -468,7 +429,6 @@ async function setConfig(key,value){
         tx.oncomplete = resolve;
     });
 }
-
 function getAllBooks(){
     return new Promise(resolve=>{
         const tx = db.transaction('books','readonly');
@@ -478,7 +438,6 @@ function getAllBooks(){
         r.onerror = ()=>resolve([]);
     });
 }
-
 function addBookToDB(book){
     return new Promise(resolve=>{
         const tx = db.transaction('books','readwrite');
@@ -487,7 +446,6 @@ function addBookToDB(book){
         tx.oncomplete = ()=>{getAllBooks();resolve();}
     });
 }
-
 function updateBookInDB(book){
     return new Promise(resolve=>{
         const tx = db.transaction('books','readwrite');
@@ -496,7 +454,6 @@ function updateBookInDB(book){
         tx.oncomplete = ()=>{getAllBooks();resolve();}
     });
 }
-
 function delBookFromDB(id){
     return new Promise(resolve=>{
         const tx = db.transaction('books','readwrite');
@@ -505,18 +462,34 @@ function delBookFromDB(id){
         tx.oncomplete = ()=>{getAllBooks();resolve();}
     });
 }
-
 window.onload = async ()=>{
     await initDB();
     await getAllBooks();
+
+    // 固定内置书籍：爱的如诉muhabbat uzi sozlaydu
+    const targetBookTitle = "爱的如诉muhabbat uzi sozlaydu";
+    const hasBook = allBooks.some(b => b.title === targetBookTitle);
+    if (!hasBook) {
+        const presetBook = {
+            title: targetBookTitle,
+            cate: "Roman",
+            desc: "",
+            tags: "爱的如诉、muhabbat uzi sozlaydu、小说",
+            link: "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02",
+            cover: "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
+            bookFile: "",
+            audioFile: ""
+        };
+        await addBookToDB(presetBook);
+        await getAllBooks();
+    }
+    
     renderBooks();
     initTab();
-
     const qrImg = await getConfig("qrcode");
     if(qrImg){
         document.getElementById("qrcodeImg").src = qrImg;
     }
-
     if(localStorage.getItem('dark')==='1'){
         document.body.classList.add('dark');
         document.getElementById('darkToggle').innerText = '☀️ 浅色模式';
@@ -526,7 +499,6 @@ window.onload = async ()=>{
         updateAdminUI();
     }
 };
-
 // 二维码更换
 function triggerQrcode(){
     if(!isAdminLogin){
@@ -553,7 +525,6 @@ async function handleQrcodeUpload(fileDom){
     await setConfig("qrcode", base64);
     alert("✅ 二维码更换成功！");
 }
-
 // 文件名称提示
 function showCoverFileName(el){
     const tip = document.getElementById('coverFileTip');
@@ -579,12 +550,10 @@ function showEditAudioFileName(el){
     const tip = document.getElementById('editAudioFileTip');
     tip.innerText = el.files[0] ? "已选择新音频：" + el.files[0].name : "未选择新音频";
 }
-
 // 关闭欢迎弹窗
 function closeWelcome(){
     document.getElementById("welcomeModal").style.display = "none";
 }
-
 // 更新管理员UI
 function updateAdminUI(){
     if(isAdminLogin){
@@ -603,7 +572,6 @@ function updateAdminUI(){
         document.getElementById('bookshelf').classList.remove('admin-btns-show');
     }
 }
-
 // 登录
 function openLoginModal(){
     document.getElementById('loginModal').style.display = 'flex';
@@ -628,7 +596,6 @@ function logout(){
     updateAdminUI();
     renderBooks();
 }
-
 // 文件转Base64
 function fileToBase64(file){
     return new Promise((res)=>{
@@ -637,7 +604,6 @@ function fileToBase64(file){
         fr.readAsDataURL(file);
     });
 }
-
 // 添加书籍
 async function addBook(){
     if(!isAdminLogin){alert('请先登录管理员账号');return;}
@@ -650,20 +616,17 @@ async function addBook(){
     const coverFile = document.getElementById('cover-input').files[0];
     const bookFile = document.getElementById('book-file').files[0];
     const audioFile = document.getElementById('audio-file').files[0];
-
     if(!title || !cate){alert('书名和分类为必填项');return;}
     
     let cover = '';
     if(coverUrl) cover = coverUrl;
     else if(coverFile) cover = await fileToBase64(coverFile);
     else {alert('请填写封面链接或上传封面图片');return;}
-
     let bookBase64 = '';
     if(bookFile) bookBase64 = await fileToBase64(bookFile);
     
     let audioBase64 = '';
     if(audioFile) audioBase64 = await fileToBase64(audioFile);
-
     await addBookToDB({title,cate,desc,tags,link,cover,bookFile:bookBase64,audioFile:audioBase64});
     renderBooks();
     
@@ -680,7 +643,6 @@ async function addBook(){
     document.getElementById('bookFileTip').innerText = "未选择电子书";
     document.getElementById('audioFileTip').innerText = "未选择音频文件";
 }
-
 // 打开阅读页
 function openReadPage(book){
     currentBook = book;
@@ -698,7 +660,6 @@ function openReadPage(book){
 function closeReadPage(){
     document.getElementById('readPage').classList.remove('show');
 }
-
 // 阅读链接 & 电子书
 function openBookLink(){
     if(!currentBook.link) return;
@@ -714,7 +675,6 @@ function openBookFile(){
     a.click();
     document.body.removeChild(a);
 }
-
 // 播放有声书 + 关闭返回（核心修复）
 function openAudioPlayer(){
     if(!currentBook.audioFile) return;
@@ -729,7 +689,6 @@ function closeAudioModal(){
     audio.src = "";
     document.getElementById('audioModal').classList.remove('show');
 }
-
 // 编辑书籍
 async function openEditModal(id){
     if(!isAdminLogin){alert('请先登录管理员账号');return;}
@@ -763,7 +722,6 @@ async function saveEditBook(){
     const coverFile = document.getElementById('edit-cover-input').files[0];
     const bookFile = document.getElementById('edit-book-file').files[0];
     const audioFile = document.getElementById('edit-audio-file').files[0];
-
     let cover = coverUrl || currentEditBook.cover;
     if(coverFile) cover = await fileToBase64(coverFile);
     
@@ -772,13 +730,11 @@ async function saveEditBook(){
     
     let audioBase64 = currentEditBook.audioFile;
     if(audioFile) audioBase64 = await fileToBase64(audioFile);
-
     const updated = {...currentEditBook,title,cate,desc,tags,link,cover,bookFile:bookBase64,audioFile:audioBase64};
     await updateBookInDB(updated);
     renderBooks();
     closeEditModal();
 }
-
 // 置顶
 function getTopCount(){
     return allBooks.filter(b=>b.isTop).length;
@@ -791,7 +747,6 @@ async function setBookTop(id,isTop){
     await updateBookInDB(book);
     renderBooks();
 }
-
 // 删除
 async function delBook(id){
     if(!isAdminLogin)return;
@@ -800,39 +755,31 @@ async function delBook(id){
         renderBooks();
     }
 }
-
 // 筛选+搜索（分类/标签/书名/简介 全匹配）
 function filterBooks(){
     const activeCate = document.querySelector('.tab.active').dataset.cate;
     const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
     const shelf = document.getElementById('bookshelf');
     shelf.innerHTML = '';
-
     let list = allBooks.filter(book => {
         const cateMatch = (activeCate === 'all') || (book.cate === activeCate);
         if(!cateMatch) return false;
-
         if(!keyword) return true;
-
         const titleMatch = book.title.toLowerCase().includes(keyword);
         const cateTextMatch = book.cate.toLowerCase().includes(keyword);
         const tagMatch = book.tags ? book.tags.toLowerCase().includes(keyword) : false;
         const descMatch = book.desc ? book.desc.toLowerCase().includes(keyword) : false;
-
         return titleMatch || cateTextMatch || tagMatch || descMatch;
     });
-
     list.sort((a,b)=>{
         if(a.isTop && !b.isTop) return -1;
-        if(!a && b) return 1;
+        if(!a.isTop && b.isTop) return 1;
         return 0;
     });
-
     if(list.length === 0){
         shelf.innerHTML = '<div class="empty-tip">暂无匹配的书籍</div>';
         return;
     }
-
     list.forEach(book=>{
         const div = document.createElement('div');
         div.className = 'book-card ' + (book.isTop ? 'top' : '');
@@ -853,7 +800,6 @@ function filterBooks(){
         shelf.appendChild(div);
     });
 }
-
 // 分类点击初始化
 function initTab(){
     const tabs = document.querySelectorAll('.tab');
@@ -865,7 +811,6 @@ function initTab(){
         }
     });
 }
-
 function sortBooks(){
     filterBooks();
 }
