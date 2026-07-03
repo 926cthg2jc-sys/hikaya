@@ -1,857 +1,97 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hekaya小故事｜个人书架</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",system-ui,sans-serif;transition:background 0.3s ease,color 0.3s ease,border-color 0.3s ease,transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
-:root{
-    --bg:#f8f5f0;--card-bg:#fff;--text-color:#3e2723;--sub-text:#8d6e63;
-    --primary:#8d6e63;--primary-light:#d7ccc8;
-    --primary-gradient:linear-gradient(135deg,#8d6e63,#bcaaa4);
-    --border:#eee;--shadow:0 2px 10px rgba(0,0,0.08);--shadow-hover:0 12px 30px rgba(141,110,99,0.25);
-}
-.dark{
-    --bg:#0f0f11;--card-bg:#1a1a22;--text-color:#f1f1f1;--sub-text:#b0a8a4;
-    --primary:#a1887f;--primary-light:#48403c;
-    --primary-gradient:linear-gradient(135deg,#a1887f,#d7ccc8);
-    --border:#333;--shadow:0 2px 12px rgba(0,0,0.3);--shadow-hover:0 12px 30px rgba(0,0,0.5);
-}
-body{background:var(--bg);color:var(--text-color);padding:20px;min-height:100vh;overflow-x:hidden;}
-/* 欢迎弹窗 二维码区域 */
-.welcome-modal{
-    position:fixed;top:0;left:0;width:100%;height:100vh;
-    background:rgba(0,0,0,0.7);z-index:99999;
-    display:flex;align-items:center;justify-content:center;
-    padding:20px;
-}
-.welcome-box{
-    background:var(--card-bg);border-radius:20px;padding:30px;
-    max-width:420px;width:100%;text-align:center;
-    box-shadow:var(--shadow-hover);
-}
-.welcome-title{
-    font-size:22px;margin-bottom:20px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.qrcode-wrap{
-    width:240px;height:240px;margin:0 auto 20px;
-    border:1px solid var(--border);border-radius:12px;
-    overflow:hidden;position:relative;
-}
-#qrcodeImg{
-    width:100%;height:100%;object-fit:contain;display:block;
-}
-.qrcode-btn{
-    position:absolute;bottom:0;left:0;width:100%;
-    background:rgba(0,0,0.6);color:#fff;
-    font-size:13px;padding:8px 0;cursor:pointer;
-    border:none;outline:none;
-}
-body:not(.admin-login) .qrcode-btn{
-    display: none;
-}
-.qrcode-btn:hover{
-    background:rgba(0,0,0.8);
-}
-#qrcodeFile{
-    display: none;
-}
-.close-welcome{
-    padding:10px 30px;background:var(--primary-gradient);
-    color:#fff;border:none;border-radius:30px;
-    font-size:15px;cursor:pointer;
-}
-.close-welcome:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(141,110,99,0.3);}
-/* 文件提示文字 */
-.file-tip {
-    font-size: 12px;
-    color: var(--primary);
-    margin-top: 4px;
-    padding-left: 4px;
-}
-/* 登录弹窗 */
-.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-content{max-width:350px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);text-align:center;}
-.login-content h3{margin-bottom:20px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px;}
-.login-form-group{margin:15px 0;text-align:left;}
-.login-form-group label{font-size:14px;color:var(--sub-text);margin-bottom:5px;display:block;}
-.login-form-group input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card-bg);color:var(--text-color);}
-.login-btn{width:100%;margin-top:20px;padding:12px;background:var(--primary-gradient);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
-.login-error{color:#ff5252;font-size:14px;margin-top:10px;height:20px;}
-/* 阅读弹窗 */
-.read-page{position:fixed;top:0;left:0;width:100%;height:100vh;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;}
-.read-page.show{display:flex;animation:fadeIn 0.4s ease;}
-.read-back-btn{position:absolute;top:25px;left:25px;padding:10px 24px;border-radius:30px;border:none;background:var(--primary-gradient);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 4px 15px rgba(141,110,99,0.3);z-index:10;}
-.read-back-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(141,110,99,0.4);}
-.read-content{max-width:600px;width:100%;text-align:center;padding-bottom:50px;}
-.read-cover{width:100%;max-width:320px;border-radius:16px;box-shadow:var(--shadow-hover);margin:0 auto 30px;}
-.read-title{font-size:28px;font-weight:700;margin-bottom:12px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.read-cate{font-size:16px;color:var(--sub-text);padding:6px 16px;background:var(--primary-light);border-radius:20px;display:inline-block;margin-bottom:20px;}
-.read-desc{font-size:15px;color:var(--text-color);line-height:1.6;margin:15px 0;text-align:left;padding:0 10px;}
-.read-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:10px 0 20px;}
-.read-tag{font-size:12px;color:var(--sub-text);padding:4px 12px;background:var(--primary-light);border-radius:10px;}
-.read-actions{display:flex;gap:15px;justify-content:center;margin:20px 0;flex-wrap:wrap;}
-.read-btn{padding:12px 24px;border-radius:30px;background:var(--primary-gradient);color:white;border:none;cursor:pointer;font-size:14px;transition:all 0.3s;}
-.read-btn.audio{background:linear-gradient(135deg,#7b4397,#dc2430);}
-.read-btn.book{background:linear-gradient(135deg,#4caf50,#81c784);}
-.read-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0.15);}
-/* 音频播放弹窗（优化关闭/返回） */
-.audio-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.6);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
-.audio-modal.show{display:flex;}
-.audio-box{background:var(--card-bg);border-radius:20px;padding:30px;width:100%;max-width:450px;text-align:center;box-shadow:var(--shadow-hover);cursor:default;}
-.audio-title{margin-bottom:20px;font-size:18px;}
-audio{width:100%;margin-top:10px;margin-bottom:20px;}
-.close-audio-btn{
-    margin-top: 10px;
-    padding:8px 20px;
-    background:var(--primary-gradient);
-    color:white;border:none;border-radius:10px;
-    cursor:pointer;
-}
-.close-audio-btn:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0.15);
-}
-/* 置顶按钮 */
-.top-btn{position:absolute;top:45px;right:10px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(255,152,0,0.4);}
-.untop-btn{background:linear-gradient(135deg,#9e9e9e,#e0e0e0);}
-.book-card:hover .top-btn{opacity:1;transform:scale(1);}
-.top-btn:hover{transform:scale(1.15) !important;}
-.top-tag{position:absolute;top:10px;left:45px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;font-size:10px;padding:2px 8px;border-radius:6px;z-index:2;box-shadow:0 2px 4px rgba(255,152,0,0.3);}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-/* 顶部栏 */
-.top-bar{max-width:1200px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;}
-.header h1{font-size:34px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;font-weight:700;letter-spacing:2px;animation:titleGlow 3s ease-in-out infinite alternate;}
-@keyframes titleGlow{from{filter:drop-shadow(0 0 2px rgba(141,110,99,0.3));}to{filter:drop-shadow(0 0 8px rgba(141,110,99,0.6));}}
-#darkToggle,#loginBtn,#logoutBtn{padding:10px 20px;border-radius:30px;border:none;background:var(--primary-gradient);color:#fff;cursor:pointer;font-size:14px;font-weight:500;box-shadow:0 4px 15px rgba(141,110,99,0.3);margin:0 5px;}
-#logoutBtn{background:linear-gradient(135deg,#ff5252,#ff1744);}
-#darkToggle:hover,#loginBtn:hover,#logoutBtn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(141,110,99,0.4);}
-#logout:hover{box-shadow:0 6px 20px rgba(255,82,82,0.4);}
-/* 搜索框 */
-.search-box{max-width:400px;width:100%;margin:0 auto 20px;position:relative;}
-#searchInput{width:100%;padding:14px 20px 14px 45px;border:1px solid var(--border);border-radius:30px;font-size:14px;background:var(--card-bg);color:var(--text-color);}
-#searchInput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(141,110,99,0.2);}
-.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--sub-text);}
-/* 分类标签 */
-.category-tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
-.tab{padding:10px 20px;background:var(--primary-light);border:none;border-radius:30px;font-size:14px;cursor:pointer;color:var(--text-color);font-weight:500;position:relative;overflow:hidden;}
-.tab::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s ease;}
-.tab:hover::before{left:100%;}
-.tab.active{background:var(--primary-gradient);color:#fff;box-shadow:0 4px 15px rgba(141,110,99,0.4);transform:scale(1.05);}
-/* 排序控件 */
-.sort-box{max-width:1200px;margin:0 auto 20px;text-align:center;}
-.sort-box select{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-color);font-size:14px;cursor:pointer;}
-.sort-box select:focus{outline:none;border-color:var(--primary);}
-/* 上传折叠按钮 */
-.upload-toggle-box{max-width:600px;margin:0 auto 10px;text-align:center;}
-#uploadToggle{padding:8px 24px;border-radius:25px;border:none;background:var(--primary-gradient);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(141,110,0.25);display:none;}
-#uploadToggle.show{display:inline-block;}
-#uploadToggle:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
-/* 上传面板 */
-.upload-box{max-width:600px;margin:0 auto 35px;padding:24px;background:var(--card-bg);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;max-height:2000px;opacity:1;visibility:visible;transition:all 0.4s ease;display:none;}
-.upload-box.show{display:block;}
-.upload-box.hide-upload{max-height:0;opacity:0;visibility:hidden;padding:0 24px;margin-bottom:0;}
-.upload-box h3{margin-bottom:18px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;font-size:20px;}
-.form-group{margin:15px 0;}
-input,select,textarea{width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:14px;background:var(--card-bg);color:var(--text-color);transition:all 0.3s ease;}
-textarea{min-height:100px;resize:vertical;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(141,110,99,0.2);transform:scale(1.01);}
-.add-btn,.save-btn{width:100%;margin-top:10px;padding:14px;background:var(--primary-gradient);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 4px 15px rgba(141,110,99,0.3);}
-.save-btn{background:linear-gradient(135deg,#4caf50,#81c784);}
-.add-btn:hover,.save-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(141,110,99,0.45);}
-.save-btn:hover{box-shadow:0 8px 25px rgba(76,175,80,0.45);}
-/* 书架网格 */
-.bookshelf{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
-.book-card{background:var(--card-bg);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);position:relative;border:1px solid var(--border);cursor:pointer;}
-.book-card.top{border:2px solid #ff9800;box-shadow:0 0 15px rgba(255,152,0,0.3);}
-.book-card:hover{transform:translateY(-12px) scale(1.03);box-shadow:var(--shadow-hover);}
-.book-cover{width:100%;height:220px;object-fit:cover;display:block;transition:transform 0.5s ease;}
-.book-card:hover .book-cover{transform:scale(1.08);}
-.book-info{padding:16px;text-align:center;background:linear-gradient(to top,var(--card-bg),transparent);position:relative;z-index:2;}
-.book-title{font-weight:600;font-size:15px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.book-cate{font-size:12px;color:var(--sub-text);padding:2px 8px;background:var(--primary-light);border-radius:10px;display:inline-block;}
-.book-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:6px;}
-.book-tag{font-size:10px;color:var(--sub-text);padding:2px 6px;background:var(--primary-light);border-radius:6px;}
-.del-btn{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#ff5252,#ff1744);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(255,23,68,0.4);display:none;}
-.edit-card-btn{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#4caf50,#81c784);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(76,175,80,0.4);display:none;}
-.book-card:hover .del-btn,.book-card:hover .edit-card-btn,.book-card:hover .top-btn{opacity:1;transform:scale(1);}
-.del-btn:hover,.edit-card-btn:hover,.top-btn:hover{transform:scale(1.15) !important;}
-.admin-btns-show .del-btn,.admin-btns-show .edit-card-btn,.admin-btns-show .top-btn{display:block;}
-.empty-tip{grid-column:1/-1;text-align:center;padding:80px 0;color:var(--sub-text);font-size:18px;animation:fadeIn 1s ease;}
-.hide{display:none !important;}
-/* 编辑弹窗 */
-.edit-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
-.edit-modal.show{display:flex;animation:fadeIn 0.4s ease;}
-.edit-content{max-width:500px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);position:relative;}
-.close-edit-btn{position:absolute;top:15px;right:15px;background:transparent;border:none;color:var(--sub-text);font-size:20px;cursor:pointer;}
-.close-edit-btn:hover{color:var(--text-color);}
-/* 响应式适配 */
-@media (max-width:768px){
-    .top-bar{flex-direction:column;}
-    .header h1{font-size:28px;}
-    .bookshelf{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px;}
-    .read-content{max-width:90%;}
-    .read-title{font-size:24px;}
-    #darkToggle,#loginBtn,#logoutBtn{margin:5px 0;}
-    .qrcode-wrap{width:200px;height:200px;}
-    .category-tabs{gap:6px;}
-    .tab{padding:8px 14px;font-size:13px;}
-}
-</style>
-</head>
-<body>
-<!-- 首页欢迎弹窗 + 二维码 -->
-<div class="welcome-modal" id="welcomeModal">
-    <div class="welcome-box">
-        <h2 class="welcome-title">欢迎关注公众号：Hekaya小故事</h2>
-        <div class="qrcode-wrap">
-            <img id="qrcodeImg" src="" alt="公众号二维码">
-            <button class="qrcode-btn" onclick="triggerQrcode()">点击更换二维码</button>
-            <input type="file" id="qrcodeFile" accept="image/png,image/jpeg,image/gif" style="display:none" onchange="handleQrcodeUpload(this)">
-        </div>
-        <button class="close-welcome" onclick="closeWelcome()">进入主页</button>
-    </div>
-</div>
-<div class="top-bar">
-    <div class="header"><h1>Hekaya小故事</h1></div>
-    <div>
-        <button id="loginBtn" onclick="openLoginModal()">🔑 管理员登录</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">🚪 退出登录</button>
-        <button id="darkToggle" onclick="toggleDark()">🌙 暗黑模式</button>
-    </div>
-</div>
-<!-- 登录弹窗 -->
-<div class="login-modal" id="loginModal" style="display:none;">
-    <div class="login-content">
-        <h3>管理员登录</h3>
-        <div class="login-form-group">
-            <label>账号</label>
-            <input type="text" id="loginUser" placeholder="输入管理员账号">
-        </div>
-        <div class="login-form-group">
-            <label>密码</label>
-            <input type="password" id="loginPwd" placeholder="输入管理员密码">
-        </div>
-        <div class="login-error" id="loginError"></div>
-        <button class="login-btn" onclick="doLogin()">登录</button>
-    </div>
-</div>
-<!-- 搜索框 -->
-<div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="搜索书名/标签/分类..." oninput="filterBooks()">
-</div>
-<!-- 分类标签 -->
-<div class="category-tabs">
-    <button class="tab active" data-cate="all">全部</button>
-    <button class="tab" data-cate="Roman">Roman</button>
-    <button class="tab" data-cate="Hekaya">Hekaya</button>
-    <button class="tab" data-cate="Rasimlik">Rasimlik</button>
-    <button class="tab" data-cate="Adibiy Aser">Adibiy Aser</button>
-    <button class="tab" data-cate="Awazlik">Awazlik</button>
-</div>
-<!-- 排序控件 -->
-<div class="sort-box">
-    <select id="sortSelect" onchange="sortBooks()">
-        <option value="default">默认排序（置顶优先）</option>
-        <option value="title-asc">书名升序</option>
-        <option value="title-desc">书名降序</option>
-        <option value="cate-asc">分类升序</option>
-    </select>
-</div>
-<div class="upload-toggle-box">
-    <button id="uploadToggle" onclick="toggleUploadBox()">📁 展开/隐藏上传区域</button>
-</div>
-<!-- 上传面板 -->
-<div class="upload-box" id="uploadBox">
-    <h3>添加新图书</h3>
-    <div class="form-group">
-        <input type="text" id="book-title" placeholder="输入图书名称">
-    </div>
-    <div class="form-group">
-        <select id="book-category">
-            <option value="">选择分类</option>
-            <option value="Roman">Roman</option>
-            <option value="Hekaya">Hekaya</option>
-            <option value="Rasimlik">Rasimlik</option>
-            <option value="Adibiy Aser">Adibiy Aser</option>
-            <option value="Awazlik">Awazlik</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <textarea id="book-desc" placeholder="输入书籍简介（选填）"></textarea>
-    </div>
-    <div class="form-group">
-        <input type="text" id="book-tags" placeholder="输入标签，多个标签用逗号分隔（选填）">
-    </div>
-    <div class="form-group">
-        <input type="text" id="book-link" placeholder="填写阅读链接/本地文件地址（选填）">
-    </div>
-    <div class="form-group">
-        <input type="text" id="cover-url" placeholder="封面图片网络链接（选填）">
-    </div>
-    <div class="form-group">
-        <input type="file" id="cover-input" accept="image/*" onchange="showCoverFileName(this)">
-        <div class="file-tip" id="coverFileTip">未选择封面图片</div>
-    </div>
-    <div class="form-group">
-        <input type="file" id="book-file" accept=".txt,.pdf,.epub" onchange="showBookFileName(this)">
-        <label style="font-size:12px;color:var(--sub-text)">上传电子书（txt/pdf/epub）</label>
-        <div class="file-tip" id="bookFileTip">未选择电子书</div>
-    </div>
-    <div class="form-group">
-        <input type="file" id="audio-file" accept="audio/*" onchange="showAudioFileName(this)">
-        <label style="font-size:12px;color:var(--sub-text)">上传有声读物（mp3/wav）</label>
-        <div class="file-tip" id="audioFileTip">未选择音频文件</div>
-    </div>
-    <button class="add-btn" onclick="addBook()">加入书架</button>
-</div>
-<div class="bookshelf" id="bookshelf"></div>
-<!-- 阅读弹窗 -->
-<div class="read-page" id="readPage">
-    <button class="read-back-btn" onclick="closeReadPage()">← 返回书架</button>
-    <div class="read-content">
-        <img id="readCover" class="read-cover" alt="封面">
-        <h2 id="readTitle" class="read-title"></h2>
-        <div id="readCate" class="read-cate"></div>
-        <div id="readTags" class="read-tags"></div>
-        <div id="readDesc" class="read-desc"></div>
-        
-        <div class="read-actions">
-            <button class="read-btn book" id="readLinkBtn" onclick="openBookLink()">🔗 打开阅读链接</button>
-            <button class="read-btn book" id="readBookBtn" onclick="openBookFile()">📖 下载电子书</button>
-            <button class="read-btn audio" id="playAudioBtn" onclick="openAudioPlayer()">🔊 播放有声书</button>
-        </div>
-    </div>
-</div>
-<!-- 音频播放弹窗（优化关闭/返回） -->
-<div class="audio-modal" id="audioModal" onclick="closeAudioModal()">
-    <div class="audio-box" onclick="event.stopPropagation()">
-        <h3 class="audioTitle" id="audioTitle"></h3>
-        <audio id="bookAudio" controls>
-        <button class="close-audio-btn" onclick="closeAudioModal()">关闭并返回</button>
-    </div>
-</div>
-<!-- 编辑弹窗 -->
-<div class="edit-modal" id="editModal">
-    <div class="edit-content">
-        <button class="close-edit-btn" onclick="closeEditModal()">×</button>
-        <h3>编辑图书信息</h3>
-        <input type="hidden" id="edit-book-id">
-        
-        <div class="form-group">
-            <input type="text" id="edit-book-title" placeholder="书名">
-        </div>
-        <div class="form-group">
-            <select id="edit-book-category">
-                <option value="">选择分类</option>
-                <option value="Roman">Roman</option>
-                <option value="Hekaya">Hekaya</option>
-                <option value="Rasimlik">Rasimlik</option>
-                <option value="Adibiy Aser">Adibiy Aser</option>
-                <option value="Awazlik">Awazlik</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <textarea id="edit-book-desc" placeholder="简介"></textarea>
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-book-tags" placeholder="标签">
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-book-link" placeholder="阅读链接/本地文件地址（选填）">
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-cover-url" placeholder="封面网络链接">
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-cover-input" accept="image/*" onchange="showEditCoverFileName(this)">
-            <div class="file-tip" id="editCoverFileTip">未选择新封面</div>
-        </div>
-        <div class="form-group">
-            <img id="edit-cover-preview" style="width:100px;height:130px;object-fit:cover;border-radius:8px;">
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-book-file" accept=".txt,.pdf,.epub" onchange="showEditBookFileName(this)">
-            <div class="file-tip" id="editBookFileTip">未选择新电子书</div>
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-audio-file" accept="audio/*" onchange="showEditAudioFileName(this)">
-            <div class="file-tip" id="editAudioFileTip">未选择新音频</div>
-        </div>
-        <button class="save-btn" onclick="saveEditBook()">保存修改</button>
-    </div>
-</div>
-<script>
-let db = null;
-let uploadBoxShow = true;
-let allBooks = [];
-let currentEditBook = null;
-let currentBook = null;
-let isAdminLogin = false;
-// 初始化数据库
-function initDB(){
-    return new Promise(resolve=>{
-        const req = indexedDB.open('HekayaBookShelf',8);
-        req.onupgradeneeded = e=>{
-            db = e.target.result;
-            if(!db.objectStoreNames.contains('books')){
-                db.createObjectStore('books',{keyPath:'id',autoIncrement:true});
-            }
-            if(!db.objectStoreNames.contains('config')){
-                db.createObjectStore('config',{keyPath:'key'});
-            }
-        };
-        req.onsuccess = e=>{db=e.target.result;resolve();};
-        req.onerror = e=>{console.error('数据库初始化失败',e);};
-    });
-}
-// 读取配置
-async function getConfig(key){
-    return new Promise(resolve=>{
-        const tx = db.transaction('config','readonly');
-        const st = tx.objectStore('config');
-        const req = st.get(key);
-        req.onsuccess = ()=>resolve(req.result ? req.result.value : "");
-        req.onerror = ()=>resolve("");
-    });
-}
-// 保存配置
-async function setConfig(key,value){
-    return new Promise(resolve=>{
-        const tx = db.transaction('config','readwrite');
-        const st = tx.objectStore('config');
-        st.put({key:key,value:value});
-        tx.oncomplete = resolve;
-    });
-}
-function getAllBooks(){
-    return new Promise(resolve=>{
-        const tx = db.transaction('books','readonly');
-        const st = tx.objectStore('books');
-        const r = st.getAll();
-        r.onsuccess = ()=>{ allBooks = r.result; resolve(r.result); }
-        r.onerror = ()=>resolve([]);
-    });
-}
-function addBookToDB(book){
-    return new Promise(resolve=>{
-        const tx = db.transaction('books','readwrite');
-        const st = tx.objectStore('books');
-        st.add({...book,isTop:false,topOrder:0});
-        tx.oncomplete = ()=>{getAllBooks();resolve();}
-    });
-}
-function updateBookInDB(book){
-    return new Promise(resolve=>{
-        const tx = db.transaction('books','readwrite');
-        const st = tx.objectStore('books');
-        st.put(book);
-        tx.oncomplete = ()=>{getAllBooks();resolve();}
-    });
-}
-function delBookFromDB(id){
-    return new Promise(resolve=>{
-        const tx = db.transaction('books','readwrite');
-        const st = tx.objectStore('books');
-        st.delete(id);
-        tx.oncomplete = ()=>{getAllBooks();resolve();}
-    });
-}
-window.onload = async ()=>{
-    await initDB();
-    await getAllBooks();
+// 全局图书数据
+let allBooks = [
+    {
+        "id": 1,
+        "title": "爱的如诉muhabbat uzi sozlaydu",
+        "cate": "Roman",
+        "desc": "",
+        "tags": "爱的如诉、muhabbat uzi sozlaydu、小说",
+        "link": "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02",
+        "cover": "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 2,
+        "title": "بوۋاي ۋە دېڭىز",
+        "cate": "Roman",
+        "desc": "«بوۋاي ۋە دېڭىز»ئامېرىكىلىق يازغۇچى ئونېست ھېمىڭۋاي 1951-يىلى كۇبادا يازغان بىر پارچە پوۋېست، تۆۋەندە سىزگە تەپسىلىي تونۇشتۇرىمىز:\n\n###ھېكايىنىڭ ئومۇمىي ئەھۋالى روماندا سانتىياگو ئىسىملىك بىر ياشانغان بېلىقچى چۆرىدىلگەن بولۇپ، ئۇ ئۇدا 84 كۈن بېلىق تۇتالمىغان، باشقىلارنىڭ نەزىرىدە ئۇ بىر مەغلۇبىيەتچى ئىدى. لېكىن ئۇ ۋاز كەچمەي، 85-كۈنى ئۆزى يالغۇز قولۋاقنى ھەيدەپ يىراق دېڭىزغا قاراپ يۈرۈپ كېتىدۇ. جاپالىق ئېلىشىش ئارقىلىق، ئۇ ئاخىرى غايەت زور بىر مالىن بېلىقىنى تۇتىدۇ. لېكىن، بۇ بېلىق ھەقىقەتەن بەك چوڭ بولغاچقا، قولۋاقنى سۆرەپ توپتوغرا ئىككى كېچە-كۈندۈز لەيلەپ يۈرىدۇ. بوۋاي بۇ ئىككى كېچە-كۈندۈزدە ئەزەلدىن باشتىن كەچۈرۈپ باقمىغان جاپالىق سىناقلارنى باشتىن كەچۈرىدۇ.قەيسەر ئىرادىسى ۋە كۈچلۈك غەيرىتىگە تايىنىپ، ئەڭ ئاخىرىدا چوڭ بېلىقنى بويسۇندۇرۇپتۇ ھەمدە ئۇنى كېمىنىڭ بىر تەرىپىگە باغلاپ قويۇپتۇ.\n\nلېكىن قايتىش سەپىرىدە، لەھەڭ چوڭ بېلىقنىڭ قان پۇرىقىنى پۇراپ قېلىپ، ئارقا-ئارقىدىن ھۇجۇم قىلىپ يېمەكلىك تالاشقان. بوۋاي لەھەڭ بىلەن پۈتۈن كۈچى بىلەن ئېلىشىپ، بېلىق ۋىلكىسى، پالاق قاتارلىق بارلىق قورال قىلغىلى بولىدىغان نەرسىلەر بىلەن لەھەڭگە تاقابىل تۇرغان بولسىمۇ، لېكىن لەھەڭ يەنىلا يېيەلەيدىغان گۆشلەرنىڭ ھەممىسىنى يەپ تۈگەتكەن. ئۇ پورتقا قايتىپ كەلگەندە، چوڭ بېلىقنىڭ پەقەت غايەت زور بىر سۆڭەك جازىسىلا قالغان.",
+        "tags": "老人与海、bowway、degiz、",
+        "link": "https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437",
+        "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 3,
+        "title": "كۆزۈم ئۈچ كۈنلا ئېچىلسا ئىدى",
+        "cate": "Roman",
+        "desc": "بۇ كىتاب خېللىن كېللىرنىڭ تەرجىمىھال خاراكتېرلىك ئەسىرى بولۇپ، ئالدىنقى يېرىم قىسمىدا ئاساسلىقى خېللىننىڭ ئەما، گاس-گاچىغا ئايلانغاندىن كېيىنكى تۇرمۇشى يېزىلغان، ئۇنىڭ ئوقۇتقۇچىسى ئاننى سالىۋېننىڭ ياردىمىدە قىيىنچىلىقلارنى قانداق يېڭىپ، ئوقۇش، يېزىقچىلىق ۋە سۆزلەش جەريانىنى تەسۋىرلىگەن؛ كېيىنكى يېرىم قىسمىدا ئۇنىڭ تەرەپ-تەرەپتىن بىلىم ئېلىش ۋە خەير-ساخاۋەت ئىشلىرىغا ئاكتىپ ئاتلىنىش كەچۈرمىشلىرى تونۇشتۇرۇلغان.",
+        "tags": "假如给我三天光明、kuzum",
+        "link": "https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2",
+        "cover": "https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 4,
+        "title": "غەرىبكە ساياھەت1",
+        "cate": "Roman",
+        "desc": "«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن، جۇڭگونىڭ قەدىمكى دەۋرىدىكى تۇنجى رومانتىزملىق بابلىق رومان. -تىياتىر مەزمۇنى:پۈتۈن كىتابتا ئاساسلىقى سۈن ۋۇكۇڭنىڭ دۇنياغا كېلىشى ۋە تيەنگۇڭ نى قالايمىقان قىلغاندىن كېيىن، تاڭ سېڭ، جۇ باجيې، شا سېڭ ۋە ئاق ئات بىلەن ئۇچرىشىپ، غەربكە نوم ئالغىلى بېرىشى، يول بويى جىن-ئالۋاستىلارنى يوقىتىپ، توقسان سەككىز قىيىنچىلىقنى باشتىن كەچۈرۈپ، ئەڭ ئاخىرىدا غەربكە يېتىپ بېرىپ تاتاگاتۇ بۇدساتۋا بىلەن كۆرۈشۈپ، ھەقىقىي نومغا ئېرىشكەنلىكى توغرىسىدىكى ھېكايە تەسۋىرلەنگەن. -سەنئەت ئالاھىدىلىكى ۋە تەسىرى:«غەربكە ساياھەت»مول، غەلىتە بەدىئىي تەسەۋۋۇر، جانلىق، ئەگرى-توقاي ھېكايە ۋەقەلىكى، جانلىق پېرسوناژ ئوبرازى، يۇمۇرىستىك تىل بىلەن ئۆزگىچە ئالاھىدىلىككە ئىگە سېھىرلىك دۇنيانى بەرپا قىلغان. ئۇ جۇڭگو سېھىرلىك ھېكايىلىرىنىڭ كىلاسسىك ئەسىرى بولۇپ، قەدىمكى رومانتىزملىق رومانلارنىڭ يۇقىرى پەللىسىگە يەتكەن، «ئۈچ پادىشاھلىق ھەققىدە قىسسە»، «سۇ بويىدا»، «قىزىل راۋاقتىكى چۈش»بىلەن قوشۇلۇپ جۇڭگو كىلاسسىك ئەسەرلىرىنىڭ تۆت چوڭ مەشھۇر ئەسىرى دەپ ئاتالغان. بۇ ئەسەر كېيىنكى ئەدەبىيات، كىنو-تېلېۋىزىيە، تىياتىر قاتارلىق سەنئەت شەكىللىرىگە چوڭقۇر تەسىر كۆرسەتكەن.",
+        "tags": "西游记维吾尔语版、维吾尔语",
+        "link": "https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f",
+        "cover": "https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 5,
+        "title": "سىرلىق ئارال",
+        "cate": "Roman",
+        "desc": "ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن بولۇپ، جەنۇبىي ئارمىيەگە قاپسىلىپ قالغان بىر توپ شىماللىقلار پۇرسەتتىن پايدىلىنىپ شار بىلەن قېچىپ كەتكەن. -ۋەقەلىك:ئۇلار يېرىم يولدا بوران-چاپقۇنغا ئۇچراپ، تىنچ ئوكياندىكى بىر قاقاس ئارالغا تاشلىنىپ قالىدۇ. بۇ سىرلىق ئارالدا، ئۇلار ئۆزلىرىنىڭ ئەقىل-پاراسىتى ۋە قەيسەر ئىرادىسىگە تايىنىپ ساپال بۇيۇملار، ئەينەك، شامال تۈگمىنى، تېلېگرامما ئاپپاراتى قاتارلىقلارنى ياساپ چىقىپ، تۇرمۇشىنى ياخشىلايدۇ. ئۇلار يەنە دېڭىز قاراقچىلىرىنىڭ ھۇجۇمى، يانار تاغ پارتلاش قاتارلىق ھەر خىل خەۋپ-خەتەرلەرگە يولۇقىدۇ. ئەسلىدە، بۇ ئارالدا ئىزچىل بىر سىرلىق ئادەم يوشۇرۇن ھالدا ئۇلارغا ياردەم قىلىپ كەلگەن بولۇپ، بۇ ئادەم دەل «دېڭىز ئاستىدىكى 20 مىڭ چاقىرىم»دىكى كاپىتان نىمو ئىدى. ئاخىرىدا،يانار تاغ پارتلاپ ئارال چۆكۈپ كېتىش ئالدىدا تۇرغاندا، ئۇلار كاپىتان گىرانتنىڭ ئوغلى قوماندانلىق قىلغان «دېڭكېن»ناملىق پاراخوتقا ئولتۇرۇپ ئارالدىكى تۇرمۇشىنى ئاخىرلاشتۇرغان.\n\n###باش تېما ۋە ئالاھىدىلىك -باش تېما:روماندا ئىنسانلارنىڭ يول ئېچىش روھى ۋە ئىجادچانلىقى نامايان قىلىنغان، كوللېكتىپ ھەمكارلىشىش ۋە قەتئىي تەۋرەنمەس پەزىلەت مەدھىيەلەنگەن. شۇنىڭ بىلەن بىر ۋاقىتتا، تەبىئەتكە بولغان ھۆرمەت ۋە پەن-تېخنىكىغا بولغان ھۆرمەت ئىپادىلەنگەن. -ئالاھىدىلىكى:ۋېرنېر ئىلىم-پەن بىلىملىرى بىلەن خەتەرلىك، ھاياجانلىق تەۋەككۈلچىلىك ۋەقەلىكىنى ئەپچىللىك بىلەن بىرلەشتۈرۈپ، ئوقۇرمەنلەرگە خىيالىي تۈسكە تولغان دۇنيانى نامايان قىلغان. ئۇنىڭ ھەر خىل ئىلىم-پەن ھادىسىلىرى ۋە كەشپىياتلارنى تەسۋىرلىشى ئوقۇرمەنلەرنى ئوقۇش بىلەن بىر ۋاقىتتا مول بىلىملەرنى ئۆگىنىش ئىمكانىيىتىگە ئىگە قىلغان.\n\n###ئەسەرنىڭ تەسىرى «سىرلىق ئارال»ۋېرننىڭ فانتازىيەلىك ھېكايىلىرىنىڭ ۋەكىللىك ئەسەرلىرىدىن بىرى بولۇپ، «كاپىتان گىرانتنىڭ بالىلىرى»، «دېڭىز ئاستىدىكى ئىككى تۈمەن چاقىرىم»بىلەن قوشۇلۇپ «ۋېرننىڭ ئۈچ كۈيى»دەپ ئاتالغان. ئۇ ئۆزىنىڭ قالتىس ھېكايىسى ۋە چوڭقۇر ئىدىيەسى بىلەن پۈتۈن دۇنيادىكى ئوقۇرمەنلەرنىڭ ياقتۇرۇشىغا ئېرىشكەن، كىشىلەرنى نامەلۇملۇق ئۈستىدە ئىزدىنىشكە، ئۆزىگە جەڭ ئېلان قىلىشقا ئىلھاملاندۇرۇپ، كېيىنكى فانتازىيەلىك ئەدەبىي ئىجادىيەتلەرگە چوڭقۇر تەسىر كۆرسەتكەن.",
+        "tags": "神秘岛、维吾尔语",
+        "link": "https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23",
+        "cover": "https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 6,
+        "title": "مۇساپىرلار قاۋىقىدا",
+        "cate": "Roman",
+        "desc": "",
+        "tags": "流浪者酒家、双语、musapirlar",
+        "link": "https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2",
+        "cover": "https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 7,
+        "title": "دېڭىز بۆرىسى",
+        "cate": "Roman",
+        "desc": "«دېڭىز بۆرىسى»1904-يىلى نەشر قىلىنغان، بۇ ئەسەردە دېڭىزدىكى تەۋەككۈلچىلىك بىلەن ئىنسان تەبىئىتى، ياشاش قاتارلىق مەسىلىلەر ئۈستىدە چوڭقۇر ئويلىنىش بىرلەشتۈرۈلگەن بولۇپ، جېك لوندوننىڭ ۋەكىللىك ئەسەرلىرىنىڭ بىرى.\n\n###ھېكايىنىڭ ئومۇمىي ئەھۋالى -كېمىگە تاسادىپىي چىقىپ قېلىش:باش پېرسوناژ ھېنف بىر سىپايە تالىپ. ئۇ بىر قېتىم كېمىگە ئولتۇرۇپ ساياھەت قىلىۋاتقاندا، ئۇ ئولتۇرغان كېمە ھادىسىگە ئۇچراپ، «ئالۋاستى»ناملىق تىيۇلېن كېمىسى تەرىپىدىن قۇتقۇزۇۋېلىنىدۇ. «ئالۋاستى»ناملىق كېمىنىڭ كاپىتانى لاسېن چەكسىز كۈچتۈڭگۈر، رەھىمسىز ھەم ئىرادىسى كۈچلۈك ئادەم بولۇپ، «دېڭىز بۆرىسى»دەپ ئاتىلىدۇ. ھېنف دەسلەپتە كېمىدە لاسېننىڭ بوزەك قىلىشىغا ئۇچرايدۇ، لېكىن ئۇ كېمىدىكى تۇرمۇشقا ماسلىشىشقا تىرىشىدۇ. -ئىچكى كۈرەش:كېمىدىكى ماتروسلار لاسېننىڭ ۋەھشىي ھۆكۈمرانلىقىدىن نارازى بولۇپ، بىر مەيدان ئىچكى كۈرەش تەدرىجىي قانات يايدۇرۇلىدۇ. ھېنف بۇ جەرياندا ئايال مۇخبىر مود بىلەن تونۇشىدۇ، ئىككىسى بىر-بىرىنى قوللايدۇ. -نەتىجە:كېيىن لاسېن ئاغرىپ قېلىپ، تېنى ۋە روھىي جەھەتتىن بارا-بارا ئاجىزلاپ كېتىدۇ. ھېنف بىلەن مود پۇرسەتتىن پايدىلىنىپ «ئالۋاستى»ناملىق كېمىنى كونترول قىلىۋالىدۇ ھەمدە قۇرۇقلۇققا قاراپ ماڭماقچى بولىدۇ. ئاخىرىدا لاسېن ئۈمىدسىزلىك ئىچىدە چۆكۈپ كېتىش ئالدىدا تۇرغان كېمىدە قېلىشنى تاللايدۇ، ھېنف بىلەن مود ئوڭۇشلۇق قۇتقۇزۇۋېلىنىدۇ.\n\n###باش تېمىنى مۇھاكىمە قىلىش -ئىنسان تەبىئىتىنىڭ مۇرەككەپلىكى:روماندا لاسېندىن ئىبارەت بۇ پېرسوناژ ئوبرازى ئارقىلىق ئىنسان تەبىئىتىنىڭ رەھىمسىز، شەخسىيەتچى تەرىپى نامايان قىلىنغان، شۇنىڭ بىلەن بىر ۋاقىتتا ھېنپنىڭ ئۆزگىرىشى ئارقىلىق ئىنسان تەبىئىتىنىڭ ناچار مۇھىتتىكى چىدامچانلىقى ۋە ئاق كۆڭۈللۈكى مۇھاكىمە قىلىنغان. -ياشاش ئۈچۈن جان تالىشىش:كىتابتا دېڭىزدىكى ناچار مۇھىتتا، كىشىلەرنىڭ ياشاش ئۈچۈن ئېلىپ بارغان كەسكىن كۈرەشلىرى تەسۋىرلەنگەن بولۇپ، ياشاشنىڭ مۈشكۈللۈكى ۋە ھاياتلىقنىڭ قەيسەرلىكى نامايان قىلىنغان. -كۈچ ۋە ئەخلاق:لاسېن كۈچلۈك كۈچىگە تايىنىپ «ئالۋاستى ناملىق پاراخوت»قا ھۆكۈمرانلىق قىلىدۇ، لېكىن ئۇنىڭدا ئەخلاق چەكلىمىسى كەمچىل؛ ھېنپنىڭ تېنى ئاجىز بولسىمۇ، لېكىن ئەخلاقنىڭ تۆۋەن چېكىدە چىڭ تۇرىدۇ. رومان ئوقۇرمەنلەرنىڭ كۈچ ۋە ئەخلاق مۇناسىۋىتى توغرىسىدىكى ئويلىنىشىنى قوزغىدى.\n\n###سەنئەت ئالاھىدىلىكى -جىددىي، ھاياجانلىق ۋەقەلىك:جېك لوندون ئۆزىنىڭ ئېسىل بايان قىلىش ئۇسۇلى ئارقىلىق، جىددىي، ھاياجانلىق دېڭىز ئۈستى تەۋەككۈلچىلىك كەيپىياتىنى يارىتىپ، ئوقۇرمەنلەرنى خۇددى شۇ مۇھىتتا تۇرغاندەك ھېس قىلدۇرغان. -چوڭقۇر پېرسوناژ تەسۋىرى:لاسېن، ھېنف قاتارلىق ئاساسلىق پېرسوناژلارنىڭ تەسۋىرى ئىنچىكە بولۇپ، ئوقۇرمەنلەرگە ئۇلارنىڭ ئىچكى دۇنياسى ۋە خاراكتېر ئالاھىدىلىكىنى چوڭقۇر چۈشەندۈرىدۇ.",
+        "tags": "海狼、维吾尔语、degiz",
+        "link": "https://weread.qq.com/web/reader/a72426a3643425f416d7031383731365838774537346337354a386e58326c5360d",
+        "cover": "https://res.weread.qq.com/wrepub/CB_Amp18716X8wE74c75J8nX2lS_parsecover",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    }
+];
 
-    // 预设书籍列表，新增老人与海
-    const presetBooks = [
-        {
-            title: "爱的如诉muhabbat uzi sozlaydu",
-            cate: "Roman",
-            desc: "",
-            tags: "爱的如诉、muhabbat uzi sozlaydu、小说",
-            link: "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02",
-            cover: "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
-            bookFile: "",
-            audioFile: ""
-        },
-        {
-            title: "چۆچەك | ئانار",
-            cate: "Hekaya",
-            desc: "",
-            tags: "Hekaya、石榴",
-            link: "https://mp.weixin.qq.com/s?__biz=Mzg4NTkxNjI1MQ==&mid=2247499135&idx=1&sn=f918f0fc31c5143225289e76161f3d4f&chksm=cfa32a4bf8d4a35d53ee4bb78d1e4f29c56a87b98716fff323a49356e8e97ef748f38a9ed1b1&scene=178&cur_album_id=4205185595242676228&search_click_id=#rd",
-            cover: "https://mmbiz.qpic.cn/mmbiz_jpg/DrqOJv4YSQPNrib5H2f6jzZuTI3bicKJhGoa49S4tUzgYQcY2ic5Fv7e1QmnBM9uahCogvKVAicgcFH3iahlUxqQusw/640?wx_fmt=jpeg&watermark=1&tp=webp&wxfrom=5&wx_lazy=1#imgIndex=1",
-            bookFile: "",
-            audioFile: ""
-        },
-        {
-            title: "老人与海",
-            cate: "Roman",
-            desc: "",
-            tags: "老人与海、boway wa degiz、小说",
-            link: "https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437",
-            cover: "https://ts1.tc.mm.bing.net/th/id/R-C.f7f77c73e490819892c884872a0a1540?rik=Y0h5kDSM%2b9n7RA&riu=http%3a%2f%2fp2.itc.cn%2fimages03%2f20200530%2f3687e9c3460c442983309a0b80ab2b5c.jpeg&ehk=cPsRX5GtfR03VAniJR5vNdKEvu5%2bxEmVZ3Gkee1C7ZI%3d&risl=&pid=ImgRaw&r=0",
-            bookFile: "",
-            audioFile: ""
-        }
-    ];
-
-    // 循环添加不存在的预设书籍
-    for(let book of presetBooks){
-        const exists = allBooks.some(b => b.title === book.title);
-        if(!exists){
-            await addBookToDB(book);
-        }
-    }
-    await getAllBooks();
-    
-    renderBooks();
-    initTab();
-    const qrImg = await getConfig("qrcode");
-    if(qrImg){
-        document.getElementById("qrcodeImg").src = qrImg;
-    }
-    if(localStorage.getItem('dark')==='1'){
-        document.body.classList.add('dark');
-        document.getElementById('darkToggle').innerText = '☀️ 浅色模式';
-    }
-    if(sessionStorage.getItem('isAdminLogin')==='1'){
-        isAdminLogin = true;
-        updateAdminUI();
-    }
-};
-// 二维码更换
-function triggerQrcode(){
-    if(!isAdminLogin){
-        alert("⚠️ 仅管理员账号可更换二维码！");
-        return;
-    }
-    document.getElementById("qrcodeFile").value = "";
-    document.getElementById("qrcodeFile").click();
-}
-async function handleQrcodeUpload(fileDom){
-    const file = fileDom.files[0];
-    if(!file) return;
-    const allowType = ["image/png","image/jpeg","image/gif"];
-    if(!allowType.includes(file.type)){
-        alert("❌ 请选择 PNG / JPG / GIF 格式图片！");
-        return;
-    }
-    if(file.size > 2 * 1024 * 1024){
-        alert("❌ 图片大小不能超过 2MB！");
-        return;
-    }
-    const base64 = await fileToBase64(file);
-    document.getElementById("qrcodeImg").src = base64;
-    await setConfig("qrcode", base64);
-    alert("✅ 二维码更换成功！");
-}
-// 文件名称提示
-function showCoverFileName(el){
-    const tip = document.getElementById('coverFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择封面图片";
-}
-function showBookFileName(el){
-    const tip = document.getElementById('bookFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择电子书";
-}
-function showAudioFileName(el){
-    const tip = document.getElementById('audioFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择音频文件";
-}
-function showEditCoverFileName(el){
-    const tip = document.getElementById('editCoverFileTip');
-    tip.innerText = el.files[0] ? "已选择新封面：" + el.files[0].name : "未选择新封面";
-}
-function showEditBookFileName(el){
-    const tip = document.getElementById('editBookFileTip');
-    tip.innerText = el.files[0] ? "已选择新电子书：" + el.files[0].name : "未选择新电子书";
-}
-function showEditAudioFileName(el){
-    const tip = document.getElementById('editAudioFileTip');
-    tip.innerText = el.files[0] ? "已选择新音频：" + el.files[0].name : "未选择新音频";
-}
-// 关闭欢迎弹窗
-function closeWelcome(){
-    document.getElementById("welcomeModal").style.display = "none";
-}
-// 更新管理员UI
-function updateAdminUI(){
-    if(isAdminLogin){
-        document.body.classList.add("admin-login");
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('uploadToggle').classList.add('show');
-        document.getElementById('uploadBox').classList.add('show');
-        document.getElementById('bookshelf').classList.add('admin-btns-show');
-    }else{
-        document.body.classList.remove("admin-login");
-        document.getElementById('loginBtn').style.display = 'inline-block';
-        document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('uploadToggle').classList.remove('show');
-        document.getElementById('uploadBox').classList.remove('show');
-        document.getElementById('bookshelf').classList.remove('admin-btns-show');
-    }
-}
-// 登录
-function openLoginModal(){
-    document.getElementById('loginModal').style.display = 'flex';
-    document.getElementById('loginError').innerText = '';
-}
-function doLogin(){
-    const user = document.getElementById('loginUser').value.trim();
-    const pwd = document.getElementById('loginPwd').value.trim();
-    if(user==='Hekaya' && pwd==='sss'){
-        isAdminLogin = true;
-        sessionStorage.setItem('isAdminLogin','1');
-        document.getElementById('loginModal').style.display = 'none';
-        updateAdminUI();
-        renderBooks();
-    }else{
-        document.getElementById('loginError').innerText = '账号或密码错误';
-    }
-}
-function logout(){
-    isAdminLogin = false;
-    sessionStorage.removeItem('isAdminLogin');
-    updateAdminUI();
-    renderBooks();
-}
-// 文件转Base64
-function fileToBase64(file){
-    return new Promise((res)=>{
-        const fr = new FileReader();
-        fr.onload = ()=>res(fr.result);
-        fr.readAsDataURL(file);
-    });
-}
-// 添加书籍
-async function addBook(){
-    if(!isAdminLogin){alert('请先登录管理员账号');return;}
-    const title = document.getElementById('book-title').value.trim();
-    const cate = document.getElementById('book-category').value;
-    const desc = document.getElementById('book-desc').value.trim();
-    const tags = document.getElementById('book-tags').value.trim();
-    const link = document.getElementById('book-link').value.trim();
-    const coverUrl = document.getElementById('cover-url').value.trim();
-    const coverFile = document.getElementById('cover-input').files[0];
-    const bookFile = document.getElementById('book-file').files[0];
-    const audioFile = document.getElementById('audio-file').files[0];
-    if(!title || !cate){alert('书名和分类为必填项');return;}
-    
-    let cover = '';
-    if(coverUrl) cover = coverUrl;
-    else if(coverFile) cover = await fileToBase64(coverFile);
-    else {alert('请填写封面链接或上传封面图片');return;}
-    let bookBase64 = '';
-    if(bookFile) bookBase64 = await fileToBase64(bookFile);
-    
-    let audioBase64 = '';
-    if(audioFile) audioBase64 = await fileToBase64(audioFile);
-    await addBookToDB({title,cate,desc,tags,link,cover,bookFile:bookBase64,audioFile:audioBase64});
-    renderBooks();
-    
-    document.getElementById('book-title').value='';
-    document.getElementById('book-category').value='';
-    document.getElementById('book-desc').value='';
-    document.getElementById('book-tags').value='';
-    document.getElementById('book-link').value='';
-    document.getElementById('cover-url').value='';
-    document.getElementById('cover-input').value = '';
-    document.getElementById('book-file').value = '';
-    document.getElementById('audio-file').value = '';
-    document.getElementById('coverFileTip').innerText = "未选择封面图片";
-    document.getElementById('bookFileTip').innerText = "未选择电子书";
-    document.getElementById('audioFileTip').innerText = "未选择音频文件";
-}
-// 打开阅读页
-function openReadPage(book){
-    currentBook = book;
-    document.getElementById('readCover').src = book.cover;
-    document.getElementById('readTitle').innerText = book.title;
-    document.getElementById('readCate').innerText = book.cate;
-    document.getElementById('readDesc').innerText = book.desc || '无简介';
-    
-    document.getElementById('readLinkBtn').style.display = book.link ? 'inline-block' : 'none';
-    document.getElementById('readBookBtn').style.display = book.bookFile ? 'inline-block' : 'none';
-    document.getElementById('playAudioBtn').style.display = book.audioFile ? 'inline-block' : 'none';
-    
-    document.getElementById('readPage').classList.add('show');
-}
-function closeReadPage(){
-    document.getElementById('readPage').classList.remove('show');
-}
-// 阅读链接 & 电子书
-function openBookLink(){
-    if(!currentBook.link) return;
-    window.open(currentBook.link,'_blank');
-}
-function openBookFile(){
-    if(!currentBook.bookFile) return;
-    const a = document.createElement('a');
-    a.href = currentBook.bookFile;
-    a.download = currentBook.title;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-// 播放有声书 + 关闭返回
-function openAudioPlayer(){
-    if(!currentBook.audioFile) return;
-    document.getElementById('audioTitle').innerText = currentBook.title;
-    document.getElementById('bookAudio').src = currentBook.audioFile;
-    document.getElementById('audioModal').classList.add('show');
-}
-function closeAudioModal(){
-    const audio = document.getElementById('bookAudio');
-    audio.pause();
-    audio.src = "";
-    document.getElementById('audioModal').classList.remove('show');
-}
-// 编辑书籍
-async function openEditModal(id){
-    if(!isAdminLogin){alert('请先登录管理员账号');return;}
-    const book = allBooks.find(b=>b.id===id);
-    currentEditBook = book;
-    document.getElementById('edit-book-id').value = book.id;
-    document.getElementById('edit-book-title').value = book.title;
-    document.getElementById('edit-book-category').value = book.cate;
-    document.getElementById('edit-book-desc').value = book.desc||'';
-    document.getElementById('edit-book-tags').value = book.tags||'';
-    document.getElementById('edit-book-link').value = book.link||'';
-    document.getElementById('edit-cover-url').value = book.cover||'';
-    document.getElementById('edit-cover-preview').src = book.cover||'';
-    document.getElementById('editCoverFileTip').innerText = "未选择新封面";
-    document.getElementById('editBookFileTip').innerText = "未选择新电子书";
-    document.getElementById('editAudioFileTip').innerText = "未选择新音频";
-    document.getElementById('editModal').classList.add('show');
-}
-function closeEditModal(){
-    document.getElementById('editModal').classList.remove('show');
-}
-async function saveEditBook(){
-    if(!isAdminLogin) return;
-    const id = parseInt(document.getElementById('edit-book-id').value);
-    const title = document.getElementById('edit-book-title').value.trim();
-    const cate = document.getElementById('edit-book-category').value;
-    const desc = document.getElementById('edit-book-desc').value.trim();
-    const tags = document.getElementById('edit-book-tags').value.trim();
-    const link = document.getElementById('edit-book-link').value.trim();
-    const coverUrl = document.getElementById('edit-cover-url').value.trim();
-    const coverFile = document.getElementById('edit-cover-input').files[0];
-    const bookFile = document.getElementById('edit-book-file').files[0];
-    const audioFile = document.getElementById('edit-audio-file').files[0];
-    let cover = coverUrl || currentEditBook.cover;
-    if(coverFile) cover = await fileToBase64(coverFile);
-    
-    let bookBase64 = currentEditBook.bookFile;
-    if(bookFile) bookBase64 = await fileToBase64(bookFile);
-    
-    let audioBase64 = currentEditBook.audioFile;
-    if(audioFile) audioBase64 = await fileToBase64(audioFile);
-    const updated = {...currentEditBook,title,cate,desc,tags,link,cover,bookFile:bookBase64,audioFile:audioBase64};
-    await updateBookInDB(updated);
-    renderBooks();
-    closeEditModal();
-}
-// 置顶
-function getTopCount(){
-    return allBooks.filter(b=>b.isTop).length;
-}
-async function setBookTop(id,isTop){
-    if(!isAdminLogin)return;
-    if(isTop && getTopCount()>=18){alert('最多只能置顶18本书籍');return;}
-    const book = allBooks.find(b=>b.id===id);
-    book.isTop = isTop;
-    await updateBookInDB(book);
-    renderBooks();
-}
-// 删除
-async function delBook(id){
-    if(!isAdminLogin)return;
-    if(confirm('确定删除该书籍？')){
-        await delBookFromDB(id);
-        renderBooks();
-    }
-}
-// 筛选+搜索（分类/标签/书名/简介 全匹配）
-function filterBooks(){
-    const activeCate = document.querySelector('.tab.active').dataset.cate;
-    const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-    const shelf = document.getElementById('bookshelf');
-    shelf.innerHTML = '';
-    let list = allBooks.filter(book => {
-        const cateMatch = (activeCate === 'all') || (book.cate === activeCate);
-        if(!cateMatch) return false;
-        if(!keyword) return true;
-        const titleMatch = book.title.toLowerCase().includes(keyword);
-        const cateTextMatch = book.cate.toLowerCase().includes(keyword);
-        const tagMatch = book.tags ? book.tags.toLowerCase().includes(keyword) : false;
-        const descMatch = book.desc ? book.desc.toLowerCase().includes(keyword) : false;
-        return titleMatch || cateTextMatch || tagMatch || descMatch;
-    });
-    list.sort((a,b)=>{
-        if(a.isTop && !b.isTop) return -1;
-        if(!a.isTop && b.isTop) return 1;
-        return 0;
-    });
-    if(list.length === 0){
-        shelf.innerHTML = '<div class="empty-tip">暂无匹配的书籍</div>';
-        return;
-    }
-    list.forEach(book=>{
-        const div = document.createElement('div');
-        div.className = 'book-card ' + (book.isTop ? 'top' : '');
-        div.onclick = ()=>openReadPage(book);
-        div.innerHTML = `
-            <button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>
-            <button class="del-btn" onclick="event.stopPropagation();delBook(${book.id})">×</button>
-            ${book.isTop?'<span class="top-tag">置顶</span>':''}
-            <button class="top-btn ${book.isTop?'untop-btn':''}" onclick="event.stopPropagation();setBookTop(${book.id},${!book.isTop})">
-                ${book.isTop?'🔻':'🔺'}
-            </button>
-            <img src="${book.cover}" class="book-cover">
-            <div class="book-info">
-                <div class="book-title">${book.title}</div>
-                <div class="book-cate">${book.cate}</div>
-            </div>
-        `;
-        shelf.appendChild(div);
-    });
-}
-// 分类点击初始化
-function initTab(){
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab=>{
-        tab.onclick = function(){
-            tabs.forEach(t=>t.classList.remove('active'));
-            this.classList.add('active');
-            filterBooks();
-        }
-    });
-}
-function sortBooks(){
-    filterBooks();
-}
-function toggleUploadBox(){
-    if(!isAdminLogin)return;
-    uploadBoxShow = !uploadBoxShow;
-    document.getElementById('uploadBox').classList.toggle('hide-upload',!uploadBoxShow);
-}
-function toggleDark(){
-    document.body.classList.toggle('dark');
-    const dark = document.body.classList.contains('dark');
-    localStorage.setItem('dark',dark?'1':'0');
-    document.getElementById('darkToggle').innerText = dark ? '☀️ 浅色模式' : '🌙 暗黑模式';
-}
-function renderBooks(){
-    getAllBooks().then(()=>filterBooks());
-}
-</script>
-</body>
-</html>
+// 二维码数据
+let qrCodeData = "";
