@@ -521,8 +521,16 @@ window.onload = async ()=>{
         updateAdminUI();
     }
     
-    // 设置二维码图片
-    document.getElementById("qrcodeImg").src = "https://res.cloudinary.com/dkmruvbxp/image/upload/v1719920604/qrcode_hxu84o.png";
+    // 尝试从localStorage恢复二维码数据
+    const savedQRCode = localStorage.getItem('qrCodeData');
+    if(savedQRCode) {
+        document.getElementById("qrcodeImg").src = savedQRCode;
+        qrCodeData = savedQRCode;
+    } else {
+        // 如果没有保存的二维码，则使用默认二维码
+        document.getElementById("qrcodeImg").src = "https://res.cloudinary.com/dkmruvbxp/image/upload/v1719920604/qrcode_hxu84o.png";
+        qrCodeData = "https://res.cloudinary.com/dkmruvbxp/image/upload/v1719920604/qrcode_hxu84o.png";
+    }
 };
 
 // 二维码相关
@@ -617,31 +625,27 @@ function triggerQrcode(){
         document.body.removeChild(modal);
         const url = prompt("请输入网络图片链接:");
         if(url) {
-            try {
-                // 验证URL格式
-                new URL(url);
-                
-                // 验证图片格式
-                const validExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
-                if (!validExtensions.test(url)) {
-                    alert("❌ 请输入有效的图片链接 (支持jpg, jpeg, png, gif, webp格式)");
-                    return;
-                }
-                
-                // 验证图片是否能加载
-                const img = new Image();
-                img.onload = () => {
-                    document.getElementById("qrcodeImg").src = url;
-                    qrCodeData = url;
-                    alert("✅ 二维码更换成功！请导出数据并更新代码！");
-                };
-                img.onerror = () => {
-                    alert("❌ 图片无法加载，请检查链接是否有效");
-                };
-                img.src = url;
-            } catch(e) {
-                alert("❌ 无效的URL格式");
+            // 简化的URL验证，不再限制特定格式，只检查基本格式
+            if (!/^https?:\/\/.+\..+/.test(url)) {
+                alert("❌ 请输入有效的URL");
+                return;
             }
+
+            // 验证图片是否能加载
+            const img = new Image();
+            img.onload = () => {
+                document.getElementById("qrcodeImg").src = url;
+                qrCodeData = url;
+                
+                // 将新的二维码数据保存到localStorage
+                localStorage.setItem('qrCodeData', url);
+                
+                alert("✅ 二维码更换成功！");
+            };
+            img.onerror = () => {
+                alert("❌ 图片无法加载，请检查链接是否有效");
+            };
+            img.src = url;
         }
     };
     
@@ -672,7 +676,11 @@ async function handleQrcodeUpload(fileDom){
     const base64 = await fileToBase64(file);
     document.getElementById("qrcodeImg").src = base64;
     qrCodeData = base64; // 保存二维码数据到变量
-    alert("✅ 二维码更换成功！请导出数据并更新代码！");
+    
+    // 将新的二维码数据保存到localStorage
+    localStorage.setItem('qrCodeData', base64);
+    
+    alert("✅ 二维码更换成功！");
 }
 
 // 文件名称提示
