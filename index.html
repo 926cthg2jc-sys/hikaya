@@ -5,261 +5,1502 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hekaya小故事｜个人书架</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",system-ui,sans-serif;transition:background 0.3s ease,color 0.3s ease,border-color 0.3s ease,transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Microsoft YaHei", system-ui, sans-serif;
+}
 :root{
-    --bg:#f8f5f0;--card-bg:#fff;--text-color:#3e2723;--sub-text:#8d6e63;
-    --primary:#8d6e63;--primary-light:#d7ccc8;
+    /* 主题颜色 */
+    --bg:#f8f5f0;
+    --card-bg:#fff;
+    --text-color:#3e2723;
+    --sub-text:#8d6e63;
+    --primary:#8d6e63;
+    --primary-light:#d7ccc8;
     --primary-gradient:linear-gradient(135deg,#8d6e63,#bcaaa4);
-    --border:#eee;--shadow:0 2px 10px rgba(0,0,0,0.08);--shadow-hover:0 12px 30px rgba(141,110,99,0.25);
+    --secondary-gradient:linear-gradient(135deg,#a1887f,#d7ccc8);
+    --border:#eee;
+    --shadow:0 2px 10px rgba(0,0,0,0.08);
+    --shadow-hover:0 12px 30px rgba(141,110,99,0.25);
+    --success:#4caf50;
+    --warning:#ff9800;
+    --error:#f44336;
+    --info:#2196f3;
+    /* 圆角 */
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:20px;
+    --radius-xl:30px;
+    /* 动画 */
+    --transition-fast:0.2s ease;
+    --transition-normal:0.3s ease;
+    --transition-slow:0.5s ease;
 }
+
 .dark{
-    --bg:#0f0f11;--card-bg:#1a1a22;--text-color:#f1f1f1;--sub-text:#b0a8a4;
-    --primary:#a1887f;--primary-light:#48403c;
+    --bg:#0f0f11;
+    --card-bg:#1a1a22;
+    --text-color:#f1f1f1;
+    --sub-text:#b0a8a4;
+    --primary:#a1887f;
+    --primary-light:#48403c;
     --primary-gradient:linear-gradient(135deg,#a1887f,#d7ccc8);
-    --border:#333;--shadow:0 2px 12px rgba(0,0,0,0.3);--shadow-hover:0 12px 30px rgba(0,0,0,0.5);
+    --secondary-gradient:linear-gradient(135deg,#bcaaa4,#8d6e63);
+    --border:#333;
+    --shadow:0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover:0 12px 30px rgba(0,0,0,0.5);
 }
-body{background:var(--bg);color:var(--text-color);padding:20px;min-height:100vh;overflow-x:hidden;}
-/* 欢迎弹窗 二维码区域 */
+
+body{
+    background:var(--bg);
+    color:var(--text-color);
+    padding:5px;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+    transition:background 0.3s ease, color 0.3s ease;
+}
+
+.transition-all{
+    transition:all 0.3s ease;
+}
+.transition-transform{
+    transition:transform 0.3s ease;
+}
+.transition-bg{
+    transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.main-content{
+    zoom: 0.8;
+}
+
+.tab, .book-cate, .book-tag, .read-tag, .read-cate, .empty-tip,
+input, select, textarea, .file-tip,
+.book-card, .book-info, .qrcode-wrap,
+.login-content, .edit-content, .audio-box{
+    transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 装饰背景元素 */
+.bg-decoration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.05;
+    background-image: 
+        radial-gradient(circle at 20% 80%, var(--primary) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, var(--primary) 1px, transparent 1px),
+        radial-gradient(circle at 40% 40%, var(--primary) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* 欢迎弹窗 */
 .welcome-modal{
-    position:fixed;top:0;left:0;width:100%;height:100vh;
-    background:rgba(0,0,0,0.7);z-index:99999;
-    display:flex;align-items:center;justify-content:center;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter: blur(15px);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     padding:20px;
+    animation: fadeInScale 0.6s ease;
+    margin:0;
 }
+
 .welcome-box{
-    background:var(--card-bg);border-radius:20px;padding:30px;
-    max-width:420px;width:100%;text-align:center;
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    padding:40px;
+    max-width:420px;
+    width:100%;
+    text-align:center;
     box-shadow:var(--shadow-hover);
+    border: 1px solid rgba(141,110,99, 0.1);
+    position:relative;
+    overflow:hidden;
+    zoom: 0.8;
 }
+
+.welcome-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(141,110,99, 0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
 .welcome-title{
-    font-size:22px;margin-bottom:20px;
+    font-size:24px;
+    margin-bottom:20px;
     background:var(--primary-gradient);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
+
 .qrcode-wrap{
-    width:240px;height:240px;margin:0 auto 20px;
-    border:1px solid var(--border);border-radius:12px;
-    overflow:hidden;position:relative;
+    width:260px;
+    height:260px;
+    margin:0 auto 20px;
+    border:3px solid var(--primary-light);
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    position:relative;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
 }
+
+.qrcode-wrap:hover {
+    transform: scale(1.02);
+}
+
 #qrcodeImg{
-    width:100%;height:100%;object-fit:contain;display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
 }
+
 .qrcode-btn{
-    position:absolute;bottom:0;left:0;width:100%;
-    background:rgba(0,0,0,0.6);color:#fff;
-    font-size:13px;padding:8px 0;cursor:pointer;
-    border:none;outline:none;
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:rgba(141,110,99, 0.9);
+    color:#fff;
+    font-size:14px;
+    padding:10px 0;
+    cursor:pointer;
+    border:none;
+    outline:none;
+    transition: background 0.3s ease;
 }
+
+.qrcode-btn:hover{
+    background:rgba(141,110,99, 1);
+}
+
 body:not(.admin-login) .qrcode-btn{
     display: none;
 }
-.qrcode-btn:hover{
-    background:rgba(0,0,0,0.8);
-}
+
 #qrcodeFile{
     display: none;
 }
+
 #qrcodeUrl{
     width:100%;
     padding:12px;
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:var(--radius-md);
     font-size:14px;
     background:var(--card-bg);
     color:var(--text-color);
     margin-bottom:10px;
 }
+
 .close-welcome{
-    padding:10px 30px;background:var(--primary-gradient);
-    color:#fff;border:none;border-radius:30px;
-    font-size:15px;cursor:pointer;
+    padding:12px 40px;
+    background:var(--primary-gradient);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-xl);
+    font-size:16px;
+    cursor:pointer;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(141,110,99, 0.3);
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
 }
-.close-welcome:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(141,110,99,0.3);}
+
+.close-welcome:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
+}
+
 /* 文件提示文字 */
 .file-tip {
     font-size: 12px;
-    color: var(--primary);
+    color: var(--sub-text);
     margin-top: 4px;
     padding-left: 4px;
+    font-style: italic;
 }
+
 /* 登录弹窗 */
-.login-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.5);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-content{max-width:350px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);text-align:center;}
-.login-content h3{margin-bottom:20px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px;}
-.login-form-group{margin:15px 0;text-align:left;}
-.login-form-group label{font-size:14px;color:var(--sub-text);margin-bottom:5px;display:block;}
-.login-form-group input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card-bg);color:var(--text-color);}
-.login-btn{width:100%;margin-top:20px;padding:12px;background:var(--primary-gradient);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
-.login-error{color:#ff5252;font-size:14px;margin-top:10px;height:20px;}
-/* 阅读弹窗 */
-.read-page{position:fixed;top:0;left:0;width:100%;height:100vh;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;}
-.read-page.show{display:flex;animation:fadeIn 0.4s ease;}
-.read-back-btn{position:absolute;top:25px;left:25px;padding:10px 24px;border-radius:30px;border:none;background:var(--primary-gradient);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 4px 15px rgba(141,110,99,0.3);z-index:10;}
-.read-back-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(141,110,99,0.4);}
-.read-content{max-width:600px;width:100%;text-align:center;padding-bottom:50px;}
-.read-cover{width:100%;max-width:320px;border-radius:16px;box-shadow:var(--shadow-hover);margin:0 auto 30px;}
-.read-title{font-size:28px;font-weight:700;margin-bottom:12px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.read-cate{font-size:16px;color:var(--sub-text);padding:6px 16px;background:var(--primary-light);border-radius:20px;display:inline-block;margin-bottom:20px;}
-.read-desc{font-size:15px;color:var(--text-color);line-height:1.6;margin:15px 0;text-align:left;padding:0 10px;}
-.read-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:10px 0 20px;}
-.read-tag{font-size:12px;color:var(--sub-text);padding:4px 12px;background:var(--primary-light);border-radius:10px;}
-.read-actions{display:flex;gap:15px;justify-content:center;margin:20px 0;flex-wrap:wrap;}
-.read-btn{padding:12px 24px;border-radius:30px;background:var(--primary-gradient);color:white;border:none;cursor:pointer;font-size:14px;transition:all 0.3s;}
-.read-btn.audio{background:linear-gradient(135deg,#7b4397,#dc2430);}
-.read-btn.book{background:linear-gradient(135deg,#4caf50,#81c784);}
-.read-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15);}
-/* 音频播放弹窗（优化关闭/返回） */
-.audio-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.6);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
-.audio-modal.show{display:flex;}
-.audio-box{background:var(--card-bg);border-radius:20px;padding:30px;width:100%;max-width:450px;text-align:center;box-shadow:var(--shadow-hover);cursor:default;}
-.audio-title{margin-bottom:20px;font-size:18px;}
-audio{width:100%;margin-top:10px;margin-bottom:20px;}
-.close-audio-btn{
-    margin-top: 10px;
-    padding:8px 20px;
+.login-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter: blur(15px);
+    z-index:10001;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    margin:0;
+}
+
+.login-content{
+    max-width:380px;
+    width:100%;
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    padding:35px;
+    box-shadow:var(--shadow-hover);
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    zoom: 0.8;
+}
+
+.login-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--primary-gradient);
+}
+
+.login-content h3{
+    margin-bottom:25px;
     background:var(--primary-gradient);
-    color:white;border:none;border-radius:10px;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    font-size:24px;
+    font-weight: 700;
+}
+
+.login-form-group{
+    margin:18px 0;
+    text-align:left;
+}
+
+.login-form-group label{
+    font-size:14px;
+    color:var(--sub-text);
+    margin-bottom:6px;
+    display:block;
+    font-weight: 500;
+}
+
+.login-form-group input{
+    width:100%;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    font-size:15px;
+    background:var(--card-bg);
+    color:var(--text-color);
+    transition:all 0.3s ease;
+}
+
+.login-form-group input:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(141,110,99, 0.2);
+    transform: scale(1.01);
+}
+
+.login-btn{
+    width:100%;
+    margin-top:25px;
+    padding:14px;
+    background:var(--primary-gradient);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-md);
+    font-size:16px;
+    cursor:pointer;
+    font-weight: 500;
+    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
+    transition:all 0.3s ease;
+}
+
+.login-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
+}
+
+.login-error{
+    color:var(--error);
+    font-size:14px;
+    margin-top:12px;
+    height:20px;
+    font-weight: 500;
+}
+
+/* 阅读弹窗 */
+.read-page{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    background:var(--bg);
+    z-index:9999;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:40px 20px 80px;
+    overflow-y:auto;
+    animation: slideInUp 0.4s ease;
+    margin:0;
+}
+
+.read-page.show{
+    display:flex;
+}
+
+.read-back-btn{
+    position:fixed;
+    top:25px;
+    left:25px;
+    padding:12px 28px;
+    border-radius:var(--radius-xl);
+    border:none;
+    background:var(--primary-gradient);
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
+    z-index:10;
+    transition:all 0.3s ease;
+    font-weight: 500;
+}
+
+.read-back-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
+}
+
+.read-content{
+    max-width:700px;
+    width:100%;
+    text-align:center;
+    padding-top:80px;
+    padding-bottom:50px;
+}
+
+.read-cover{
+    width:100%;
+    max-width:350px;
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-hover);
+    margin:0 auto 30px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease;
+}
+
+.read-cover:hover {
+    transform: scale(1.02);
+}
+
+.read-title{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:15px;
+    background:var(--primary-gradient);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    line-height: 1.3;
+}
+
+.read-cate{
+    font-size:18px;
+    color:var(--sub-text);
+    padding:8px 20px;
+    background:var(--primary-light);
+    border-radius:var(--radius-xl);
+    display:inline-block;
+    margin-bottom:25px;
+    font-weight: 500;
+}
+
+.read-desc{
+    font-size:16px;
+    color:var(--text-color);
+    line-height:1.8;
+    margin:20px 0;
+    padding:0 15px;
+    background: rgba(141,110,99, 0.05);
+    padding: 15px;
+    border-radius: var(--radius-md);
+    direction: rtl;
+    text-align: justify;
+    unicode-bidi: plaintext;
+}
+
+.read-tags{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin:15px 0 25px;
+}
+
+.read-tag{
+    font-size:13px;
+    color:var(--sub-text);
+    padding:6px 14px;
+    background:var(--primary-light);
+    border-radius:var(--radius-xl);
+    font-weight: 500;
+}
+
+.read-actions{
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    margin:25px 0;
+    flex-wrap:wrap;
+}
+
+.read-btn{
+    padding:14px 28px;
+    border-radius:var(--radius-xl);
+    background:var(--primary-gradient);
+    color:white;
+    border:none;
+    cursor:pointer;
+    font-size:15px;
+    transition:all 0.3s;
+    font-weight: 500;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.read-btn.audio{
+    background:linear-gradient(135deg,#7b4397,#dc2430);
+}
+
+.read-btn.book{
+    background:linear-gradient(135deg,#4caf50,#81c784);
+}
+
+.read-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* 音频播放弹窗 */
+.audio-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    z-index:10002;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
     cursor:pointer;
 }
+
+.audio-modal.show{
+    display:flex;
+}
+
+.audio-box{
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    padding:35px;
+    width:100%;
+    max-width:480px;
+    text-align:center;
+    box-shadow:var(--shadow-hover);
+    cursor:default;
+    border: 1px solid var(--border);
+}
+
+.audio-title{
+    margin-bottom:25px;
+    font-size:20px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+audio{
+    width:100%;
+    margin-top:15px;
+    margin-bottom:25px;
+    border-radius: var(--radius-md);
+}
+
+.close-audio-btn{
+    margin-top: 15px;
+    padding:10px 25px;
+    background:var(--primary-gradient);
+    color:white;
+    border:none;
+    border-radius:var(--radius-md);
+    cursor:pointer;
+    font-size: 15px;
+    font-weight: 500;
+}
+
 .close-audio-btn:hover{
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
+
 /* 置顶按钮 */
-.top-btn{position:absolute;top:45px;right:10px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(255,152,0,0.4);}
-.untop-btn{background:linear-gradient(135deg,#9e9e9e,#e0e0e0);}
-.book-card:hover .top-btn{opacity:1;transform:scale(1);}
-.top-btn:hover{transform:scale(1.15) !important;}
-.top-tag{position:absolute;top:10px;left:45px;background:linear-gradient(135deg,#ff9800,#ffc107);color:#fff;font-size:10px;padding:2px 8px;border-radius:6px;z-index:2;box-shadow:0 2px 4px rgba(255,152,0,0.3);}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.top-btn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    background:var(--warning);
+    color:#fff;
+    border:none;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    opacity:0;
+    transform:scale(0.5);
+    transition:all 0.3s ease;
+    z-index:3;
+    box-shadow:0 2px 8px rgba(255,152,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.untop-btn{
+    background:var(--info);
+}
+
+.book-card:hover .top-btn{
+    opacity:1;
+    transform:scale(1);
+}
+
+.top-btn:hover{
+    transform:scale(1.15) !important;
+    box-shadow:0 4px 12px rgba(255,152,0,0.6);
+}
+
+.top-tag{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background:var(--warning);
+    color:#fff;
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:var(--radius-sm);
+    z-index:2;
+    box-shadow:0 2px 4px rgba(255,152,0,0.3);
+    font-weight: 600;
+}
+
+@keyframes fadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+@keyframes fadeInScale{
+    from{opacity:0; transform: scale(0.9);}
+    to{opacity:1; transform: scale(1);}
+}
+
+@keyframes slideInUp{
+    from{opacity:0; transform: translateY(30px);}
+    to{opacity:1; transform: translateY(0);}
+}
+
 /* 顶部栏 */
-.top-bar{max-width:1200px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;}
-.header h1{font-size:34px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;font-weight:700;letter-spacing:2px;animation:titleGlow 3s ease-in-out infinite alternate;}
-@keyframes titleGlow{from{filter:drop-shadow(0 0 2px rgba(141,110,99,0.3));}to{filter:drop-shadow(0 0 8px rgba(141,110,99,0.6));}}
-#darkToggle,#loginBtn,#logoutBtn,#exportDataBtn{padding:10px 20px;border-radius:30px;border:none;background:var(--primary-gradient);color:#fff;cursor:pointer;font-size:14px;font-weight:500;box-shadow:0 4px 15px rgba(141,110,99,0.3);margin:0 5px;}
-#logoutBtn{background:linear-gradient(135deg,#ff5252,#ff1744);}
-#exportDataBtn{background:linear-gradient(135deg,#2196F3,#42A5F5);}
-#darkToggle:hover,#loginBtn:hover,#logoutBtn:hover,#exportDataBtn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(141,110,99,0.4);}
-#logout:hover{box-shadow:0 6px 20px rgba(255,82,82,0.4);}
-#exportDataBtn:hover{box-shadow:0 6px 20px rgba(33,150,243,0.4);}
+.top-bar{
+    max-width:1200px;
+    margin:0 auto 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    position: relative;
+}
+
+.top-bar::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+}
+
+.header h1{
+    font-size:38px;
+    background:var(--primary-gradient);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-align:center;
+    font-weight:800;
+    letter-spacing:2px;
+    animation:titleGlow 3s ease-in-out infinite alternate;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@keyframes titleGlow{
+    from{filter:drop-shadow(0 0 3px rgba(141,110,99, 0.4));}
+    to{filter:drop-shadow(0 0 10px rgba(141,110,99, 0.7));}
+}
+
+.btn-common{
+    padding:12px 24px;
+    border-radius:var(--radius-xl);
+    border:none;
+    background:var(--primary-gradient);
+    color:#fff;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:500;
+    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
+    margin:0 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition:all 0.3s ease;
+}
+
+.btn-common:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
+}
+
+#logoutBtn{
+    background:linear-gradient(135deg,#ff5252,#ff1744);
+}
+
+#exportDataBtn{
+    background:linear-gradient(135deg,#2196F3,#42A5F5);
+}
+
+#darkToggle{
+    background:linear-gradient(135deg,#9e9e9e,#607d8b);
+}
+
 /* 搜索框 */
-.search-box{max-width:400px;width:100%;margin:0 auto 20px;position:relative;}
-#searchInput{width:100%;padding:14px 20px 14px 45px;border:1px solid var(--border);border-radius:30px;font-size:14px;background:var(--card-bg);color:var(--text-color);}
-#searchInput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(141,110,99,0.2);}
-.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--sub-text);}
+.search-box{
+    max-width:500px;
+    width:100%;
+    margin:0 auto 25px;
+    position:relative;
+}
+
+#searchInput{
+    width:100%;
+    padding:16px 20px 16px 50px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-xl);
+    font-size:15px;
+    background:var(--card-bg);
+    color:var(--text-color);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(141,110,99, 0.2), inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-icon{
+    position:absolute;
+    left:20px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--sub-text);
+    font-size: 18px;
+}
+
 /* 分类标签 */
-.category-tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
-.tab{padding:10px 20px;background:var(--primary-light);border:none;border-radius:30px;font-size:14px;cursor:pointer;color:var(--text-color);font-weight:500;position:relative;overflow:hidden;}
-.tab::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s ease;}
-.tab:hover::before{left:100%;}
-.tab.active{background:var(--primary-gradient);color:#fff;box-shadow:0 4px 15px rgba(141,110,99,0.4);transform:scale(1.05);}
+.category-tabs{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:25px;
+}
+
+.tab{
+    padding:12px 24px;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius-xl);
+    font-size:15px;
+    cursor:pointer;
+    color:var(--text-color);
+    font-weight:500;
+    position:relative;
+    overflow:hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.tab::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+    transition:left 0.5s ease;
+}
+
+.tab:hover::before{
+    left:100%;
+}
+
+.tab:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.tab.active{
+    background:var(--primary-gradient);
+    color:#fff;
+    border-color: var(--primary);
+    box-shadow:0 4px 15px rgba(141,110,99, 0.4);
+    transform:scale(1.05);
+    font-weight: 600;
+}
+
 /* 排序控件 */
-.sort-box{max-width:1200px;margin:0 auto 20px;text-align:center;}
-.sort-box select{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text-color);font-size:14px;cursor:pointer;}
-.sort-box select:focus{outline:none;border-color:var(--primary);}
+.sort-box{
+    max-width:1200px;
+    margin:0 auto 25px;
+    text-align:center;
+}
+
+.sort-box select{
+    padding:10px 24px;
+    border-radius:var(--radius-xl);
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    color:var(--text-color);
+    font-size:15px;
+    cursor:pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.sort-box select:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(141,110,99, 0.2);
+}
+
 /* 上传折叠按钮 */
-.upload-toggle-box{max-width:600px;margin:0 auto 10px;text-align:center;}
-#uploadToggle{padding:8px 24px;border-radius:25px;border:none;background:var(--primary-gradient);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(141,110,99,0.25);display:none;}
-#uploadToggle.show{display:inline-block;}
-#uploadToggle:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(141,110,99,0.35);}
+.upload-toggle-box{
+    max-width:600px;
+    margin:0 auto 15px;
+    text-align:center;
+}
+
+#uploadToggle{
+    padding:10px 28px;
+    border-radius:var(--radius-xl);
+    border:none;
+    background:var(--primary-gradient);
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(141,110,99, 0.25);
+    display:none;
+    transition: all 0.3s ease;
+}
+
+#uploadToggle.show{
+    display:inline-block;
+}
+
+#uploadToggle:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(141,110,99, 0.35);
+}
+
 /* 上传面板 */
-.upload-box{max-width:600px;margin:0 auto 35px;padding:24px;background:var(--card-bg);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;max-height:2000px;opacity:1;visibility:visible;transition:all 0.4s ease;display:none;}
-.upload-box.show{display:block;}
-.upload-box.hide-upload{max-height:0;opacity:0;visibility:hidden;padding:0 24px;margin-bottom:0;}
-.upload-box h3{margin-bottom:18px;background:var(--primary-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;font-size:20px;}
-.form-group{margin:15px 0;}
-input,select,textarea{width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:14px;background:var(--card-bg);color:var(--text-color);transition:all 0.3s ease;}
-textarea{min-height:100px;resize:vertical;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(141,110,99,0.2);transform:scale(1.01);}
-.add-btn,.save-btn{width:100%;margin-top:10px;padding:14px;background:var(--primary-gradient);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 4px 15px rgba(141,110,99,0.3);}
-.save-btn{background:linear-gradient(135deg,#4caf50,#81c784);}
-.add-btn:hover,.save-btn:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(141,110,99,0.45);}
-.save-btn:hover{box-shadow:0 8px 25px rgba(76,175,80,0.45);}
+.upload-box{
+    max-width:600px;
+    margin:0 auto 35px;
+    padding:30px;
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+    overflow:hidden;
+    max-height:2000px;
+    opacity:1;
+    visibility:visible;
+    transition:all 0.4s ease;
+    display:none;
+    position: relative;
+}
+
+.upload-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.upload-box.show{
+    display:block;
+}
+
+.upload-box.hide-upload{
+    max-height:0;
+    opacity:0;
+    visibility:hidden;
+    padding:0 30px;
+    margin-bottom:0;
+}
+
+.upload-box h3{
+    margin-bottom:22px;
+    background:var(--primary-gradient);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-align:center;
+    font-size:22px;
+    font-weight: 700;
+}
+
+.form-group{
+    margin:18px 0;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    font-size:15px;
+    background:var(--card-bg);
+    color:var(--text-color);
+    transition:all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+}
+
+input:focus,select:focus,textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(141,110,99, 0.2), inset 0 2px 5px rgba(0,0,0,0.05);
+    transform:scale(1.01);
+}
+
+.add-btn,.save-btn{
+    width:100%;
+    margin-top:15px;
+    padding:16px;
+    background:var(--primary-gradient);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-md);
+    font-size:16px;
+    font-weight:500;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
+    transition:all 0.3s ease;
+}
+
+.save-btn{
+    background:linear-gradient(135deg,#4caf50,#81c784);
+}
+
+.add-btn:hover,.save-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 25px rgba(141,110,99, 0.45);
+}
+
+.save-btn:hover{
+    box-shadow:0 8px 25px rgba(76,175,80, 0.45);
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
 /* 书架网格 */
-.bookshelf{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px;}
-.book-card{background:var(--card-bg);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);position:relative;border:1px solid var(--border);cursor:pointer;}
-.book-card.top{border:2px solid #ff9800;box-shadow:0 0 15px rgba(255,152,0,0.3);}
-.book-card:hover{transform:translateY(-12px) scale(1.03);box-shadow:var(--shadow-hover);}
-.book-cover{width:100%;height:220px;object-fit:cover;display:block;transition:transform 0.5s ease;}
-.book-card:hover .book-cover{transform:scale(1.08);}
-.book-info{padding:16px;text-align:center;background:linear-gradient(to top,var(--card-bg),transparent);position:relative;z-index:2;}
-.book-title{font-weight:600;font-size:15px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.book-cate{font-size:12px;color:var(--sub-text);padding:2px 8px;background:var(--primary-light);border-radius:10px;display:inline-block;}
-.book-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:6px;}
-.book-tag{font-size:10px;color:var(--sub-text);padding:2px 6px;background:var(--primary-light);border-radius:6px;}
-.del-btn{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#ff5252,#ff1744);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(255,23,68,0.4);display:none;}
-.edit-card-btn{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#4caf50,#81c784);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;opacity:0;transform:scale(0.5);transition:all 0.3s ease;z-index:3;box-shadow:0 2px 8px rgba(76,175,80,0.4);display:none;}
-.book-card:hover .del-btn,.book-card:hover .edit-card-btn,.book-card:hover .top-btn{opacity:1;transform:scale(1);}
-.del-btn:hover,.edit-card-btn:hover,.top-btn:hover{transform:scale(1.15) !important;}
-.admin-btns-show .del-btn,.admin-btns-show .edit-card-btn,.admin-btns-show .top-btn{display:block;}
-.empty-tip{grid-column:1/-1;text-align:center;padding:80px 0;color:var(--sub-text);font-size:18px;animation:fadeIn 1s ease;}
-.hide{display:none !important;}
+.bookshelf{
+    max-width:1200px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:32px;
+}
+
+.book-card{
+    background:var(--card-bg);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    position:relative;
+    border:1px solid var(--border);
+    cursor:pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.book-card.top{
+    border:2px solid var(--warning);
+    box-shadow:0 0 20px rgba(255,152,0,0.3);
+}
+
+.book-card:hover{
+    transform:translateY(-15px) scale(1.05);
+    box-shadow:var(--shadow-hover);
+}
+
+.book-cover{
+    width:100%;
+    height:240px;
+    object-fit:cover;
+    display:block;
+    transition:transform 0.5s ease;
+    border-bottom: 1px solid var(--border);
+}
+
+.book-card:hover .book-cover{
+    transform:scale(1.08);
+}
+
+.book-info{
+    padding:18px;
+    text-align:center;
+    background:var(--card-bg);
+    position:relative;
+    z-index:2;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-title{
+    font-weight:600;
+    font-size:16px;
+    margin-bottom:8px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color: var(--text-color);
+}
+
+.book-cate{
+    font-size:13px;
+    color:var(--sub-text);
+    padding:4px 10px;
+    background:var(--primary-light);
+    border-radius:var(--radius-sm);
+    display:inline-block;
+    margin-bottom:8px;
+}
+
+.book-tags{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:5px;
+    margin-top:8px;
+}
+
+.book-tag{
+    font-size:11px;
+    color:var(--sub-text);
+    padding:3px 8px;
+    background:var(--primary-light);
+    border-radius:var(--radius-sm);
+}
+
+.del-btn{
+    position:absolute;
+    top:15px;
+    right:55px;
+    background:linear-gradient(135deg,#ff5252,#ff1744);
+    color:#fff;
+    border:none;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    opacity:0;
+    transform:scale(0.5);
+    transition:all 0.3s ease;
+    z-index:3;
+    box-shadow:0 2px 8px rgba(255,23,68,0.4);
+    display:none;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-card-btn{
+    position:absolute;
+    top:15px;
+    left:55px;
+    background:linear-gradient(135deg,#4caf50,#81c784);
+    color:#fff;
+    border:none;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    opacity:0;
+    transform:scale(0.5);
+    transition:all 0.3s ease;
+    z-index:3;
+    box-shadow:0 2px 8px rgba(76,175,80,0.4);
+    display:none;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-card:hover .del-btn,
+.book-card:hover .edit-card-btn,
+.book-card:hover .top-btn{
+    opacity:1;
+    transform:scale(1);
+}
+
+.del-btn:hover,
+.edit-card-btn:hover,
+.top-btn:hover{
+    transform:scale(1.15) !important;
+}
+
+.admin-btns-show .del-btn,
+.admin-btns-show .edit-card-btn,
+.admin-btns-show .top-btn{
+    display:flex;
+}
+
+.empty-tip{
+    grid-column:1/-1;
+    text-align:center;
+    padding:100px 0;
+    color:var(--sub-text);
+    font-size:20px;
+    animation:fadeIn 1s ease;
+    background: rgba(141,110,99, 0.03);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--border);
+}
+
+.hide{
+    display:none !important;
+}
+
 /* 编辑弹窗 */
-.edit-modal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
-.edit-modal.show{display:flex;animation:fadeIn 0.4s ease;}
-.edit-content{max-width:500px;width:100%;background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:var(--shadow-hover);position:relative;}
-.close-edit-btn{position:absolute;top:15px;right:15px;background:transparent;border:none;color:var(--sub-text);font-size:20px;cursor:pointer;}
-.close-edit-btn:hover{color:var(--text-color);}
+.edit-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    z-index:10000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    margin:0;
+}
+
+.edit-modal.show{
+    display:flex;
+    animation:fadeIn 0.4s ease;
+}
+
+.edit-content{
+    max-width:550px;
+    width:100%;
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    padding:35px;
+    box-shadow:var(--shadow-hover);
+    position:relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.close-edit-btn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    background:transparent;
+    border:none;
+    color:var(--sub-text);
+    font-size:24px;
+    cursor:pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-edit-btn:hover{
+    background: rgba(0,0,0,0.1);
+    color: var(--text-color);
+}
+
 /* 响应式适配 */
 @media (max-width:768px){
-    .top-bar{flex-direction:column;}
-    .header h1{font-size:28px;}
-    .bookshelf{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px;}
-    .read-content{max-width:90%;}
-    .read-title{font-size:24px;}
-    #darkToggle,#loginBtn,#logoutBtn,#exportDataBtn{margin:5px 0;}
-    .qrcode-wrap{width:200px;height:200px;}
-    .category-tabs{gap:6px;}
-    .tab{padding:8px 14px;font-size:13px;}
+    .top-bar{
+        flex-direction:column;
+        gap: 10px;
+    }
+    
+    .header h1{
+        font-size:30px;
+    }
+    
+    .bookshelf{
+        grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+        gap:20px;
+    }
+    
+    .read-content{
+        max-width:95%;
+        padding-top: 100px;
+    }
+    
+    .read-title{
+        font-size:26px;
+    }
+    
+    .btn-common{
+        margin:5px 0;
+        width: 100%;
+    }
+    
+    .qrcode-wrap{
+        width:220px;
+        height:220px;
+    }
+    
+    .category-tabs{
+        gap:8px;
+    }
+    
+    .tab{
+        padding:10px 16px;
+        font-size:14px;
+    }
+    
+    .upload-box{
+        padding: 20px;
+    }
+    
+    .read-actions{
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .read-btn{
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* 加载动画 */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* 通用弹窗样式 */
+.utility-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    z-index:100000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    margin:0;
+}
+
+.utility-modal-content{
+    background:var(--card-bg);
+    border-radius:var(--radius-xl);
+    padding:30px;
+    max-width:420px;
+    width:100%;
+    text-align:center;
+    box-shadow:var(--shadow-hover);
+}
+
+.utility-modal-title{
+    margin-bottom:25px;
+    color:var(--primary);
+    font-weight:600;
+}
+
+.utility-btn{
+    display:block;
+    width:100%;
+    padding:14px;
+    margin-bottom:18px;
+    border:none;
+    border-radius:var(--radius-md);
+    cursor:pointer;
+    font-size:16px;
+    font-weight:500;
+    transition:all 0.3s ease;
+}
+
+.utility-btn:hover{
+    transform:translateY(-2px);
+}
+
+.utility-btn-primary{
+    background:var(--primary-gradient);
+    color:white;
+}
+
+.utility-btn-primary:hover{
+    box-shadow:0 4px 15px rgba(141,110,99, 0.4);
+}
+
+.utility-btn-blue{
+    background:linear-gradient(135deg, #2196F3, #42A5F5);
+    color:white;
+}
+
+.utility-btn-blue:hover{
+    box-shadow:0 4px 15px rgba(33,150,243, 0.4);
+}
+
+.utility-btn-gray{
+    background:#666;
+    color:white;
+    margin-bottom:0;
+}
+
+.utility-btn-gray:hover{
+    box-shadow:0 4px 15px rgba(102,102,102, 0.4);
+}
+
+/* 导出弹窗 */
+.export-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    margin:0;
+}
+
+.export-box{
+    background:#fff;
+    border-radius:var(--radius-xl);
+    padding:25px;
+    width:100%;
+    max-width:800px;
+    max-height:80vh;
+    overflow:auto;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    position:relative;
+}
+
+.export-title{
+    margin-bottom:15px;
+    color:var(--primary);
+    text-align:center;
+    font-weight:600;
+}
+
+.export-code{
+    width:100%;
+    height:400px;
+    padding:15px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    font-family:monospace;
+    font-size:14px;
+    resize:none;
+    background:#f8f9fa;
+    color:#333;
+    font-weight:500;
+}
+
+.export-btn{
+    margin-top:15px;
+    padding:12px 35px;
+    background:var(--success);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-xl);
+    cursor:pointer;
+    font-size:16px;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    font-weight:500;
+    transition:all 0.3s ease;
+}
+
+.export-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 15px rgba(76,175,80, 0.4);
+}
+
+.export-close-btn{
+    margin-top:10px;
+    padding:10px 25px;
+    background:#666;
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-xl);
+    cursor:pointer;
+    font-size:14px;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    font-weight:500;
+    transition:all 0.3s ease;
+}
+
+.export-close-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 15px rgba(102,102,102, 0.4);
 }
 </style>
 </head>
 <body>
+<div class="bg-decoration"></div>
+
 <!-- 首页欢迎弹窗 + 二维码 -->
 <div class="welcome-modal" id="welcomeModal">
     <div class="welcome-box">
-        <h2 class="welcome-title">欢迎关注公众号：Hekaya小故事</h2>
+        <h2 class="welcome-title">📚 欢迎关注公众号：Hekaya小故事</h2>
         <div class="qrcode-wrap">
             <img id="qrcodeImg" src="" alt="公众号二维码">
-            <button class="qrcode-btn" onclick="triggerQrcode()">点击更换二维码</button>
-            <input type="file" id="qrcodeFile" accept="image/png,image/jpeg,image/gif" style="display:none" onchange="handleQrcodeUpload(this)">
-            <!-- 网络图片输入框 -->
+            <button class="qrcode-btn" onclick="triggerQrcode()">🔄 更换二维码</button>
+            <input type="file" id="qrcodeFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="handleQrcodeUpload(this)">
             <input type="text" id="qrcodeUrl" placeholder="或输入网络图片链接" style="display:none;">
         </div>
         <button class="close-welcome" onclick="closeWelcome()">进入主页</button>
     </div>
 </div>
+
+<div class="main-content">
 <div class="top-bar">
     <div class="header"><h1>Hekaya小故事</h1></div>
     <div>
-        <button id="loginBtn" onclick="openLoginModal()">🔑 管理员登录</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">🚪 退出登录</button>
-        <button id="exportDataBtn" onclick="exportBooksData()" style="display:none;">📤 导出数据</button>
-        <button id="darkToggle" onclick="toggleDark()">🌙 暗黑模式</button>
+        <button id="loginBtn" class="btn-common" onclick="openLoginModal()">🔐 管理员登录</button>
+        <button id="logoutBtn" class="btn-common" onclick="logout()" style="display:none;">🚪 退出登录</button>
+        <button id="exportDataBtn" class="btn-common" onclick="exportBooksData()" style="display:none;">📥 导出数据</button>
+        <button id="darkToggle" class="btn-common" onclick="toggleDark()">🌙 暗黑模式</button>
     </div>
 </div>
-<!-- 登录弹窗 -->
-<div class="login-modal" id="loginModal" style="display:none;">
-    <div class="login-content">
-        <h3>管理员登录</h3>
-        <div class="login-form-group">
-            <label>账号</label>
-            <input type="text" id="loginUser" placeholder="输入管理员账号">
-        </div>
-        <div class="login-form-group">
-            <label>密码</label>
-            <input type="password" id="loginPwd" placeholder="输入管理员密码">
-        </div>
-        <div class="login-error" id="loginError"></div>
-        <button class="login-btn" onclick="doLogin()">登录</button>
-    </div>
-</div>
+
 <!-- 搜索框 -->
 <div class="search-box">
     <span class="search-icon">🔍</span>
     <input type="text" id="searchInput" placeholder="搜索书名/标签/分类..." oninput="filterBooks()">
 </div>
+
 <!-- 分类标签 -->
 <div class="category-tabs">
     <button class="tab active" data-cate="all">全部</button>
@@ -269,27 +1510,30 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
     <button class="tab" data-cate="Adibiy Aser">Adibiy Aser</button>
     <button class="tab" data-cate="Awazlik">Awazlik</button>
 </div>
+
 <!-- 排序控件 -->
 <div class="sort-box">
     <select id="sortSelect" onchange="sortBooks()">
-        <option value="default">默认排序（置顶优先）</option>
-        <option value="title-asc">书名升序</option>
-        <option value="title-desc">书名降序</option>
-        <option value="cate-asc">分类升序</option>
+        <option value="default">📌 默认排序（置顶优先）</option>
+        <option value="title-asc">🔤 书名升序</option>
+        <option value="title-desc">🔠 书名降序</option>
+        <option value="cate-asc">🏷️ 分类升序</option>
     </select>
 </div>
+
 <div class="upload-toggle-box">
     <button id="uploadToggle" onclick="toggleUploadBox()">📁 展开/隐藏上传区域</button>
 </div>
+
 <!-- 上传面板 -->
 <div class="upload-box" id="uploadBox">
-    <h3>添加新图书</h3>
+    <h3>➕ 添加新图书</h3>
     <div class="form-group">
-        <input type="text" id="book-title" placeholder="输入图书名称">
+        <input type="text" id="book-title" placeholder="📝 输入图书名称 *">
     </div>
     <div class="form-group">
         <select id="book-category">
-            <option value="">选择分类</option>
+            <option value="">🏷️ 选择分类 *</option>
             <option value="Roman">Roman</option>
             <option value="Hekaya">Hekaya</option>
             <option value="Rasimlik">Rasimlik</option>
@@ -298,34 +1542,55 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         </select>
     </div>
     <div class="form-group">
-        <textarea id="book-desc" placeholder="输入书籍简介（选填）"></textarea>
+        <textarea id="book-desc" placeholder="💬 输入书籍简介（选填）"></textarea>
     </div>
     <div class="form-group">
-        <input type="text" id="book-tags" placeholder="输入标签，多个标签用逗号分隔（选填）">
+        <input type="text" id="book-tags" placeholder="🏷️ 输入标签，多个标签用逗号分隔（选填）">
     </div>
     <div class="form-group">
-        <input type="text" id="book-link" placeholder="填写阅读链接/本地文件地址（选填）">
+        <input type="text" id="book-link" placeholder="🔗 填写阅读链接/本地文件地址（选填）">
     </div>
     <div class="form-group">
-        <input type="text" id="cover-url" placeholder="封面图片网络链接（选填）">
+        <input type="text" id="cover-url" placeholder="🖼️ 封面图片网络链接（选填）">
     </div>
     <div class="form-group">
-        <input type="file" id="cover-input" accept="image/*" onchange="showCoverFileName(this)">
-        <div class="file-tip" id="coverFileTip">未选择封面图片</div>
+        <input type="file" id="cover-input" accept="image/*" onchange="showFileName(this, 'coverFileTip', '📸 未选择封面图片')">
+        <div class="file-tip" id="coverFileTip">📸 未选择封面图片</div>
     </div>
     <div class="form-group">
-        <input type="file" id="book-file" accept=".txt,.pdf,.epub" onchange="showBookFileName(this)">
-        <label style="font-size:12px;color:var(--sub-text)">上传电子书（txt/pdf/epub）</label>
-        <div class="file-tip" id="bookFileTip">未选择电子书</div>
+        <input type="file" id="book-file" accept=".txt,.pdf,.epub" onchange="showFileName(this, 'bookFileTip', '📚 未选择电子书')">
+        <label style="font-size:13px;color:var(--sub-text)">📚 上传电子书（txt/pdf/epub）</label>
+        <div class="file-tip" id="bookFileTip">📖 未选择电子书</div>
     </div>
     <div class="form-group">
-        <input type="file" id="audio-file" accept="audio/*" onchange="showAudioFileName(this)">
-        <label style="font-size:12px;color:var(--sub-text)">上传有声读物（mp3/wav）</label>
-        <div class="file-tip" id="audioFileTip">未选择音频文件</div>
+        <input type="file" id="audio-file" accept="audio/*" onchange="showFileName(this, 'audioFileTip', '🎵 未选择音频文件')">
+        <label style="font-size:13px;color:var(--sub-text)">🔊 上传有声读物（mp3/wav）</label>
+        <div class="file-tip" id="audioFileTip">🎵 未选择音频文件</div>
     </div>
-    <button class="add-btn" onclick="addBook()">加入书架</button>
+    <button class="add-btn" onclick="addBook()">➕ 加入书架</button>
 </div>
+
 <div class="bookshelf" id="bookshelf"></div>
+</div>
+
+<!-- 登录弹窗 -->
+<div class="login-modal" id="loginModal" style="display:none;" onclick="closeLoginModal()">
+    <div class="login-content" onclick="event.stopPropagation()">
+        <button class="close-edit-btn" onclick="closeLoginModal()">×</button>
+        <h3>🔐 管理员登录</h3>
+        <div class="login-form-group">
+            <label>👤 账号</label>
+            <input type="text" id="loginUser" placeholder="输入管理员账号">
+        </div>
+        <div class="login-form-group">
+            <label>🔒 密码</label>
+            <input type="password" id="loginPwd" placeholder="输入管理员密码">
+        </div>
+        <div class="login-error" id="loginError"></div>
+        <button class="login-btn" onclick="doLogin()">登录</button>
+    </div>
+</div>
+
 <!-- 阅读弹窗 -->
 <div class="read-page" id="readPage">
     <button class="read-back-btn" onclick="closeReadPage()">← 返回书架</button>
@@ -343,27 +1608,29 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
         </div>
     </div>
 </div>
-<!-- 音频播放弹窗（优化关闭/返回） -->
+
+<!-- 音频播放弹窗 -->
 <div class="audio-modal" id="audioModal" onclick="closeAudioModal()">
     <div class="audio-box" onclick="event.stopPropagation()">
         <h3 class="audioTitle" id="audioTitle"></h3>
         <audio id="bookAudio" controls></audio>
-        <button class="close-audio-btn" onclick="closeAudioModal()">关闭并返回</button>
+        <button class="close-audio-btn" onclick="closeAudioModal()">❌ 关闭并返回</button>
     </div>
 </div>
+
 <!-- 编辑弹窗 -->
 <div class="edit-modal" id="editModal">
     <div class="edit-content">
         <button class="close-edit-btn" onclick="closeEditModal()">×</button>
-        <h3>编辑图书信息</h3>
+        <h3>✏️ 编辑图书信息</h3>
         <input type="hidden" id="edit-book-id">
         
         <div class="form-group">
-            <input type="text" id="edit-book-title" placeholder="书名">
+            <input type="text" id="edit-book-title" placeholder="📝 书名 *">
         </div>
         <div class="form-group">
             <select id="edit-book-category">
-                <option value="">选择分类</option>
+                <option value="">🏷️ 选择分类 *</option>
                 <option value="Roman">Roman</option>
                 <option value="Hekaya">Hekaya</option>
                 <option value="Rasimlik">Rasimlik</option>
@@ -372,42 +1639,36 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
             </select>
         </div>
         <div class="form-group">
-            <textarea id="edit-book-desc" placeholder="简介"></textarea>
+            <textarea id="edit-book-desc" placeholder="💬 简介"></textarea>
         </div>
         <div class="form-group">
-            <input type="text" id="edit-book-tags" placeholder="标签">
+            <input type="text" id="edit-book-tags" placeholder="🏷️ 标签">
         </div>
         <div class="form-group">
-            <input type="text" id="edit-book-link" placeholder="阅读链接/本地文件地址（选填）">
+            <input type="text" id="edit-book-link" placeholder="🔗 阅读链接/本地文件地址（选填）">
         </div>
         <div class="form-group">
-            <input type="text" id="edit-cover-url" placeholder="封面网络链接">
+            <input type="text" id="edit-cover-url" placeholder="🖼️ 封面网络链接">
         </div>
         <div class="form-group">
-            <input type="file" id="edit-cover-input" accept="image/*" onchange="showEditCoverFileName(this)">
-            <div class="file-tip" id="editCoverFileTip">未选择新封面</div>
+            <input type="file" id="edit-cover-input" accept="image/*" onchange="showFileName(this, 'editCoverFileTip', '📸 未选择新封面', '✅ 已选择新封面：')">
+            <div class="file-tip" id="editCoverFileTip">📸 未选择新封面</div>
         </div>
         <div class="form-group">
-            <img id="edit-cover-preview" style="width:100px;height:130px;object-fit:cover;border-radius:8px;">
+            <img id="edit-cover-preview" style="width:120px;height:150px;object-fit:cover;border-radius:var(--radius-md);display:block;margin:0 auto;">
         </div>
         <div class="form-group">
-            <input type="file" id="edit-book-file" accept=".txt,.pdf,.epub" onchange="showEditBookFileName(this)">
-            <div class="file-tip" id="editBookFileTip">未选择新电子书</div>
+            <input type="file" id="edit-book-file" accept=".txt,.pdf,.epub" onchange="showFileName(this, 'editBookFileTip', '📚 未选择新电子书', '✅ 已选择新电子书：')">
+            <div class="file-tip" id="editBookFileTip">📖 未选择新电子书</div>
         </div>
         <div class="form-group">
-            <input type="file" id="edit-audio-file" accept="audio/*" onchange="showEditAudioFileName(this)">
-            <div class="file-tip" id="editAudioFileTip">未选择新音频</div>
+            <input type="file" id="edit-audio-file" accept="audio/*" onchange="showFileName(this, 'editAudioFileTip', '🎵 未选择新音频', '✅ 已选择新音频：')">
+            <div class="file-tip" id="editAudioFileTip">🎵 未选择新音频</div>
         </div>
-        <button class="save-btn" onclick="saveEditBook()">保存修改</button>
+        <button class="save-btn" onclick="saveEditBook()">💾 保存修改</button>
     </div>
 </div>
 
-    
-<!-- 底部信息 -->
-<div class="footer">
-    <p>© 2026 Hekaya小故事 | 个人书架管理系统 | 📚 让阅读更美好</p>
-</div>
-    
 <script>
 // 全局图书数据（所有上传的内容都存在这里，直接写在代码中）
 let allBooks = [
@@ -455,7 +1716,7 @@ let allBooks = [
         "id": 4,
         "title": "غەرىبكە ساياھەت1",
         "cate": "Roman",
-        "desc": "«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن، جۇڭگونىڭ قەدىمكى دەۋرىدىكى تۇنجى رومانتىزملىق بابلىق رومان. -تىياتىر مەزمۇنى:پۈتۈن كىتابتا ئاساسلىقى سۈن ۋۇكۇڭنىڭ دۇنياغا كېلىشى ۋە تيەنگۇڭ نى قالايمىقان قىلغاندىن كېيىن، تاڭ سېڭ، جۇ باجيې، شا سېڭ ۋە ئاق ئات بىلەن ئۇچرىشىپ، غەربكە نوم ئالغىلى بېرىشى، يول بويى جىن-ئالۋاستىلارنى يوقىتىپ، توقسان سەككىز قىيىنچىلىقنى باشتىن كەچۈرۈپ، ئەڭ ئاخىرىدا غەربكە يېتىپ بېرىپ تاتاگاتۇ بۇدساتۋا بىلەن كۆرۈشۈپ، ھەقىقىي نومغا ئېرىشكەنلىكى توغرىسىدىكى ھېكايە تەسۋىرلەنگەن. -سەنئەت ئالاھىدىلىكى ۋە تەسىرى:«غەربكە ساياھەت»mol، غەلىتە بەدىئىي تەسەۋۋۇر، جانلىق، ئەگرى-توقاي ھېكايە ۋەقەلىكى، جانلىق پېرسوناژ ئوبرازى، يۇمۇرىستىك تىل بىلەن ئۆزگىچە ئالاھىدىلىككە ئىگە سېھىرلىك دۇنيانى بەرپا قىلغان. ئۇ جۇڭگو سېھىرلىك ھېكايىلىرىنىڭ كىلاسسىك ئەسىرى بولۇپ، قەدىمكى رومانتىزملىق رومانلارنىڭ يۇقىرى پەللىسىگە يەتكەن، «ئۈچ پادىشاھلىق ھەققىدە قىسسە»، «سۇ بويىدا»، «قىزىل راۋاقتىكى چۈش»بىلەن قوشۇلۇپ جۇڭگو كىلاسسىك ئەسەرلىرىنىڭ تۆت چوڭ مەشھۇر ئەسىرى دەپ ئاتالغان. بۇ ئەسەر كېيىنكى ئەدەبىيات، كىنو-تېلېۋىزىيە، تىياتىر قاتارلىق سەنئەت شەكىللىرىگە چوڭقۇر تەسىر كۆرسەتكەن.",
+        "desc": "«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن، جۇڭگونىڭ قەدىمكى دەۋرىدىكى تۇنجى رومانتىزملىق بابلىق رومان. -تىياتىر مەزمۇنى:پۈتۈن كىتابتا ئاساسلىقى سۈن ۋۇكۇڭنىڭ دۇنياغا كېلىشى ۋە تيەنگۇڭ نى قالايمىقان قىلغاندىن كېيىن، تاڭ سېڭ، جۇ باجيې، شا سېڭ ۋە ئاق ئات بىلەن ئۇچرىشىپ، غەربكە نوم ئالغىلى بېرىشى، yol بويى جىن-ئالۋاستىلارنى يوقىتىپ، توقسان سەككىز قىيىنچىلىقنى باشتىن كەچۈرۈپ، ئەڭ ئاخىرىدا غەربكە يېتىپ بېرىپ تاتاگاتۇ بۇدساتۋا بىلەن كۆرۈشۈپ، ھەقىقىي نومغا ئېرىشكەنلىكى توغرىسىدىكى ھېكايە تەسۋىرلەنگەن. -سەنئەت ئالاھىدىلىكى ۋە تەسىرى:«غەربكە ساياھەت»mol، غەلىتە بەدىئىي تەسەۋۋۇر، جانلىق، ئەگرى-توقاي ھېكايە ۋەقەلىكى، جانلىق پېرسوناژ ئوبرازى، يۇمۇرىستىك تىل بىلەن ئۆزگىچە ئالاھىدىلىككە ئىگە سېھىرلىك دۇنيانى بەرپا قىلغان. ئۇ جۇڭگو سېھىرلىك ھېكايىلىرىنىڭ كىلاسسىك ئەسىرى بولۇپ، قەدىمكى رومانتىزملىق رومانلارنىڭ يۇقىرى پەللىسىگە يەتكەن، «ئۈچ پادىشاھلىق ھەققىدە قىسسە»، «سۇ بويىدا»، «قىزىل راۋاقتىكى چۈش»بىلەن قوشۇلۇپ جۇڭگو كىلاسسىك ئەسەرلىرىنىڭ تۆت چوڭ مەشھۇر ئەسىرى دەپ ئاتالغان. بۇ ئەسەر كېيىنكى ئەدەبىيات، كىنو-تېلېۋىزىيە، تىياتىر قاتارلىق سەنئەت شەكىللىرىگە چوڭقۇر تەسىر كۆرسەتكەن.",
         "tags": "西游记维吾尔语版、维吾尔语",
         "link": "https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f",
         "cover": "https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover",
@@ -468,7 +1729,7 @@ let allBooks = [
         "id": 5,
         "title": "سىرلىق ئارال",
         "cate": "Roman",
-        "desc": "ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن بولۇپ، جەنۇبىي ئارمىيەگە قاپسىلىپ قالغان بىر توپ شىماللىقلار پۇرسەتتىن پايدىلىنىپ شار بىلەن قېچىپ كەتكەن. -ۋەقەلىك:ئۇلار يېرىم yolدا بوران-چاپقۇنغا ئۇچراپ، تىنچ ئوكياندىكى بىر قاقاس ئارالغا تاشلىنىپ قالىدۇ. بۇ سىرلىق ئارالدا، ئۇلار ئۆزلىرىنىڭ ئەقىل-پاراسىتى ۋە قەيسەر ئىرادىسىگە تايىنىپ ساپال بۇيۇملار، ئەينەك، شامال تۈگمىنى، تېلېگرامما ئاپپاراتى قاتارلىقلارنى ياساپ چىقىپ، تۇرمۇشىنى ياخشىلايدۇ. ئۇلار يەنە دېڭىز قاراقچىلىرىنىڭ ھۇجۇمى، يانار تاغ پارتلاش قاتارلىق ھەر خىل خەۋپ-خەتەرلەرگە yolۇقىدۇ. ئەسلىدە، بۇ ئارالدا ئىزچىل بىر سىرلىق ئادەم يوشۇرۇن ھالدا ئۇلارغا ياردەم قىلىپ كەلگەن بولۇپ، بۇ ئادەم دەل «دېڭىز ئاستىدىكى 20 مىڭ چاقىرىم»دىكى كاپىتان نىمو ئىدى. ئاخىرىدا،يانار تاغ پارتلاپ ئارال چۆكۈپ كېتىش ئالدىدا تۇرغاندا، ئۇلار كاپىتان گىرانتنىڭ ئوغلى قوماندانلىق قىلغان «دېڭكېن»ناملىق پاراخوتقا ئولتۇرۇپ ئارالدىكى تۇرمۇشىنى ئاخىرلاشتۇرغان.\n\n###باش تېما ۋە ئالاھىدىلىك -باش تېما:روماندا ئىنسانلارنىڭ yol ئېچىش روھى ۋە ئىجادچانلىقى نامايان قىلىنغان، كوللېكتىپ ھەمكارلىشىش ۋە قەتئىي تەۋرەنمەس پەزىلەت مەدھىيەلەنگەن. شۇنىڭ بىلەن بىر ۋاقىتتا، تەبىئەتكە بولغان ھۆرمەت ۋە پەن-تېخنىكىغا بولغان ھۆرمەت ئىپادىلەنگەن. -ئالاھىدىلىكى:ۋېرنېر ئىلىم-پەن بىلىملىرى بىلەن خەتەرلىك، ھاياجانلىق تەۋەككۈلچىلىك ۋەقەلىكىنى ئەپچىللىك بىلەن بىرلەشتۈرۈپ، ئوقۇرمەنلەرگە خىيالىي تۈسكە تولغان دۇنيانى نامايان قىلغان. ئۇنىڭ ھەر خىل ئىلىم-پەن ھادىسىلىرى ۋە كەشپىياتلارنى تەسۋىرلىشى ئوقۇرمەنلەرنى ئوقۇش بىلەن بىر ۋاقىتتا مول بىلىملەرنى ئۆگىنىش ئىمكانىيىتىگە ئىگە قىلغان.\n\n###ئەسەرنىڭ تەسىرى «سىرلىق ئارال»ۋېرننىڭ فانتازىيەلىك ھېكايىلىرىنىڭ ۋەكىللىك ئەسەرلىرىدىن بىرى بولۇپ، «كاپىتان گىرانتنىڭ بالىلىرى»، «دېڭىز ئاستىدىكى ئىككى تۈمەن چاقىرىم»بىلەن قوشۇلۇپ «ۋېرننىڭ ئۈچ كۈيى»دەپ ئاتالغان. ئۇ ئۆزىنىڭ قالتىس ھېكايىسى ۋە چوڭقۇر ئىدىيەسى بىلەن پۈتۈن دۇنيادىكى ئوقۇرمەنلەرنىڭ ياقتۇرۇشىغا ئېرىشكەن، كىشىلەرنى نامەلۇملۇق ئۈستىدە ئىزدىنىشكە، ئۆزىگە جەڭ ئېلان قىلىشقا ئىلھاملاندۇرۇپ، كېيىنكى فانتازىيەلىك ئەدەبىي ئىجادىيەتلەرگە چوڭقۇر تەسىر كۆرسەتكەن.",
+        "desc": "ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن بولۇپ، جەنۇبىي ئارمىيەگە قاپسىلىپ قالغان بىر توپ شىماللىقلار پۇرسەتتىن پايدىلىنىپ شار بىلەن قېچىپ كەتكەن. -ۋەقەلىك:ئۇلار يېرىم yolدا بوران-چاپقۇنغا ئۇچراپ، تىنچ ئوكياندىكى بىر قاقاس ئارالغا تاشلىنىپ قالىدۇ. بۇ سىرلىق ئارالدا، ئۇلار ئۆزلىرىنىڭ ئەقىل-پاراسىتى ۋە قەيسەر ئىرادىسىگە تايىنىپ ساپال بۇيۇملار، ئەينەك، شامال تۈگمىنى، تېلېگرامما ئاپپاراتى قاتارلىقلارنى ياساپ چىقىپ، تۇرمۇشىنى ياخشىلايدۇ. ئۇلار يەنە دېڭىز قاراقچىلىرىنىڭ ھۇجۇمى، يانار تاغ پارتلاش قاتارلىق ھەر خىل خەۋپ-خەتەرلەرگە yolۇقىدۇ. ئەسلىدە، بۇ ئارالدا ئىزچىل بىر سىرلىق ئادەم يoshۇرۇن ھالدا ئۇلارغا ياردەم قىلىپ كەلگەن بولۇپ، بۇ ئادەم دەل «دېڭىز ئاستىدىكى 20 مىڭ چاقىرىم»دىكى كاپىتان نىمو ئىدى. ئاخىرىدا،يانار تاغ پارتلاپ ئارال چۆكۈپ كېتىش ئالدىدا تۇرغاندا، ئۇلار كاپىتان گىرانتنىڭ ئوغلى قوماندانلىق قىلغان «دېڭكېن»ناملىق پاراخوتقا ئولتۇرۇپ ئارالدىكى تۇرمۇشىنى ئاخىرلاشتۇرغان.\n\n###باش تېما ۋە ئالاھىدىلىك -باش تېما:روماندا ئىنسانلارنىڭ yol ئېچىش روھى ۋە ئىجادچانلىقى نامايان قىلىنغان، كوللېكتىپ ھەمكارلىشىش ۋە قەتئىي تەۋرەنمەس پەزىلەت مەدھىيەلەنگەن. شۇنىڭ بىلەن بىر ۋاقىتتا، تەبىئەتكە بولغان ھۆرمەت ۋە پەن-تېخنىكىغا بولغان ھۆرمەت ئىپادىلەنگەن. -ئالاھىدىلىكى:ۋېرنېر ئىلىم-پەن بىلىملىرى بىلەن خەتەرلىك، ھاياجانلىق تەۋەككۈلچىلىك ۋەقەلىكىنى ئەپچىللىك بىلەن بىرلەشتۈرۈپ، ئوقۇرمەنلەرگە خىيالىي تۈسكە تولغان دۇنيانى نامايان قىلغان. ئۇنىڭ ھەر خىل ئىلىم-پەن ھادىسىلىرى ۋە كەشپىياتلارنى تەسۋىرلىشى ئوقۇرمەنلەرنى ئوقۇش بىلەن بىر ۋاقىتتا مول بىلىملەرنى ئۆگىنىش ئىمكانىيىتىگە ئىگە قىلغان.\n\n###ئەسەرنىڭ تەسىرى «سىرلىق ئارال»ۋېرننىڭ فانتازىيەلىك ھېكايىلىرىنىڭ ۋەكىللىك ئەسەرلىرىدىن بىرى بولۇپ، «كاپىتان گىرانتنىڭ بالىلىرى»، «دېڭىز ئاستىدىكى ئىككى تۈمەن چاقىرىم»بىلەن قوشۇلۇپ «ۋېرننىڭ ئۈچ كۈيى»دەپ ئاتالغان. ئۇ ئۆزىنىڭ قالتىس ھېكايىسى ۋە چوڭقۇر ئىدىيەسى بىلەن پۈتۈن دۇنيادىكى ئوقۇرمەنلەرنىڭ ياقتۇرۇشىغا ئېرىشكەن، كىشىلەرنى نامەلۇملۇق ئۈستىدە ئىزدىنىشكە، ئۆزىگە جەڭ ئېلان قىلىشقا ئىلھاملاندۇرۇپ، كېيىنكى فانتازىيەلىك ئەدەبىي ئىجادىيەتلەرگە چوڭقۇر تەسىر كۆرسەتكەن.",
         "tags": "神秘岛、维吾尔语",
         "link": "https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23",
         "cover": "https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover",
@@ -509,7 +1770,43 @@ let uploadBoxShow = true;
 let currentEditBook = null;
 let currentBook = null;
 let isAdminLogin = false;
-let qrCodeData = "https://private-user-images.githubusercontent.com/298942585/617362317-24fefd3b-7c4d-4842-b832-9b15c83c8e53.jpg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODMzMTU2NDUsIm5iZiI6MTc4MzMxNTM0NSwicGF0aCI6Ii8yOTg5NDI1ODUvNjE3MzYyMzE3LTI0ZmVmZDNiLTdjNGQtNDg0Mi1iODMyLTliMTVjODNjOGU1My5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwNzA2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDcwNlQwNTIyMjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT00MjM4ODA2NjUzZDJiODNkYWYyNDdmZTczNGNiYzJhN2EyNjYwODlhYmIyODgxNjFmNjQwOWYwNDAwODI3YjMwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9aW1hZ2UlMkZqcGVnIn0.-j1TYIWynJZozwxuGC1mIapXhMS6CVvezlA0z2YG7eQ"; // 二维码数据
+let qrCodeData = "";
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function debounce(func, delay) {
+    let timer = null;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+function getRandomGradient() {
+    const colors = [
+        ['#ff6b6b', '#ee5a5a', '#c0392b'],
+        ['#4ecdc4', '#44a08d', '#2c3e50'],
+        ['#a8e063', '#56ab2f', '#3d7a14'],
+        ['#f39c12', '#e67e22', '#d35400'],
+        ['#9b59b6', '#8e44ad', '#6c3483'],
+        ['#3498db', '#2980b9', '#1a5276'],
+        ['#e74c3c', '#c0392b', '#922b21'],
+        ['#1abc9c', '#16a085', '#138d75'],
+        ['#f1c40f', '#f39c12', '#d68910'],
+        ['#e91e63', '#c2185b', '#880e4f']
+    ];
+    const colorSet = colors[Math.floor(Math.random() * colors.length)];
+    const angle = Math.floor(Math.random() * 360);
+    return `linear-gradient(${angle}deg, ${colorSet[0]}dd, ${colorSet[1]}cc, ${colorSet[2]}aa)`;
+}
 
 // 页面加载初始化
 window.onload = async ()=>{
@@ -519,7 +1816,7 @@ window.onload = async ()=>{
     // 初始化暗黑模式
     if(localStorage.getItem('dark')==='1'){
         document.body.classList.add('dark');
-        document.getElementById('darkToggle').innerText = '☀️ 浅色模式';
+        document.getElementById('darkToggle').innerHTML = '☀️ 浅色模式';
     }
     
     // 初始化管理员状态
@@ -540,87 +1837,33 @@ window.onload = async ()=>{
     }
 };
 
-// 二维码相关
 function triggerQrcode(){
     if(!isAdminLogin){
         alert("⚠️ 仅管理员账号可更换二维码！");
         return;
     }
     
-    // 创建弹窗让用户选择上传方式
     const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    `;
+    modal.className = 'utility-modal';
     
     const content = document.createElement('div');
-    content.style.cssText = `
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 30px;
-        max-width: 420px;
-        width: 100%;
-        text-align: center;
-        box-shadow: var(--shadow-hover);
-    `;
+    content.className = 'utility-modal-content';
     
     const title = document.createElement('h3');
-    title.textContent = '选择二维码上传方式';
-    title.style.cssText = 'margin-bottom: 20px;';
+    title.className = 'utility-modal-title';
+    title.textContent = '🔄 选择二维码上传方式';
     
     const localBtn = document.createElement('button');
-    localBtn.textContent = '上传本地图片';
-    localBtn.style.cssText = `
-        display: block;
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 16px;
-    `;
+    localBtn.className = 'utility-btn utility-btn-primary';
+    localBtn.textContent = '📸 上传本地图片';
     
     const networkBtn = document.createElement('button');
-    networkBtn.textContent = '输入网络图片链接';
-    networkBtn.style.cssText = `
-        display: block;
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        background: linear-gradient(135deg, #2196F3, #42A5F5);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 16px;
-    `;
+    networkBtn.className = 'utility-btn utility-btn-blue';
+    networkBtn.textContent = '🌐 输入网络图片链接';
     
     const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = '取消';
-    cancelBtn.style.cssText = `
-        display: block;
-        width: 100%;
-        padding: 12px;
-        background: #666;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 16px;
-    `;
+    cancelBtn.className = 'utility-btn utility-btn-gray';
+    cancelBtn.textContent = '❌ 取消';
     
     localBtn.onclick = () => {
         document.body.removeChild(modal);
@@ -632,21 +1875,16 @@ function triggerQrcode(){
         document.body.removeChild(modal);
         const url = prompt("请输入网络图片链接:");
         if(url) {
-            // 简化的URL验证，不再限制特定格式，只检查基本格式
             if (!/^https?:\/\/.+\..+/.test(url)) {
                 alert("❌ 请输入有效的URL");
                 return;
             }
 
-            // 验证图片是否能加载
             const img = new Image();
             img.onload = () => {
                 document.getElementById("qrcodeImg").src = url;
                 qrCodeData = url;
-                
-                // 将新的二维码数据保存到localStorage
                 localStorage.setItem('qrCodeData', url);
-                
                 alert("✅ 二维码更换成功！");
             };
             img.onerror = () => {
@@ -690,30 +1928,9 @@ async function handleQrcodeUpload(fileDom){
     alert("✅ 二维码更换成功！");
 }
 
-// 文件名称提示
-function showCoverFileName(el){
-    const tip = document.getElementById('coverFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择封面图片";
-}
-function showBookFileName(el){
-    const tip = document.getElementById('bookFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择电子书";
-}
-function showAudioFileName(el){
-    const tip = document.getElementById('audioFileTip');
-    tip.innerText = el.files[0] ? "已选择：" + el.files[0].name : "未选择音频文件";
-}
-function showEditCoverFileName(el){
-    const tip = document.getElementById('editCoverFileTip');
-    tip.innerText = el.files[0] ? "已选择新封面：" + el.files[0].name : "未选择新封面";
-}
-function showEditBookFileName(el){
-    const tip = document.getElementById('editBookFileTip');
-    tip.innerText = el.files[0] ? "已选择新电子书：" + el.files[0].name : "未选择新电子书";
-}
-function showEditAudioFileName(el){
-    const tip = document.getElementById('editAudioFileTip');
-    tip.innerText = el.files[0] ? "已选择新音频：" + el.files[0].name : "未选择新音频";
+function showFileName(el, tipId, emptyText, prefix = "✅ 已选择："){
+    const tip = document.getElementById(tipId);
+    tip.innerText = el.files[0] ? prefix + el.files[0].name : emptyText;
 }
 
 // 关闭欢迎弹窗
@@ -744,7 +1961,8 @@ function updateAdminUI(){
 
 // 登录
 function openLoginModal(){
-    document.getElementById('loginModal').style.display = 'flex';
+    const modal = document.getElementById('loginModal');
+    modal.style.display = 'flex';
     document.getElementById('loginError').innerText = '';
 }
 
@@ -758,7 +1976,7 @@ function doLogin(){
         updateAdminUI();
         renderBooks();
     }else{
-        document.getElementById('loginError').innerText = '账号或密码错误';
+        document.getElementById('loginError').innerText = '❌ 账号或密码错误';
     }
 }
 
@@ -767,6 +1985,13 @@ function logout(){
     sessionStorage.removeItem('isAdminLogin');
     updateAdminUI();
     renderBooks();
+}
+
+function closeLoginModal(){
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPwd').value = '';
+    document.getElementById('loginError').innerText = '';
 }
 
 // 文件转Base64
@@ -780,7 +2005,7 @@ function fileToBase64(file){
 
 // 添加书籍
 async function addBook(){
-    if(!isAdminLogin){alert('请先登录管理员账号');return;}
+    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
     const title = document.getElementById('book-title').value.trim();
     const cate = document.getElementById('book-category').value;
     const desc = document.getElementById('book-desc').value.trim();
@@ -791,12 +2016,12 @@ async function addBook(){
     const bookFile = document.getElementById('book-file').files[0];
     const audioFile = document.getElementById('audio-file').files[0];
     
-    if(!title || !cate){alert('书名和分类为必填项');return;}
+    if(!title || !cate){alert('📋 书名和分类为必填项');return;}
     
     let cover = '';
     if(coverUrl) cover = coverUrl;
     else if(coverFile) cover = await fileToBase64(coverFile);
-    else {alert('请填写封面链接或上传封面图片');return;}
+    else {alert('🖼️ 请填写封面链接或上传封面图片');return;}
     
     let bookBase64 = '';
     if(bookFile) bookBase64 = await fileToBase64(bookFile);
@@ -836,16 +2061,16 @@ async function addBook(){
     document.getElementById('cover-input').value = '';
     document.getElementById('book-file').value = '';
     document.getElementById('audio-file').value = '';
-    document.getElementById('coverFileTip').innerText = "未选择封面图片";
-    document.getElementById('bookFileTip').innerText = "未选择电子书";
-    document.getElementById('audioFileTip').innerText = "未选择音频文件";
+    document.getElementById('coverFileTip').innerText = "📸 未选择封面图片";
+    document.getElementById('bookFileTip').innerText = "📚 未选择电子书";
+    document.getElementById('audioFileTip').innerText = "🎵 未选择音频文件";
     
     alert("✅ 书籍添加成功！请点击「导出数据」并更新代码，否则换电脑后会丢失！");
 }
 
 // 删除书籍
 function deleteBook(id){
-    if(!confirm('确定要删除这本书吗？')) return;
+    if(!confirm('⚠️ 确定要删除这本书吗？')) return;
     allBooks = allBooks.filter(book => book.id !== id);
     renderBooks();
     alert("✅ 书籍删除成功！请点击「导出数据」并更新代码！");
@@ -853,7 +2078,7 @@ function deleteBook(id){
 
 // 编辑书籍
 function openEditModal(id){
-    if(!isAdminLogin){alert('请先登录管理员账号');return;}
+    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
     const book = allBooks.find(b=>b.id===id);
     if(!book) return;
     
@@ -868,9 +2093,9 @@ function openEditModal(id){
     document.getElementById('edit-cover-preview').src = book.cover;
     
     // 清空编辑表单的文件提示
-    document.getElementById('editCoverFileTip').innerText = "未选择新封面";
-    document.getElementById('editBookFileTip').innerText = "未选择新电子书";
-    document.getElementById('editAudioFileTip').innerText = "未选择新音频";
+    document.getElementById('editCoverFileTip').innerText = "📸 未选择新封面";
+    document.getElementById('editBookFileTip').innerText = "📚 未选择新电子书";
+    document.getElementById('editAudioFileTip').innerText = "🎵 未选择新音频";
     
     // 显示编辑弹窗
     document.getElementById('editModal').classList.add('show');
@@ -890,7 +2115,7 @@ async function saveEditBook(){
     const bookFile = document.getElementById('edit-book-file').files[0];
     const audioFile = document.getElementById('edit-audio-file').files[0];
     
-    if(!title || !cate){alert('书名和分类为必填项');return;}
+    if(!title || !cate){alert('📋 书名和分类为必填项');return;}
     
     // 处理封面
     let cover = coverUrl;
@@ -941,11 +2166,15 @@ function closeEditModal(){
 
 // 置顶/取消置顶
 function toggleTop(id){
+    if(!isAdminLogin){
+        alert('🔐 请先登录管理员账号');
+        return;
+    }
     const book = allBooks.find(b => b.id === id);
     if(book){
         book.isTop = !book.isTop;
         if(book.isTop){
-            book.topOrder = Date.now(); // 用时间戳作为置顶顺序
+            book.topOrder = Date.now();
         }
         renderBooks();
     }
@@ -954,12 +2183,13 @@ function toggleTop(id){
 // 打开阅读页
 function openReadPage(book){
     currentBook = book;
-    document.getElementById('readCover').src = book.cover;
+    const coverImg = document.getElementById('readCover');
+    coverImg.src = book.cover;
+    coverImg.onerror = () => { coverImg.src = 'https://via.placeholder.com/350x450?text=Cover'; };
     document.getElementById('readTitle').innerText = book.title;
     document.getElementById('readCate').innerText = book.cate;
-    document.getElementById('readDesc').innerText = book.desc || '无简介';
+    document.getElementById('readDesc').innerText = book.desc || '📋 无简介';
     
-    // 渲染标签
     const tagsContainer = document.getElementById('readTags');
     tagsContainer.innerHTML = '';
     if(book.tags){
@@ -1038,7 +2268,7 @@ function renderBooks(){
     
     // 渲染
     if(filteredBooks.length === 0){
-        shelf.innerHTML = '<div class="empty-tip">暂无书籍 📚</div>';
+        shelf.innerHTML = '<div class="empty-tip">📚 暂无书籍，快去添加一本吧！</div>';
         return;
     }
     
@@ -1048,30 +2278,27 @@ function renderBooks(){
         card.className = `book-card ${book.isTop ? 'top' : ''}`;
         card.onclick = () => openReadPage(book);
         
-        // 标签（置顶）
-        const topTag = book.isTop ? '<div class="top-tag">置顶</div>' : '';
+        const topTag = isAdminLogin && book.isTop ? '<div class="top-tag">📌 置顶</div>' : '';
         
-        // 标签渲染
         let tagsHtml = '';
         if(book.tags){
             book.tags.split(',').forEach(tag => {
-                tagsHtml += `<div class="book-tag">${tag.trim()}</div>`;
+                tagsHtml += `<div class="book-tag">${escapeHtml(tag.trim())}</div>`;
             });
         }
         
-        // 置顶按钮
         const topBtnText = book.isTop ? '🔽' : '🔼';
         const topBtnClass = book.isTop ? 'top-btn untop-btn' : 'top-btn';
+        const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
         
         card.innerHTML = `
             ${topTag}
-            <img class="book-cover" src="${book.cover}" alt="${book.title}">
+            <img class="book-cover" src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'">
             <div class="book-info">
-                <div class="book-title">${book.title}</div>
-                <div class="book-cate">${book.cate}</div>
-                <div class="book-tags">${tagsHtml}</div>
+                <div class="book-title">${escapeHtml(book.title)}</div>
+                <div class="book-cate">${escapeHtml(book.cate)}</div>
             </div>
-            <button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>
+            ${topBtnHtml}
             <button class="del-btn" onclick="event.stopPropagation();deleteBook(${book.id})">🗑️</button>
             <button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>
         `;
@@ -1111,10 +2338,9 @@ function sortBooks(){
     renderBooks();
 }
 
-// 过滤书籍
-function filterBooks(){
+const filterBooks = debounce(() => {
     renderBooks();
-}
+}, 300);
 
 // 初始化分类标签
 function initTab(){
@@ -1145,71 +2371,55 @@ function toggleUploadBox(){
 function toggleDark(){
     const isDark = document.body.classList.toggle('dark');
     localStorage.setItem('dark', isDark ? '1' : '0');
-    document.getElementById('darkToggle').innerText = isDark ? '☀️ 浅色模式' : '🌙 暗黑模式';
+    document.getElementById('darkToggle').innerHTML = isDark ? '☀️ 浅色模式' : '🌙 暗黑模式';
 }
 
-// 导出数据（核心功能：将当前所有数据生成可复制的代码）
 function exportBooksData(){
-    if(!isAdminLogin){alert('请先登录管理员账号');return;}
+    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
     
-    // 生成数据代码
     const dataCode = `// 全局图书数据
 let allBooks = ${JSON.stringify(allBooks, null, 4)};
 
 // 二维码数据
 let qrCodeData = "${qrCodeData}";`;
     
-    // 创建导出弹窗
     const exportModal = document.createElement('div');
-    exportModal.style.cssText = `
-        position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.8);z-index:99999;
-        display:flex;align-items:center;justify-content:center;padding:20px;
-    `;
+    exportModal.className = 'export-modal';
     
     const exportBox = document.createElement('div');
-    exportBox.style.cssText = `
-        background:#fff;border-radius:10px;padding:20px;width:100%;max-width:800px;max-height:80vh;
-        overflow:auto;
-    `;
+    exportBox.className = 'export-box';
     
     const exportTitle = document.createElement('h3');
-    exportTitle.innerText = "复制以下代码替换原文件中的对应部分";
-    exportTitle.style.cssText = "margin-bottom:15px;color:#333;text-align:center;";
+    exportTitle.className = 'export-title';
+    exportTitle.innerText = "📋 复制以下代码替换原文件中的对应部分";
     
     const codeArea = document.createElement('textarea');
+    codeArea.className = 'export-code';
     codeArea.value = dataCode;
-    codeArea.style.cssText = `
-        width:100%;height:400px;padding:10px;border:1px solid #ccc;border-radius:5px;
-        font-family:monospace;font-size:14px;resize:none;
-    `;
     
     const copyBtn = document.createElement('button');
-    copyBtn.innerText = "复制代码";
-    copyBtn.style.cssText = `
-        margin-top:15px;padding:10px 30px;background:#4caf50;color:#fff;border:none;
-        border-radius:5px;cursor:pointer;font-size:16px;display:block;margin-left:auto;margin-right:auto;
-    `;
+    copyBtn.className = 'export-btn';
+    copyBtn.innerHTML = "📋 复制代码";
     
     const closeBtn = document.createElement('button');
-    closeBtn.innerText = "关闭";
-    closeBtn.style.cssText = `
-        margin-top:10px;padding:8px 20px;background:#666;color:#fff;border:none;
-        border-radius:5px;cursor:pointer;font-size:14px;display:block;margin-left:auto;margin-right:auto;
-    `;
+    closeBtn.className = 'export-close-btn';
+    closeBtn.innerHTML = "❌ 关闭";
     
-    // 复制功能
-    copyBtn.onclick = () => {
-        codeArea.select();
-        document.execCommand('copy');
-        alert('✅ 代码复制成功！');
+    copyBtn.onclick = async () => {
+        try {
+            await navigator.clipboard.writeText(dataCode);
+            alert('✅ 代码复制成功！');
+        } catch (err) {
+            codeArea.select();
+            document.execCommand('copy');
+            alert('✅ 代码复制成功！');
+        }
     };
     
-    // 关闭功能
     closeBtn.onclick = () => {
         document.body.removeChild(exportModal);
     };
     
-    // 组装弹窗
     exportBox.appendChild(exportTitle);
     exportBox.appendChild(codeArea);
     exportBox.appendChild(copyBtn);
