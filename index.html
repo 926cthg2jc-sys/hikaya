@@ -77,6 +77,24 @@ body{
     zoom: 0.8;
 }
 
+.modal-overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter: blur(15px);
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    margin:0;
+}
+
 .tab, .book-cate, .book-tag, .read-tag, .read-cate, .empty-tip,
 input, select, textarea, .file-tip,
 .book-card, .book-info, .qrcode-wrap,
@@ -103,22 +121,8 @@ input, select, textarea, .file-tip,
 
 /* 欢迎弹窗 */
 .welcome-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
-    background:rgba(0,0,0,0.5);
-    backdrop-filter: blur(15px);
     z-index:99999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
     animation: fadeInScale 0.6s ease;
-    margin:0;
 }
 
 .welcome-box{
@@ -248,21 +252,7 @@ body:not(.admin-login) .qrcode-btn{
 
 /* 登录弹窗 */
 .login-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
-    background:rgba(0,0,0,0.5);
-    backdrop-filter: blur(15px);
     z-index:10001;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    margin:0;
 }
 
 .login-content{
@@ -519,18 +509,8 @@ body:not(.admin-login) .qrcode-btn{
 
 /* 音频播放弹窗 */
 .audio-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
     z-index:10002;
     display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
     cursor:pointer;
 }
 
@@ -1147,19 +1127,8 @@ textarea{
 
 /* 编辑弹窗 */
 .edit-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
     z-index:10000;
     display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    margin:0;
 }
 
 .edit-modal.show{
@@ -1298,19 +1267,7 @@ textarea{
 
 /* 通用弹窗样式 */
 .utility-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
     z-index:100000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    margin:0;
 }
 
 .utility-modal-content{
@@ -1376,19 +1333,7 @@ textarea{
 
 /* 导出弹窗 */
 .export-modal{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
     z-index:99999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    margin:0;
 }
 
 .export-box{
@@ -1471,7 +1416,7 @@ textarea{
 <div class="bg-decoration"></div>
 
 <!-- 首页欢迎弹窗 + 二维码 -->
-<div class="welcome-modal" id="welcomeModal">
+<div class="modal-overlay welcome-modal" id="welcomeModal">
     <div class="welcome-box">
         <h2 class="welcome-title">📚 欢迎关注公众号：Hekaya小故事</h2>
         <div class="qrcode-wrap">
@@ -1574,7 +1519,7 @@ textarea{
 </div>
 
 <!-- 登录弹窗 -->
-<div class="login-modal" id="loginModal" style="display:none;" onclick="closeLoginModal()">
+<div class="modal-overlay login-modal" id="loginModal" style="display:none;" onclick="closeLoginModal()">
     <div class="login-content" onclick="event.stopPropagation()">
         <button class="close-edit-btn" onclick="closeLoginModal()">×</button>
         <h3>🔐 管理员登录</h3>
@@ -1610,7 +1555,7 @@ textarea{
 </div>
 
 <!-- 音频播放弹窗 -->
-<div class="audio-modal" id="audioModal" onclick="closeAudioModal()">
+<div class="modal-overlay audio-modal" id="audioModal" onclick="closeAudioModal()">
     <div class="audio-box" onclick="event.stopPropagation()">
         <h3 class="audioTitle" id="audioTitle"></h3>
         <audio id="bookAudio" controls></audio>
@@ -1619,7 +1564,7 @@ textarea{
 </div>
 
 <!-- 编辑弹窗 -->
-<div class="edit-modal" id="editModal">
+<div class="modal-overlay edit-modal" id="editModal">
     <div class="edit-content">
         <button class="close-edit-btn" onclick="closeEditModal()">×</button>
         <h3>✏️ 编辑图书信息</h3>
@@ -1790,24 +1735,6 @@ function debounce(func, delay) {
     };
 }
 
-function getRandomGradient() {
-    const colors = [
-        ['#ff6b6b', '#ee5a5a', '#c0392b'],
-        ['#4ecdc4', '#44a08d', '#2c3e50'],
-        ['#a8e063', '#56ab2f', '#3d7a14'],
-        ['#f39c12', '#e67e22', '#d35400'],
-        ['#9b59b6', '#8e44ad', '#6c3483'],
-        ['#3498db', '#2980b9', '#1a5276'],
-        ['#e74c3c', '#c0392b', '#922b21'],
-        ['#1abc9c', '#16a085', '#138d75'],
-        ['#f1c40f', '#f39c12', '#d68910'],
-        ['#e91e63', '#c2185b', '#880e4f']
-    ];
-    const colorSet = colors[Math.floor(Math.random() * colors.length)];
-    const angle = Math.floor(Math.random() * 360);
-    return `linear-gradient(${angle}deg, ${colorSet[0]}dd, ${colorSet[1]}cc, ${colorSet[2]}aa)`;
-}
-
 // 页面加载初始化
 window.onload = async ()=>{
     renderBooks();
@@ -1844,7 +1771,7 @@ function triggerQrcode(){
     }
     
     const modal = document.createElement('div');
-    modal.className = 'utility-modal';
+    modal.className = 'modal-overlay utility-modal';
     
     const content = document.createElement('div');
     content.className = 'utility-modal-content';
@@ -2384,7 +2311,7 @@ let allBooks = ${JSON.stringify(allBooks, null, 4)};
 let qrCodeData = "${qrCodeData}";`;
     
     const exportModal = document.createElement('div');
-    exportModal.className = 'export-modal';
+    exportModal.className = 'modal-overlay export-modal';
     
     const exportBox = document.createElement('div');
     exportBox.className = 'export-box';
