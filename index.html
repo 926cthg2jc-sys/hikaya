@@ -13,26 +13,27 @@
 }
 :root{
     /* 主题颜色 */
-    --bg:#f8f5f0;
-    --card-bg:#fff;
-    --text-color:#3e2723;
-    --sub-text:#8d6e63;
-    --primary:#8d6e63;
-    --primary-light:#d7ccc8;
-    --primary-gradient:linear-gradient(135deg,#8d6e63,#bcaaa4);
-    --secondary-gradient:linear-gradient(135deg,#a1887f,#d7ccc8);
-    --border:#eee;
-    --shadow:0 2px 10px rgba(0,0,0,0.08);
-    --shadow-hover:0 12px 30px rgba(141,110,99,0.25);
-    --success:#4caf50;
-    --warning:#ff9800;
-    --error:#f44336;
-    --info:#2196f3;
+    --bg:#f5f3ef;
+    --card-bg:#ffffff;
+    --text-color:#2d2d2d;
+    --sub-text:#6b6b6b;
+    --primary:#6c5ce7;
+    --primary-light:#a29bfe;
+    --primary-gradient:linear-gradient(135deg,#6c5ce7,#a29bfe);
+    --secondary-gradient:linear-gradient(135deg,#fd79a8,#fab1a0);
+    --accent-gradient:linear-gradient(135deg,#00b894,#00cec9);
+    --border:#e8e8e8;
+    --shadow:0 4px 15px rgba(0,0,0,0.06);
+    --shadow-hover:0 12px 40px rgba(108,92,231,0.15);
+    --success:#00b894;
+    --warning:#fdcb6e;
+    --error:#ff6b6b;
+    --info:#74b9ff;
     /* 圆角 */
-    --radius-sm:8px;
-    --radius-md:12px;
-    --radius-lg:20px;
-    --radius-xl:30px;
+    --radius-sm:10px;
+    --radius-md:16px;
+    --radius-lg:24px;
+    --radius-xl:32px;
     /* 动画 */
     --transition-fast:0.2s ease;
     --transition-normal:0.3s ease;
@@ -40,17 +41,18 @@
 }
 
 .dark{
-    --bg:#0f0f11;
-    --card-bg:#1a1a22;
-    --text-color:#f1f1f1;
-    --sub-text:#b0a8a4;
-    --primary:#a1887f;
-    --primary-light:#48403c;
-    --primary-gradient:linear-gradient(135deg,#a1887f,#d7ccc8);
-    --secondary-gradient:linear-gradient(135deg,#bcaaa4,#8d6e63);
-    --border:#333;
-    --shadow:0 2px 12px rgba(0,0,0,0.3);
-    --shadow-hover:0 12px 30px rgba(0,0,0,0.5);
+    --bg:#0d0d0d;
+    --card-bg:#1a1a2e;
+    --text-color:#f8f8f8;
+    --sub-text:#888888;
+    --primary:#a29bfe;
+    --primary-light:#6c5ce7;
+    --primary-gradient:linear-gradient(135deg,#a29bfe,#6c5ce7);
+    --secondary-gradient:linear-gradient(135deg,#fd79a8,#fab1a0);
+    --accent-gradient:linear-gradient(135deg,#00b894,#00cec9);
+    --border:#2d2d44;
+    --shadow:0 4px 15px rgba(0,0,0,0.2);
+    --shadow-hover:0 12px 40px rgba(108,92,231,0.3);
 }
 
 body{
@@ -117,6 +119,142 @@ input, select, textarea, .file-tip,
         radial-gradient(circle at 80% 20%, var(--primary) 1px, transparent 1px),
         radial-gradient(circle at 40% 40%, var(--primary) 1px, transparent 1px);
     background-size: 50px 50px;
+}
+
+/* 轮播图 */
+.carousel{
+    position:relative;
+    width:100%;
+    max-width:1200px;
+    height:320px;
+    margin:0 auto 30px;
+    border-radius:var(--radius-xl);
+    overflow:hidden;
+    box-shadow:var(--shadow-hover);
+}
+
+.carousel-track{
+    display:flex;
+    width:100%;
+    height:100%;
+    transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.carousel-item{
+    flex-shrink:0;
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+.carousel-item img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.carousel-item .carousel-overlay{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    padding:30px;
+    background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color:#fff;
+}
+
+.carousel-item .carousel-title{
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:5px;
+}
+
+.carousel-item .carousel-desc{
+    font-size:14px;
+    opacity:0.9;
+}
+
+.carousel-item .carousel-link-icon{
+    position:absolute;
+    top:15px;
+    right:15px;
+    font-size:24px;
+    opacity:0.8;
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{opacity:0.8;transform:scale(1);}
+    50%{opacity:1;transform:scale(1.1);}
+}
+
+.carousel-prev, .carousel-next{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.2);
+    backdrop-filter:blur(10px);
+    border:none;
+    color:#fff;
+    font-size:24px;
+    cursor:pointer;
+    transition:background 0.3s ease, transform 0.3s ease;
+    z-index:10;
+}
+
+.carousel-prev{
+    left:20px;
+}
+
+.carousel-next{
+    right:20px;
+}
+
+.carousel-prev:hover, .carousel-next:hover{
+    background:rgba(255,255,255,0.4);
+    transform:translateY(-50%) scale(1.1);
+}
+
+.carousel-indicators{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:10px;
+    z-index:10;
+}
+
+.carousel-indicator{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.5);
+    cursor:pointer;
+    transition:background 0.3s ease, transform 0.3s ease;
+    border:none;
+}
+
+.carousel-indicator.active{
+    background:#fff;
+    width:30px;
+    border-radius:6px;
+}
+
+.carousel-edit-btn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    z-index:10;
+    opacity:0;
+    transition:opacity 0.3s ease;
+}
+
+.carousel:hover .carousel-edit-btn{
+    opacity:1;
 }
 
 /* 欢迎弹窗 */
@@ -428,13 +566,13 @@ body:not(.admin-login) .qrcode-btn{
 }
 
 .read-cate{
-    font-size:18px;
-    color:var(--sub-text);
-    padding:8px 20px;
-    background:var(--primary-light);
-    border-radius:var(--radius-xl);
+    font-size:14px;
+    color:var(--primary);
+    padding:5px 14px;
+    background:rgba(108,92,231,0.1);
+    border-radius:var(--radius-md);
     display:inline-block;
-    margin-bottom:25px;
+    margin-bottom:15px;
     font-weight: 500;
 }
 
@@ -456,16 +594,16 @@ body:not(.admin-login) .qrcode-btn{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:10px;
-    margin:15px 0 25px;
+    gap:6px;
+    margin:10px 0 15px;
 }
 
 .read-tag{
-    font-size:13px;
-    color:var(--sub-text);
-    padding:6px 14px;
-    background:var(--primary-light);
-    border-radius:var(--radius-xl);
+    font-size:12px;
+    color:var(--primary);
+    padding:4px 10px;
+    background:rgba(108,92,231,0.08);
+    border-radius:var(--radius-md);
     font-weight: 500;
 }
 
@@ -576,7 +714,7 @@ audio{
     font-size:16px;
     opacity:0;
     transform:scale(0.5);
-    transition:all 0.3s ease;
+    transition:opacity 0.3s ease, transform 0.3s ease;
     z-index:3;
     box-shadow:0 2px 8px rgba(255,152,0,0.4);
     display: flex;
@@ -757,7 +895,7 @@ audio{
     font-weight:500;
     position:relative;
     overflow:hidden;
-    transition: all 0.3s ease;
+    transition:background 0.3s ease, transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
@@ -806,7 +944,7 @@ audio{
     font-size:15px;
     cursor:pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+    transition:border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .sort-box select:focus{
@@ -832,7 +970,7 @@ audio{
     cursor:pointer;
     box-shadow:0 4px 12px rgba(141,110,99, 0.25);
     display:none;
-    transition: all 0.3s ease;
+    transition:transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 #uploadToggle.show{
@@ -857,7 +995,7 @@ audio{
     max-height:2000px;
     opacity:1;
     visibility:visible;
-    transition:all 0.4s ease;
+    transition:opacity 0.4s ease, max-height 0.4s ease;
     display:none;
     position: relative;
 }
@@ -965,7 +1103,7 @@ textarea{
     border-radius:var(--radius-lg);
     overflow:hidden;
     box-shadow:var(--shadow);
-    transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275), box-shadow 0.4s ease;
     position:relative;
     border:1px solid var(--border);
     cursor:pointer;
@@ -998,6 +1136,15 @@ textarea{
     transform:scale(1.08);
 }
 
+.lazy-img{
+    opacity:0;
+    transition:opacity 0.3s ease;
+}
+
+.lazy-img.loaded{
+    opacity:1;
+}
+
 .book-info{
     padding:18px;
     text-align:center;
@@ -1021,29 +1168,32 @@ textarea{
 }
 
 .book-cate{
-    font-size:13px;
-    color:var(--sub-text);
-    padding:4px 10px;
-    background:var(--primary-light);
+    font-size:12px;
+    color:var(--primary);
+    padding:3px 10px;
+    background:rgba(108,92,231,0.1);
     border-radius:var(--radius-sm);
     display:inline-block;
-    margin-bottom:8px;
+    margin-bottom:6px;
+    font-weight:500;
+    white-space:nowrap;
 }
 
 .book-tags{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:5px;
-    margin-top:8px;
+    gap:4px;
+    margin-top:6px;
 }
 
 .book-tag{
     font-size:11px;
-    color:var(--sub-text);
-    padding:3px 8px;
-    background:var(--primary-light);
+    color:var(--primary);
+    padding:2px 6px;
+    background:rgba(108,92,231,0.08);
     border-radius:var(--radius-sm);
+    white-space:nowrap;
 }
 
 .del-btn{
@@ -1060,7 +1210,7 @@ textarea{
     font-size:16px;
     opacity:0;
     transform:scale(0.5);
-    transition:all 0.3s ease;
+    transition:opacity 0.3s ease, transform 0.3s ease;
     z-index:3;
     box-shadow:0 2px 8px rgba(255,23,68,0.4);
     display:none;
@@ -1082,7 +1232,7 @@ textarea{
     font-size:16px;
     opacity:0;
     transform:scale(0.5);
-    transition:all 0.3s ease;
+    transition:opacity 0.3s ease, transform 0.3s ease;
     z-index:3;
     box-shadow:0 2px 8px rgba(76,175,80,0.4);
     display:none;
@@ -1440,6 +1590,41 @@ textarea{
     </div>
 </div>
 
+<!-- 轮播图 -->
+<div class="carousel" id="carousel">
+    <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-item">
+            <img src="https://via.placeholder.com/1200x320?text=Banner+1" alt="轮播图1">
+            <div class="carousel-overlay">
+                <div class="carousel-title">欢迎来到 Hekaya 小故事</div>
+                <div class="carousel-desc">探索精彩的维吾尔文学世界</div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://via.placeholder.com/1200x320?text=Banner+2" alt="轮播图2">
+            <div class="carousel-overlay">
+                <div class="carousel-title">每日精选好书</div>
+                <div class="carousel-desc">发现更多精彩内容</div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://via.placeholder.com/1200x320?text=Banner+3" alt="轮播图3">
+            <div class="carousel-overlay">
+                <div class="carousel-title">有声读物上线</div>
+                <div class="carousel-desc">用耳朵感受文学的魅力</div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-prev" onclick="prevSlide()">‹</button>
+    <button class="carousel-next" onclick="nextSlide()">›</button>
+    <div class="carousel-indicators" id="carouselIndicators">
+        <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(1)"></button>
+        <button class="carousel-indicator" onclick="goToSlide(2)"></button>
+    </div>
+    <button class="carousel-edit-btn btn-common" onclick="openCarouselEdit()" style="display:none;">✏️ 编辑轮播</button>
+</div>
+
 <!-- 搜索框 -->
 <div class="search-box">
     <span class="search-icon">🔍</span>
@@ -1739,6 +1924,8 @@ function debounce(func, delay) {
 window.onload = async ()=>{
     renderBooks();
     initTab();
+    initCarousel();
+    initLazyLoad();
     
     // 初始化暗黑模式
     if(localStorage.getItem('dark')==='1'){
@@ -1875,6 +2062,8 @@ function updateAdminUI(){
         document.getElementById('uploadToggle').classList.add('show');
         document.getElementById('uploadBox').classList.add('show');
         document.getElementById('bookshelf').classList.add('admin-btns-show');
+        const carouselEditBtn = document.querySelector('.carousel-edit-btn');
+        if(carouselEditBtn) carouselEditBtn.style.display = 'block';
     }else{
         document.body.classList.remove("admin-login");
         document.getElementById('loginBtn').style.display = 'inline-block';
@@ -1883,6 +2072,8 @@ function updateAdminUI(){
         document.getElementById('uploadToggle').classList.remove('show');
         document.getElementById('uploadBox').classList.remove('show');
         document.getElementById('bookshelf').classList.remove('admin-btns-show');
+        const carouselEditBtn = document.querySelector('.carousel-edit-btn');
+        if(carouselEditBtn) carouselEditBtn.style.display = 'none';
     }
 }
 
@@ -2178,11 +2369,8 @@ function renderBooks(){
     const activeCate = document.querySelector('.tab.active').dataset.cate;
     const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
     
-    // 过滤书籍
     let filteredBooks = allBooks.filter(book => {
-        // 分类过滤
         const cateMatch = activeCate === 'all' || book.cate === activeCate;
-        // 搜索过滤
         const searchMatch = 
             book.title.toLowerCase().includes(searchText) || 
             book.tags.toLowerCase().includes(searchText) || 
@@ -2190,16 +2378,15 @@ function renderBooks(){
         return cateMatch && searchMatch;
     });
     
-    // 排序
     filteredBooks = sortBooksData(filteredBooks);
     
-    // 渲染
     if(filteredBooks.length === 0){
         shelf.innerHTML = '<div class="empty-tip">📚 暂无书籍，快去添加一本吧！</div>';
         return;
     }
     
-    shelf.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    
     filteredBooks.forEach(book => {
         const card = document.createElement('div');
         card.className = `book-card ${book.isTop ? 'top' : ''}`;
@@ -2207,20 +2394,13 @@ function renderBooks(){
         
         const topTag = isAdminLogin && book.isTop ? '<div class="top-tag">📌 置顶</div>' : '';
         
-        let tagsHtml = '';
-        if(book.tags){
-            book.tags.split(',').forEach(tag => {
-                tagsHtml += `<div class="book-tag">${escapeHtml(tag.trim())}</div>`;
-            });
-        }
-        
         const topBtnText = book.isTop ? '🔽' : '🔼';
         const topBtnClass = book.isTop ? 'top-btn untop-btn' : 'top-btn';
         const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
         
         card.innerHTML = `
             ${topTag}
-            <img class="book-cover" src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'">
+            <img class="book-cover lazy-img" data-src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'">
             <div class="book-info">
                 <div class="book-title">${escapeHtml(book.title)}</div>
                 <div class="book-cate">${escapeHtml(book.cate)}</div>
@@ -2230,8 +2410,13 @@ function renderBooks(){
             <button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>
         `;
         
-        shelf.appendChild(card);
+        fragment.appendChild(card);
     });
+    
+    shelf.innerHTML = '';
+    shelf.appendChild(fragment);
+    
+    initLazyLoad();
 }
 
 // 排序书籍
@@ -2268,6 +2453,47 @@ function sortBooks(){
 const filterBooks = debounce(() => {
     renderBooks();
 }, 300);
+
+let lazyLoadObserver = null;
+
+function initLazyLoad(){
+    if(lazyLoadObserver){
+        lazyLoadObserver.disconnect();
+    }
+    
+    const lazyImages = document.querySelectorAll('.lazy-img');
+    
+    if('IntersectionObserver' in window){
+        lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    const img = entry.target;
+                    const src = img.getAttribute('data-src');
+                    if(src){
+                        img.src = src;
+                        img.classList.add('loaded');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        }, {
+            rootMargin: '50px',
+            threshold: 0.1
+        });
+        
+        lazyImages.forEach(img => {
+            lazyLoadObserver.observe(img);
+        });
+    }else{
+        lazyImages.forEach(img => {
+            const src = img.getAttribute('data-src');
+            if(src){
+                img.src = src;
+                img.classList.add('loaded');
+            }
+        });
+    }
+}
 
 // 初始化分类标签
 function initTab(){
@@ -2308,7 +2534,10 @@ function exportBooksData(){
 let allBooks = ${JSON.stringify(allBooks, null, 4)};
 
 // 二维码数据
-let qrCodeData = "${qrCodeData}";`;
+let qrCodeData = "${qrCodeData}";
+
+// 轮播图数据
+let carouselData = ${JSON.stringify(carouselData, null, 4)};`;
     
     const exportModal = document.createElement('div');
     exportModal.className = 'modal-overlay export-modal';
@@ -2318,7 +2547,7 @@ let qrCodeData = "${qrCodeData}";`;
     
     const exportTitle = document.createElement('h3');
     exportTitle.className = 'export-title';
-    exportTitle.innerText = "📋 复制以下代码替换原文件中的对应部分";
+    exportTitle.innerText = "📋 复制以下代码（包含图书、二维码、轮播图数据）";
     
     const codeArea = document.createElement('textarea');
     codeArea.className = 'export-code';
@@ -2354,6 +2583,312 @@ let qrCodeData = "${qrCodeData}";`;
     exportModal.appendChild(exportBox);
     document.body.appendChild(exportModal);
 }
+
+// 轮播图功能
+let currentSlide = 0;
+let carouselTimer = null;
+const CAROUSEL_STORAGE_KEY = 'hekaya_carousel_data';
+let carouselData = [
+     {
+        "image": "https://pic.rmb.bdstatic.com/bjh/3ea623fd09b/251219/b5f9926ca4051316036ea37bf18cfe79.png",
+        "title": "欢迎来到 Hekaya 小故事",
+        "desc": "探索精彩的维吾尔文学世界",
+        "link": ""
+    },
+    {
+        "image": "https://img1.baidu.com/it/u=1817117755,432099410&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=934&amp;h=500",
+        "title": "每日精选好书",
+        "desc": "发现更多精彩内容",
+        "link": ""
+    },
+    {
+        "image": "https://i1.hdslb.com/bfs/archive/e08d1fe76da38ffd24c3057d20239ac1a0a73c39.jpg",
+        "title": "有声读物上线",
+        "desc": "用耳朵感受文学的魅力",
+        "link": ""
+    },
+    {
+        "image": "https://img2.baidu.com/it/u=2531817659,4171588850&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=1025&amp;h=574",
+        "title": "维吾尔语文案 | ئۇيغۇرچە يازمىلار",
+        "desc": "كۈندە نادىر يازمىلار يوللىنىدۇ",
+        "link": "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzYzMTk3OTQ1Nw==&amp;amp;amp;amp;action=getalbum&amp;amp;amp;amp;album_id=4585847137669218304&amp;amp;amp;amp;subscene=126&amp;amp;amp;amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzYzMTk3OTQ1Nw%3D%3D%26mid%3D2247483771%26idx%3D1%26sn%3D6e7c75c0ea6392e09a56b0332e174ae2%26chksm%3Df19ce04ba45222917b07b4a19a050454160af92fb0407db507e879a4b1525f85432de5b7bf5b%26scene%3D126%26sessionid%3D1783478147%26subscene%3Dundefined%26clicktime%3D1783478155%26enterid%3D1783478155%26click_id%3D813300684%26key%3Ddaf9bdc5abc4e8d090b4df174ebe2bf1ae759f8c1d37b6abb307dac590633a333376e74e8abb304e7545037068fa9a6ee502c24a0f2ff4a65bc4f7ea7868e061c586308356b705affcab4c9f27db08cd65e57ed3c0f3aa32b86243d005c4bd3ba59e3f759de1d46e5dd10f80bae7ed900b5dc8fd776feab29b3e1f0af6b968e8%26ascene%3D1%26uin%3DMjEzNDQzMTI2MQ%253D%253D%26devicetype%3DUnifiedPCWindows%26version%3Df2541a1d%26lang%3Dzh_CN%26countrycode%3DCN%26exportkey%3Dn_ChQIAhIQLZ3mUF%252BWCaPnjBP18cJo%252BhLnAQIE97dBBAEAAAAAAGd5LKt0REcAAAAOpnltbLcz9gKNyK89dVj0zg9gOMNcK0EhSQuRTTWmXXgawQMkd4kA3Fj72WipFWYqACnnevFe1CcsTT4T%252FHwpKZikcGMLosMWXqLe9niD6L3tOai%252FoQNacxge7EU%252FkcFIovJ%252B4FALHbFQzqqyjd1ftAIq4Lx%252F2xZgZQJZGdBpG2hWXLOzauGO3yPdDnYKYhPs7Oq%252FTCcB7NmYFDyWplBCL%252FN5fNdAAZFFWFm3UEgs1BdfYwli8hJr3833vsTobpaQKd3LqtxZ1ZZl8NY40RSRWQ%253D%253D%26acctmode%3D1%26pass_ticket%3DYhhOZzV4husvRkxro4KnvjGWF8OsdDBWJ6LkER3%252F9EjTjpMpI8ZgnEwXu6QW0iol%26wx_header%3D0%26fasttmpl_type%3D0%26fasttmpl_fullversion%3D8335294-zh_CN-html%26from_xworker%3D1&amp;amp;amp;amp;nolastread=1&amp;amp;amp;amp;sessionid=#wechat_redirect"
+    }
+];
+
+function initCarousel(){
+    loadCarouselData();
+    renderCarousel();
+    startCarousel();
+}
+
+function loadCarouselData(){
+    try{
+        const saved = localStorage.getItem(CAROUSEL_STORAGE_KEY);
+        if(saved){
+            const parsed = JSON.parse(saved);
+            if(Array.isArray(parsed) && parsed.length > 0){
+                carouselData = parsed.map(item => ({
+                    image: item.image || '',
+                    title: item.title || '',
+                    desc: item.desc || '',
+                    link: item.link || ''
+                }));
+            }
+        }
+    }catch(e){
+        console.error('加载轮播图数据失败:', e);
+    }
+}
+
+function saveCarouselToStorage(){
+    try{
+        localStorage.setItem(CAROUSEL_STORAGE_KEY, JSON.stringify(carouselData));
+    }catch(e){
+        console.error('保存轮播图数据失败:', e);
+        alert('⚠️ 保存失败，请检查浏览器存储权限');
+    }
+}
+
+function renderCarousel(){
+    const track = document.getElementById('carouselTrack');
+    const indicators = document.getElementById('carouselIndicators');
+    track.innerHTML = '';
+    indicators.innerHTML = '';
+    
+    carouselData.forEach((item, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-item';
+        if(item.link){
+            slide.style.cursor = 'pointer';
+            slide.onclick = () => {
+                if(item.link.startsWith('http://') || item.link.startsWith('https://')){
+                    window.open(item.link, '_blank');
+                }else{
+                    window.location.href = item.link;
+                }
+            };
+        }
+        slide.innerHTML = `
+            <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/1200x320?text=Banner'">
+            <div class="carousel-overlay">
+                <div class="carousel-title">${escapeHtml(item.title)}</div>
+                <div class="carousel-desc">${escapeHtml(item.desc)}</div>
+                ${item.link ? '<div class="carousel-link-icon">🔗</div>' : ''}
+            </div>
+        `;
+        track.appendChild(slide);
+        
+        const indicator = document.createElement('button');
+        indicator.className = `carousel-indicator ${index === currentSlide ? 'active' : ''}`;
+        indicator.onclick = () => goToSlide(index);
+        indicators.appendChild(indicator);
+    });
+}
+
+function startCarousel(){
+    stopCarousel();
+    carouselTimer = setInterval(nextSlide, 5000);
+}
+
+function stopCarousel(){
+    if(carouselTimer){
+        clearInterval(carouselTimer);
+        carouselTimer = null;
+    }
+}
+
+function nextSlide(){
+    currentSlide = (currentSlide + 1) % carouselData.length;
+    updateCarousel();
+}
+
+function prevSlide(){
+    currentSlide = (currentSlide - 1 + carouselData.length) % carouselData.length;
+    updateCarousel();
+}
+
+function goToSlide(index){
+    currentSlide = index;
+    updateCarousel();
+}
+
+function updateCarousel(){
+    const track = document.getElementById('carouselTrack');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    indicators.forEach((ind, i) => {
+        ind.classList.toggle('active', i === currentSlide);
+    });
+}
+
+// 轮播图管理
+function openCarouselEdit(){
+    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay utility-modal';
+    modal.id = 'carouselEditModal';
+    
+    const content = document.createElement('div');
+    content.className = 'utility-modal-content';
+    content.style.maxWidth = '500px';
+    content.style.maxHeight = '80vh';
+    content.style.overflowY = 'auto';
+    
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '20px';
+    
+    const title = document.createElement('h3');
+    title.textContent = '✏️ 编辑轮播图';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-close';
+    closeBtn.innerHTML = '×';
+    closeBtn.style.fontSize = '24px';
+    closeBtn.style.width = '32px';
+    closeBtn.style.height = '32px';
+    closeBtn.style.display = 'flex';
+    closeBtn.style.alignItems = 'center';
+    closeBtn.style.justifyContent = 'center';
+    closeBtn.onclick = closeCarouselEdit;
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    content.appendChild(header);
+    
+    const formContainer = document.createElement('div');
+    formContainer.id = 'carouselFormContainer';
+    renderCarouselForm(formContainer);
+    content.appendChild(formContainer);
+    
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-btn';
+    addBtn.textContent = '➕ 添加轮播图';
+    addBtn.style.width = '100%';
+    addBtn.style.marginTop = '15px';
+    addBtn.onclick = addCarouselItem;
+    content.appendChild(addBtn);
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn-common';
+    saveBtn.textContent = '💾 保存';
+    saveBtn.style.width = '100%';
+    saveBtn.style.marginTop = '10px';
+    saveBtn.onclick = saveCarouselData;
+    content.appendChild(saveBtn);
+    
+    modal.appendChild(content);
+    modal.onclick = (e) => {
+        if(e.target === modal) closeCarouselEdit();
+    };
+    content.onclick = e => e.stopPropagation();
+    document.body.appendChild(modal);
+}
+
+function closeCarouselEdit(){
+    const modal = document.getElementById('carouselEditModal');
+    if(modal){
+        modal.remove();
+    }
+}
+
+function renderCarouselForm(container){
+    container.innerHTML = '';
+    carouselData.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.style.border = '1px solid var(--border)';
+        itemDiv.style.borderRadius = 'var(--radius-md)';
+        itemDiv.style.padding = '15px';
+        itemDiv.style.marginBottom = '15px';
+        
+        const imgGroup = document.createElement('div');
+        imgGroup.className = 'form-group';
+        const imgInput = document.createElement('input');
+        imgInput.type = 'text';
+        imgInput.placeholder = '图片链接';
+        imgInput.value = escapeHtml(item.image);
+        imgInput.id = `carousel-img-${index}`;
+        imgGroup.appendChild(imgInput);
+        itemDiv.appendChild(imgGroup);
+        
+        const titleGroup = document.createElement('div');
+        titleGroup.className = 'form-group';
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.placeholder = '标题';
+        titleInput.value = escapeHtml(item.title);
+        titleInput.id = `carousel-title-${index}`;
+        titleGroup.appendChild(titleInput);
+        itemDiv.appendChild(titleGroup);
+        
+        const descGroup = document.createElement('div');
+        descGroup.className = 'form-group';
+        const descInput = document.createElement('input');
+        descInput.type = 'text';
+        descInput.placeholder = '描述';
+        descInput.value = escapeHtml(item.desc);
+        descInput.id = `carousel-desc-${index}`;
+        descGroup.appendChild(descInput);
+        itemDiv.appendChild(descGroup);
+        
+        const linkGroup = document.createElement('div');
+        linkGroup.className = 'form-group';
+        const linkInput = document.createElement('input');
+        linkInput.type = 'text';
+        linkInput.placeholder = '跳转链接（可选，支持 http/https）';
+        linkInput.value = escapeHtml(item.link || '');
+        linkInput.id = `carousel-link-${index}`;
+        linkGroup.appendChild(linkInput);
+        itemDiv.appendChild(linkGroup);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-common';
+        deleteBtn.textContent = '🗑️ 删除';
+        deleteBtn.style.width = '100%';
+        deleteBtn.style.marginTop = '5px';
+        deleteBtn.onclick = () => deleteCarouselItem(index);
+        itemDiv.appendChild(deleteBtn);
+        
+        container.appendChild(itemDiv);
+    });
+}
+
+function addCarouselItem(){
+    carouselData.push({
+        image: '',
+        title: '',
+        desc: '',
+        link: ''
+    });
+    renderCarouselForm(document.getElementById('carouselFormContainer'));
+}
+
+function deleteCarouselItem(index){
+    if(carouselData.length <= 1){
+        alert('⚠️ 至少保留一张轮播图');
+        return;
+    }
+    carouselData.splice(index, 1);
+    renderCarouselForm(document.getElementById('carouselFormContainer'));
+}
+
+function saveCarouselData(){
+    carouselData.forEach((item, index) => {
+        item.image = document.getElementById(`carousel-img-${index}`).value || 'https://via.placeholder.com/1200x320?text=Banner';
+        item.title = document.getElementById(`carousel-title-${index}`).value || '未命名';
+        item.desc = document.getElementById(`carousel-desc-${index}`).value || '';
+        item.link = document.getElementById(`carousel-link-${index}`).value || '';
+    });
+    saveCarouselToStorage();
+    closeCarouselEdit();
+    renderCarousel();
+    alert('✅ 轮播图保存成功！');
+}
+
 </script>
+
 </body>
 </html>
