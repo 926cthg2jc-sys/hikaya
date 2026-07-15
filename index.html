@@ -1,2894 +1,1042 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hekaya小故事｜个人书架</title>
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Microsoft YaHei", system-ui, sans-serif;
-}
-:root{
-    /* 主题颜色 */
-    --bg:#f5f3ef;
-    --card-bg:#ffffff;
-    --text-color:#2d2d2d;
-    --sub-text:#6b6b6b;
-    --primary:#6c5ce7;
-    --primary-light:#a29bfe;
-    --primary-gradient:linear-gradient(135deg,#6c5ce7,#a29bfe);
-    --secondary-gradient:linear-gradient(135deg,#fd79a8,#fab1a0);
-    --accent-gradient:linear-gradient(135deg,#00b894,#00cec9);
-    --border:#e8e8e8;
-    --shadow:0 4px 15px rgba(0,0,0,0.06);
-    --shadow-hover:0 12px 40px rgba(108,92,231,0.15);
-    --success:#00b894;
-    --warning:#fdcb6e;
-    --error:#ff6b6b;
-    --info:#74b9ff;
-    /* 圆角 */
-    --radius-sm:10px;
-    --radius-md:16px;
-    --radius-lg:24px;
-    --radius-xl:32px;
-    /* 动画 */
-    --transition-fast:0.2s ease;
-    --transition-normal:0.3s ease;
-    --transition-slow:0.5s ease;
-}
-
-.dark{
-    --bg:#0d0d0d;
-    --card-bg:#1a1a2e;
-    --text-color:#f8f8f8;
-    --sub-text:#888888;
-    --primary:#a29bfe;
-    --primary-light:#6c5ce7;
-    --primary-gradient:linear-gradient(135deg,#a29bfe,#6c5ce7);
-    --secondary-gradient:linear-gradient(135deg,#fd79a8,#fab1a0);
-    --accent-gradient:linear-gradient(135deg,#00b894,#00cec9);
-    --border:#2d2d44;
-    --shadow:0 4px 15px rgba(0,0,0,0.2);
-    --shadow-hover:0 12px 40px rgba(108,92,231,0.3);
-}
-
-body{
-    background:var(--bg);
-    color:var(--text-color);
-    padding:5px;
-    min-height:100vh;
-    overflow-x:hidden;
-    position:relative;
-    transition:background 0.3s ease, color 0.3s ease;
-}
-
-.transition-all{
-    transition:all 0.3s ease;
-}
-.transition-transform{
-    transition:transform 0.3s ease;
-}
-.transition-bg{
-    transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.main-content{
-    zoom: 0.8;
-}
-
-.modal-overlay{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
-    background:rgba(0,0,0,0.5);
-    backdrop-filter: blur(15px);
-    z-index:10000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    margin:0;
-}
-
-.tab, .book-cate, .book-tag, .read-tag, .read-cate, .empty-tip,
-input, select, textarea, .file-tip,
-.book-card, .book-info, .qrcode-wrap,
-.login-content, .edit-content, .audio-box{
-    transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* 装饰背景元素 */
-.bg-decoration {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.05;
-    background-image: 
-        radial-gradient(circle at 20% 80%, var(--primary) 1px, transparent 1px),
-        radial-gradient(circle at 80% 20%, var(--primary) 1px, transparent 1px),
-        radial-gradient(circle at 40% 40%, var(--primary) 1px, transparent 1px);
-    background-size: 50px 50px;
-}
-
-/* 轮播图 */
-.carousel{
-    position:relative;
-    width:100%;
-    max-width:1200px;
-    height:320px;
-    margin:0 auto 30px;
-    border-radius:var(--radius-xl);
-    overflow:hidden;
-    box-shadow:var(--shadow-hover);
-}
-
-.carousel-track{
-    display:flex;
-    width:100%;
-    height:100%;
-    transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);
-}
-
-.carousel-item{
-    flex-shrink:0;
-    width:100%;
-    height:100%;
-    position:relative;
-}
-
-.carousel-item img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-.carousel-item .carousel-overlay{
-    position:absolute;
-    bottom:0;
-    left:0;
-    right:0;
-    padding:30px;
-    background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-    color:#fff;
-}
-
-.carousel-item .carousel-title{
-    font-size:24px;
-    font-weight:600;
-    margin-bottom:5px;
-}
-
-.carousel-item .carousel-desc{
-    font-size:14px;
-    opacity:0.9;
-}
-
-.carousel-item .carousel-link-icon{
-    position:absolute;
-    top:15px;
-    right:15px;
-    font-size:24px;
-    opacity:0.8;
-    animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-    0%,100%{opacity:0.8;transform:scale(1);}
-    50%{opacity:1;transform:scale(1.1);}
-}
-
-.carousel-prev, .carousel-next{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.2);
-    backdrop-filter:blur(10px);
-    border:none;
-    color:#fff;
-    font-size:24px;
-    cursor:pointer;
-    transition:background 0.3s ease, transform 0.3s ease;
-    z-index:10;
-}
-
-.carousel-prev{
-    left:20px;
-}
-
-.carousel-next{
-    right:20px;
-}
-
-.carousel-prev:hover, .carousel-next:hover{
-    background:rgba(255,255,255,0.4);
-    transform:translateY(-50%) scale(1.1);
-}
-
-.carousel-indicators{
-    position:absolute;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:10px;
-    z-index:10;
-}
-
-.carousel-indicator{
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.5);
-    cursor:pointer;
-    transition:background 0.3s ease, transform 0.3s ease;
-    border:none;
-}
-
-.carousel-indicator.active{
-    background:#fff;
-    width:30px;
-    border-radius:6px;
-}
-
-.carousel-edit-btn{
-    position:absolute;
-    top:15px;
-    right:15px;
-    z-index:10;
-    opacity:0;
-    transition:opacity 0.3s ease;
-}
-
-.carousel:hover .carousel-edit-btn{
-    opacity:1;
-}
-
-/* 欢迎弹窗 */
-.welcome-modal{
-    z-index:99999;
-    animation: fadeInScale 0.6s ease;
-}
-
-.welcome-box{
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    padding:40px;
-    max-width:420px;
-    width:100%;
-    text-align:center;
-    box-shadow:var(--shadow-hover);
-    border: 1px solid rgba(141,110,99, 0.1);
-    position:relative;
-    overflow:hidden;
-    zoom: 0.8;
-}
-
-.welcome-box::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(141,110,99, 0.1) 0%, transparent 70%);
-    z-index: -1;
-}
-
-.welcome-title{
-    font-size:24px;
-    margin-bottom:20px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-.qrcode-wrap{
-    width:260px;
-    height:260px;
-    margin:0 auto 20px;
-    border:3px solid var(--primary-light);
-    border-radius:var(--radius-md);
-    overflow:hidden;
-    position:relative;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.qrcode-wrap:hover {
-    transform: scale(1.02);
-}
-
-#qrcodeImg{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-}
-
-.qrcode-btn{
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    background:rgba(141,110,99, 0.9);
-    color:#fff;
-    font-size:14px;
-    padding:10px 0;
-    cursor:pointer;
-    border:none;
-    outline:none;
-    transition: background 0.3s ease;
-}
-
-.qrcode-btn:hover{
-    background:rgba(141,110,99, 1);
-}
-
-body:not(.admin-login) .qrcode-btn{
-    display: none;
-}
-
-#qrcodeFile{
-    display: none;
-}
-
-#qrcodeUrl{
-    width:100%;
-    padding:12px;
-    border:1px solid var(--border);
-    border-radius:var(--radius-md);
-    font-size:14px;
-    background:var(--card-bg);
-    color:var(--text-color);
-    margin-bottom:10px;
-}
-
-.close-welcome{
-    padding:12px 40px;
-    background:var(--primary-gradient);
-    color:#fff;
-    border:none;
-    border-radius:var(--radius-xl);
-    font-size:16px;
-    cursor:pointer;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(141,110,99, 0.3);
-    transition: all 0.3s ease;
-    letter-spacing: 1px;
-}
-
-.close-welcome:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
-}
-
-/* 文件提示文字 */
-.file-tip {
-    font-size: 12px;
-    color: var(--sub-text);
-    margin-top: 4px;
-    padding-left: 4px;
-    font-style: italic;
-}
-
-/* 登录弹窗 */
-.login-modal{
-    z-index:10001;
-}
-
-.login-content{
-    max-width:380px;
-    width:100%;
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    padding:35px;
-    box-shadow:var(--shadow-hover);
-    text-align:center;
-    position:relative;
-    overflow:hidden;
-    zoom: 0.8;
-}
-
-.login-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: var(--primary-gradient);
-}
-
-.login-content h3{
-    margin-bottom:25px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    font-size:24px;
-    font-weight: 700;
-}
-
-.login-form-group{
-    margin:18px 0;
-    text-align:left;
-}
-
-.login-form-group label{
-    font-size:14px;
-    color:var(--sub-text);
-    margin-bottom:6px;
-    display:block;
-    font-weight: 500;
-}
-
-.login-form-group input{
-    width:100%;
-    padding:14px;
-    border:1px solid var(--border);
-    border-radius:var(--radius-md);
-    font-size:15px;
-    background:var(--card-bg);
-    color:var(--text-color);
-    transition:all 0.3s ease;
-}
-
-.login-form-group input:focus{
-    outline:none;
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(141,110,99, 0.2);
-    transform: scale(1.01);
-}
-
-.login-btn{
-    width:100%;
-    margin-top:25px;
-    padding:14px;
-    background:var(--primary-gradient);
-    color:#fff;
-    border:none;
-    border-radius:var(--radius-md);
-    font-size:16px;
-    cursor:pointer;
-    font-weight: 500;
-    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
-    transition:all 0.3s ease;
-}
-
-.login-btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
-}
-
-.login-error{
-    color:var(--error);
-    font-size:14px;
-    margin-top:12px;
-    height:20px;
-    font-weight: 500;
-}
-
-/* 阅读弹窗 */
-.read-page{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100vw;
-    height:100vh;
-    background:var(--bg);
-    z-index:9999;
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding:40px 20px 80px;
-    overflow-y:auto;
-    animation: slideInUp 0.4s ease;
-    margin:0;
-}
-
-.read-page.show{
-    display:flex;
-}
-
-.read-back-btn{
-    position:fixed;
-    top:25px;
-    left:25px;
-    padding:12px 28px;
-    border-radius:var(--radius-xl);
-    border:none;
-    background:var(--primary-gradient);
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
-    z-index:10;
-    transition:all 0.3s ease;
-    font-weight: 500;
-}
-
-.read-back-btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
-}
-
-.read-content{
-    max-width:700px;
-    width:100%;
-    text-align:center;
-    padding-top:80px;
-    padding-bottom:50px;
-}
-
-.read-cover{
-    width:100%;
-    max-width:350px;
-    border-radius:var(--radius-lg);
-    box-shadow:var(--shadow-hover);
-    margin:0 auto 30px;
-    border: 1px solid var(--border);
-    transition: transform 0.3s ease;
-}
-
-.read-cover:hover {
-    transform: scale(1.02);
-}
-
-.read-title{
-    font-size:32px;
-    font-weight:700;
-    margin-bottom:15px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    line-height: 1.3;
-}
-
-.read-cate{
-    font-size:14px;
-    color:var(--primary);
-    padding:5px 14px;
-    background:rgba(108,92,231,0.1);
-    border-radius:var(--radius-md);
-    display:inline-block;
-    margin-bottom:15px;
-    font-weight: 500;
-}
-
-.read-desc{
-    font-size:16px;
-    color:var(--text-color);
-    line-height:1.8;
-    margin:20px 0;
-    padding:0 15px;
-    background: rgba(141,110,99, 0.05);
-    padding: 15px;
-    border-radius: var(--radius-md);
-    direction: rtl;
-    text-align: justify;
-    unicode-bidi: plaintext;
-}
-
-.read-tags{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:6px;
-    margin:10px 0 15px;
-}
-
-.read-tag{
-    font-size:12px;
-    color:var(--primary);
-    padding:4px 10px;
-    background:rgba(108,92,231,0.08);
-    border-radius:var(--radius-md);
-    font-weight: 500;
-}
-
-.read-actions{
-    display:flex;
-    gap:18px;
-    justify-content:center;
-    margin:25px 0;
-    flex-wrap:wrap;
-}
-
-.read-btn{
-    padding:14px 28px;
-    border-radius:var(--radius-xl);
-    background:var(--primary-gradient);
-    color:white;
-    border:none;
-    cursor:pointer;
-    font-size:15px;
-    transition:all 0.3s;
-    font-weight: 500;
-    min-width: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.read-btn.audio{
-    background:linear-gradient(135deg,#7b4397,#dc2430);
-}
-
-.read-btn.book{
-    background:linear-gradient(135deg,#4caf50,#81c784);
-}
-
-.read-btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 15px rgba(0,0,0,0.2);
-}
-
-/* 音频播放弹窗 */
-.audio-modal{
-    z-index:10002;
-    display:none;
-    cursor:pointer;
-}
-
-.audio-modal.show{
-    display:flex;
-}
-
-.audio-box{
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    padding:35px;
-    width:100%;
-    max-width:480px;
-    text-align:center;
-    box-shadow:var(--shadow-hover);
-    cursor:default;
-    border: 1px solid var(--border);
-}
-
-.audio-title{
-    margin-bottom:25px;
-    font-size:20px;
-    color: var(--primary);
-    font-weight: 600;
-}
-
-audio{
-    width:100%;
-    margin-top:15px;
-    margin-bottom:25px;
-    border-radius: var(--radius-md);
-}
-
-.close-audio-btn{
-    margin-top: 15px;
-    padding:10px 25px;
-    background:var(--primary-gradient);
-    color:white;
-    border:none;
-    border-radius:var(--radius-md);
-    cursor:pointer;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.close-audio-btn:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-/* 置顶按钮 */
-.top-btn{
-    position:absolute;
-    top:15px;
-    right:15px;
-    background:var(--warning);
-    color:#fff;
-    border:none;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    cursor:pointer;
-    font-size:16px;
-    opacity:0;
-    transform:scale(0.5);
-    transition:opacity 0.3s ease, transform 0.3s ease;
-    z-index:3;
-    box-shadow:0 2px 8px rgba(255,152,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.untop-btn{
-    background:var(--info);
-}
-
-.book-card:hover .top-btn{
-    opacity:1;
-    transform:scale(1);
-}
-
-.top-btn:hover{
-    transform:scale(1.15) !important;
-    box-shadow:0 4px 12px rgba(255,152,0,0.6);
-}
-
-.top-tag{
-    position:absolute;
-    top:12px;
-    left:12px;
-    background:var(--warning);
-    color:#fff;
-    font-size:11px;
-    padding:4px 10px;
-    border-radius:var(--radius-sm);
-    z-index:2;
-    box-shadow:0 2px 4px rgba(255,152,0,0.3);
-    font-weight: 600;
-}
-
-@keyframes fadeIn{
-    from{opacity:0;}
-    to{opacity:1;}
-}
-
-@keyframes fadeInScale{
-    from{opacity:0; transform: scale(0.9);}
-    to{opacity:1; transform: scale(1);}
-}
-
-@keyframes slideInUp{
-    from{opacity:0; transform: translateY(30px);}
-    to{opacity:1; transform: translateY(0);}
-}
-
-/* 顶部栏 */
-.top-bar{
-    max-width:1200px;
-    margin:0 auto 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:15px;
-    position: relative;
-}
-
-.top-bar::after {
-    content: '';
-    position: absolute;
-    bottom: -15px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
-}
-
-.header h1{
-    font-size:38px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-align:center;
-    font-weight:800;
-    letter-spacing:2px;
-    animation:titleGlow 3s ease-in-out infinite alternate;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-@keyframes titleGlow{
-    from{filter:drop-shadow(0 0 3px rgba(141,110,99, 0.4));}
-    to{filter:drop-shadow(0 0 10px rgba(141,110,99, 0.7));}
-}
-
-.btn-common{
-    padding:12px 24px;
-    border-radius:var(--radius-xl);
-    border:none;
-    background:var(--primary-gradient);
-    color:#fff;
-    cursor:pointer;
-    font-size:15px;
-    font-weight:500;
-    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
-    margin:0 5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition:all 0.3s ease;
-}
-
-.btn-common:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 20px rgba(141,110,99, 0.4);
-}
-
-#logoutBtn{
-    background:linear-gradient(135deg,#ff5252,#ff1744);
-}
-
-#exportDataBtn{
-    background:linear-gradient(135deg,#2196F3,#42A5F5);
-}
-
-#darkToggle{
-    background:linear-gradient(135deg,#9e9e9e,#607d8b);
-}
-
-/* 搜索框 */
-.search-box{
-    max-width:500px;
-    width:100%;
-    margin:0 auto 25px;
-    position:relative;
-}
-
-#searchInput{
-    width:100%;
-    padding:16px 20px 16px 50px;
-    border:1px solid var(--border);
-    border-radius:var(--radius-xl);
-    font-size:15px;
-    background:var(--card-bg);
-    color:var(--text-color);
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-}
-
-#searchInput:focus{
-    outline:none;
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(141,110,99, 0.2), inset 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.search-icon{
-    position:absolute;
-    left:20px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--sub-text);
-    font-size: 18px;
-}
-
-/* 分类标签 */
-.category-tabs{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-bottom:25px;
-}
-
-.tab{
-    padding:12px 24px;
-    background:var(--card-bg);
-    border:1px solid var(--border);
-    border-radius:var(--radius-xl);
-    font-size:15px;
-    cursor:pointer;
-    color:var(--text-color);
-    font-weight:500;
-    position:relative;
-    overflow:hidden;
-    transition:background 0.3s ease, transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.tab::before{
-    content:'';
-    position:absolute;
-    top:0;
-    left:-100%;
-    width:100%;
-    height:100%;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
-    transition:left 0.5s ease;
-}
-
-.tab:hover::before{
-    left:100%;
-}
-
-.tab:hover {
-    transform: translateY(-2px);
-    border-color: var(--primary);
-}
-
-.tab.active{
-    background:var(--primary-gradient);
-    color:#fff;
-    border-color: var(--primary);
-    box-shadow:0 4px 15px rgba(141,110,99, 0.4);
-    transform:scale(1.05);
-    font-weight: 600;
-}
-
-/* 排序控件 */
-.sort-box{
-    max-width:1200px;
-    margin:0 auto 25px;
-    text-align:center;
-}
-
-.sort-box select{
-    padding:10px 24px;
-    border-radius:var(--radius-xl);
-    border:1px solid var(--border);
-    background:var(--card-bg);
-    color:var(--text-color);
-    font-size:15px;
-    cursor:pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition:border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sort-box select:focus{
-    outline:none;
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(141,110,99, 0.2);
-}
-
-/* 上传折叠按钮 */
-.upload-toggle-box{
-    max-width:600px;
-    margin:0 auto 15px;
-    text-align:center;
-}
-
-#uploadToggle{
-    padding:10px 28px;
-    border-radius:var(--radius-xl);
-    border:none;
-    background:var(--primary-gradient);
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    box-shadow:0 4px 12px rgba(141,110,99, 0.25);
-    display:none;
-    transition:transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-#uploadToggle.show{
-    display:inline-block;
-}
-
-#uploadToggle:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 18px rgba(141,110,99, 0.35);
-}
-
-/* 上传面板 */
-.upload-box{
-    max-width:600px;
-    margin:0 auto 35px;
-    padding:30px;
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    box-shadow:var(--shadow);
-    border:1px solid var(--border);
-    overflow:hidden;
-    max-height:2000px;
-    opacity:1;
-    visibility:visible;
-    transition:opacity 0.4s ease, max-height 0.4s ease;
-    display:none;
-    position: relative;
-}
-
-.upload-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: var(--primary-gradient);
-}
-
-.upload-box.show{
-    display:block;
-}
-
-.upload-box.hide-upload{
-    max-height:0;
-    opacity:0;
-    visibility:hidden;
-    padding:0 30px;
-    margin-bottom:0;
-}
-
-.upload-box h3{
-    margin-bottom:22px;
-    background:var(--primary-gradient);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-align:center;
-    font-size:22px;
-    font-weight: 700;
-}
-
-.form-group{
-    margin:18px 0;
-}
-
-input,select,textarea{
-    width:100%;
-    padding:14px;
-    border:1px solid var(--border);
-    border-radius:var(--radius-md);
-    font-size:15px;
-    background:var(--card-bg);
-    color:var(--text-color);
-    transition:all 0.3s ease;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
-}
-
-input:focus,select:focus,textarea:focus{
-    outline:none;
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(141,110,99, 0.2), inset 0 2px 5px rgba(0,0,0,0.05);
-    transform:scale(1.01);
-}
-
-.add-btn,.save-btn{
-    width:100%;
-    margin-top:15px;
-    padding:16px;
-    background:var(--primary-gradient);
-    color:#fff;
-    border:none;
-    border-radius:var(--radius-md);
-    font-size:16px;
-    font-weight:500;
-    cursor:pointer;
-    box-shadow:0 4px 15px rgba(141,110,99, 0.3);
-    transition:all 0.3s ease;
-}
-
-.save-btn{
-    background:linear-gradient(135deg,#4caf50,#81c784);
-}
-
-.add-btn:hover,.save-btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 25px rgba(141,110,99, 0.45);
-}
-
-.save-btn:hover{
-    box-shadow:0 8px 25px rgba(76,175,80, 0.45);
-}
-
-textarea{
-    min-height:120px;
-    resize:vertical;
-}
-
-/* 书架网格 */
-.bookshelf{
-    max-width:1200px;
-    margin:0 auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-    gap:32px;
-}
-
-.book-card{
-    background:var(--card-bg);
-    border-radius:var(--radius-lg);
-    overflow:hidden;
-    box-shadow:var(--shadow);
-    transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275), box-shadow 0.4s ease;
-    position:relative;
-    border:1px solid var(--border);
-    cursor:pointer;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.book-card.top{
-    border:2px solid var(--warning);
-    box-shadow:0 0 20px rgba(255,152,0,0.3);
-}
-
-.book-card:hover{
-    transform:translateY(-15px) scale(1.05);
-    box-shadow:var(--shadow-hover);
-}
-
-.book-cover{
-    width:100%;
-    height:240px;
-    object-fit:cover;
-    display:block;
-    transition:transform 0.5s ease;
-    border-bottom: 1px solid var(--border);
-}
-
-.book-card:hover .book-cover{
-    transform:scale(1.08);
-}
-
-.lazy-img{
-    opacity:0;
-    transition:opacity 0.3s ease;
-}
-
-.lazy-img.loaded{
-    opacity:1;
-}
-
-.book-info{
-    padding:18px;
-    text-align:center;
-    background:var(--card-bg);
-    position:relative;
-    z-index:2;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.book-title{
-    font-weight:600;
-    font-size:16px;
-    margin-bottom:8px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    color: var(--text-color);
-}
-
-.book-cate{
-    font-size:12px;
-    color:var(--primary);
-    padding:3px 10px;
-    background:rgba(108,92,231,0.1);
-    border-radius:var(--radius-sm);
-    display:inline-block;
-    margin-bottom:6px;
-    font-weight:500;
-    white-space:nowrap;
-}
-
-.book-tags{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:4px;
-    margin-top:6px;
-}
-
-.book-tag{
-    font-size:11px;
-    color:var(--primary);
-    padding:2px 6px;
-    background:rgba(108,92,231,0.08);
-    border-radius:var(--radius-sm);
-    white-space:nowrap;
-}
-
-.del-btn{
-    position:absolute;
-    top:15px;
-    right:55px;
-    background:linear-gradient(135deg,#ff5252,#ff1744);
-    color:#fff;
-    border:none;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    cursor:pointer;
-    font-size:16px;
-    opacity:0;
-    transform:scale(0.5);
-    transition:opacity 0.3s ease, transform 0.3s ease;
-    z-index:3;
-    box-shadow:0 2px 8px rgba(255,23,68,0.4);
-    display:none;
-    align-items: center;
-    justify-content: center;
-}
-
-.edit-card-btn{
-    position:absolute;
-    top:15px;
-    left:55px;
-    background:linear-gradient(135deg,#4caf50,#81c784);
-    color:#fff;
-    border:none;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    cursor:pointer;
-    font-size:16px;
-    opacity:0;
-    transform:scale(0.5);
-    transition:opacity 0.3s ease, transform 0.3s ease;
-    z-index:3;
-    box-shadow:0 2px 8px rgba(76,175,80,0.4);
-    display:none;
-    align-items: center;
-    justify-content: center;
-}
-
-.book-card:hover .del-btn,
-.book-card:hover .edit-card-btn,
-.book-card:hover .top-btn{
-    opacity:1;
-    transform:scale(1);
-}
-
-.del-btn:hover,
-.edit-card-btn:hover,
-.top-btn:hover{
-    transform:scale(1.15) !important;
-}
-
-.admin-btns-show .del-btn,
-.admin-btns-show .edit-card-btn,
-.admin-btns-show .top-btn{
-    display:flex;
-}
-
-.empty-tip{
-    grid-column:1/-1;
-    text-align:center;
-    padding:100px 0;
-    color:var(--sub-text);
-    font-size:20px;
-    animation:fadeIn 1s ease;
-    background: rgba(141,110,99, 0.03);
-    border-radius: var(--radius-lg);
-    border: 1px dashed var(--border);
-}
-
-.hide{
-    display:none !important;
-}
-
-/* 编辑弹窗 */
-.edit-modal{
-    z-index:10000;
-    display:none;
-}
-
-.edit-modal.show{
-    display:flex;
-    animation:fadeIn 0.4s ease;
-}
-
-.edit-content{
-    max-width:550px;
-    width:100%;
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    padding:35px;
-    box-shadow:var(--shadow-hover);
-    position:relative;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.close-edit-btn{
-    position:absolute;
-    top:15px;
-    right:15px;
-    background:transparent;
-    border:none;
-    color:var(--sub-text);
-    font-size:24px;
-    cursor:pointer;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.close-edit-btn:hover{
-    background: rgba(0,0,0,0.1);
-    color: var(--text-color);
-}
-
-/* 响应式适配 */
-@media (max-width:768px){
-    .top-bar{
-        flex-direction:column;
-        gap: 10px;
-    }
-    
-    .header h1{
-        font-size:30px;
-    }
-    
-    .bookshelf{
-        grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-        gap:20px;
-    }
-    
-    .read-content{
-        max-width:95%;
-        padding-top: 100px;
-    }
-    
-    .read-title{
-        font-size:26px;
-    }
-    
-    .btn-common{
-        margin:5px 0;
-        width: 100%;
-    }
-    
-    .qrcode-wrap{
-        width:220px;
-        height:220px;
-    }
-    
-    .category-tabs{
-        gap:8px;
-    }
-    
-    .tab{
-        padding:10px 16px;
-        font-size:14px;
-    }
-    
-    .upload-box{
-        padding: 20px;
-    }
-    
-    .read-actions{
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .read-btn{
-        min-width: auto;
-        width: 100%;
-    }
-}
-
-/* 加载动画 */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* 滚动条样式 */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-light);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
-}
-
-/* 通用弹窗样式 */
-.utility-modal{
-    z-index:100000;
-}
-
-.utility-modal-content{
-    background:var(--card-bg);
-    border-radius:var(--radius-xl);
-    padding:30px;
-    max-width:420px;
-    width:100%;
-    text-align:center;
-    box-shadow:var(--shadow-hover);
-}
-
-.utility-modal-title{
-    margin-bottom:25px;
-    color:var(--primary);
-    font-weight:600;
-}
-
-.utility-btn{
-    display:block;
-    width:100%;
-    padding:14px;
-    margin-bottom:18px;
-    border:none;
-    border-radius:var(--radius-md);
-    cursor:pointer;
-    font-size:16px;
-    font-weight:500;
-    transition:all 0.3s ease;
-}
-
-.utility-btn:hover{
-    transform:translateY(-2px);
-}
-
-.utility-btn-primary{
-    background:var(--primary-gradient);
-    color:white;
-}
-
-.utility-btn-primary:hover{
-    box-shadow:0 4px 15px rgba(141,110,99, 0.4);
-}
-
-.utility-btn-blue{
-    background:linear-gradient(135deg, #2196F3, #42A5F5);
-    color:white;
-}
-
-.utility-btn-blue:hover{
-    box-shadow:0 4px 15px rgba(33,150,243, 0.4);
-}
-
-.utility-btn-gray{
-    background:#666;
-    color:white;
-    margin-bottom:0;
-}
-
-.utility-btn-gray:hover{
-    box-shadow:0 4px 15px rgba(102,102,102, 0.4);
-}
-
-/* 导出弹窗 */
-.export-modal{
-    z-index:99999;
-}
-
-.export-box{
-    background:#fff;
-    border-radius:var(--radius-xl);
-    padding:25px;
-    width:100%;
-    max-width:800px;
-    max-height:80vh;
-    overflow:auto;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    position:relative;
-}
-
-.export-title{
-    margin-bottom:15px;
-    color:var(--primary);
-    text-align:center;
-    font-weight:600;
-}
-
-.export-code{
-    width:100%;
-    height:400px;
-    padding:15px;
-    border:1px solid var(--border);
-    border-radius:var(--radius-md);
-    font-family:monospace;
-    font-size:14px;
-    resize:none;
-    background:#f8f9fa;
-    color:#333;
-    font-weight:500;
-}
-
-.export-btn{
-    margin-top:15px;
-    padding:12px 35px;
-    background:var(--success);
-    color:#fff;
-    border:none;
-    border-radius:var(--radius-xl);
-    cursor:pointer;
-    font-size:16px;
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
-    font-weight:500;
-    transition:all 0.3s ease;
-}
-
-.export-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 4px 15px rgba(76,175,80, 0.4);
-}
-
-.export-close-btn{
-    margin-top:10px;
-    padding:10px 25px;
-    background:#666;
-    color:#fff;
-    border:none;
-    border-radius:var(--radius-xl);
-    cursor:pointer;
-    font-size:14px;
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
-    font-weight:500;
-    transition:all 0.3s ease;
-}
-
-.export-close-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 4px 15px rgba(102,102,102, 0.4);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hekaya小故事｜个人书架</title>
+    <style>
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei", system-ui, sans-serif; }
+        :root{
+            --bg:#f5f3ef; --card-bg:#ffffff; --text-color:#2d2d2d; --sub-text:#6b6b6b;
+            --primary:#6c5ce7; --primary-light:#a29bfe; --primary-gradient:linear-gradient(135deg,#6c5ce7,#a29bfe);
+            --secondary-gradient:linear-gradient(135deg,#fd79a8,#fab1a0); --accent-gradient:linear-gradient(135deg,#00b894,#00cec9);
+            --border:#e8e8e8; --shadow:0 4px 15px rgba(0,0,0,0.06); --shadow-hover:0 12px 40px rgba(108,92,231,0.15);
+            --success:#00b894; --warning:#fdcb6e; --error:#ff6b6b; --info:#74b9ff;
+            --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-xl:32px;
+            --transition-fast:0.2s ease; --transition-normal:0.3s ease; --transition-slow:0.5s ease;
+        }
+        .dark{
+            --bg:#0d0d0d; --card-bg:#1a1a2e; --text-color:#f8f8f8; --sub-text:#888888;
+            --primary:#a29bfe; --primary-light:#6c5ce7; --primary-gradient:linear-gradient(135deg,#a29bfe,#6c5ce7);
+            --border:#2d2d44; --shadow:0 4px 15px rgba(0,0,0,0.2); --shadow-hover:0 12px 40px rgba(108,92,231,0.3);
+        }
+        body{ background:var(--bg); color:var(--text-color); min-height:100vh; overflow-x:hidden; overflow-y:auto; }
+        
+        .modal-overlay{
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.5); backdrop-filter: blur(15px); z-index:10000;
+            display:flex; align-items:center; justify-content:center; padding:20px; margin:0;
+        }
+        .reading-overlay{
+            position:fixed !important; top:0 !important; left:0 !important; width:100% !important; height:100vh !important;
+            background:rgba(0,0,0,0.5) !important; backdrop-filter: blur(15px) !important; z-index:10000 !important;
+            padding:20px !important; margin:0 !important;
+            overflow-y:auto !important;
+            display:block !important;
+            align-items:normal !important;
+            justify-content:normal !important;
+        }
+
+        #welcomePage{
+            position:fixed; top:0; left:0; right:0; bottom:0;
+            background:#1a2f23; display:flex; align-items:center; justify-content:center;
+            padding:40px 20px; z-index:100;
+        }
+        #welcomePage.hidden{ display:none; }
+        
+        .welcome-container{
+            background:#1a2f23; border-radius:24px; padding:60px 80px;
+            max-width:900px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.4); position:relative;
+        }
+        .welcome-top-label{ text-align:center; color:#6b8e7b; font-size:12px; letter-spacing:3px; margin-bottom:20px; text-transform:uppercase; }
+        .welcome-title{ text-align:center; color:#fff; font-size:36px; font-weight:700; margin-bottom:50px; letter-spacing:-1px; }
+        
+        .welcome-books-container{
+            display:flex; justify-content:center; align-items:flex-end; gap:-20px;
+            margin-bottom:30px; perspective:1000px;
+        }
+        .welcome-book-cover{
+            width:140px; height:200px; border-radius:8px; overflow:hidden;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3); transition:transform 0.3s ease;
+            cursor:pointer; position:relative;
+        }
+        .welcome-book-cover:hover{ transform:translateY(-10px) scale(1.05); z-index:10; }
+        .welcome-book-cover img{ width:100%; height:100%; object-fit:cover; }
+        .welcome-book-cover:nth-child(1){ transform:rotate(-8deg) translateX(20px); }
+        .welcome-book-cover:nth-child(2){ transform:rotate(-4deg) translateX(10px); }
+        .welcome-book-cover:nth-child(3){ transform:rotate(2deg); }
+        .welcome-book-cover:nth-child(4){ transform:rotate(6deg) translateX(-10px); }
+        .welcome-book-cover:hover:nth-child(1){ transform:rotate(-5deg) translateX(20px) translateY(-10px) scale(1.05); }
+        .welcome-book-cover:hover:nth-child(2){ transform:rotate(-2deg) translateX(10px) translateY(-10px) scale(1.05); }
+        .welcome-book-cover:hover:nth-child(3){ transform:rotate(0deg) translateY(-10px) scale(1.05); }
+        .welcome-book-cover:hover:nth-child(4){ transform:rotate(4deg) translateX(-10px) translateY(-10px) scale(1.05); }
+        
+        .welcome-meta-info{ text-align:center; color:#6b8e7b; font-size:13px; margin-bottom:40px; letter-spacing:1px; }
+        
+        .welcome-edit-btn, .welcome-login-btn{
+            position:absolute; top:20px; right:20px; padding:10px 20px;
+            background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+            border-radius:20px; color:#fff; font-size:13px; cursor:pointer; transition:all 0.3s ease;
+        }
+        .welcome-edit-btn:hover, .welcome-login-btn:hover{ background:rgba(255,255,255,0.2); }
+        .welcome-edit-btn{ display:none; }
+        .admin-login .welcome-edit-btn{ display:block; }
+        .admin-login .welcome-login-btn{ display:none; }
+        
+        .start-reading-btn{
+            display:flex; width:50px; height:50px; margin:20px auto 0; padding:0;
+            background:#4a9060; border:none; border-radius:50%; color:#fff; font-size:20px;
+            cursor:pointer; transition:all 0.3s ease; align-items:center; justify-content:center;
+        }
+        .start-reading-btn:hover{ background:#3a8050; transform:translateY(-2px) scale(1.1); box-shadow:0 5px 20px rgba(74,144,96,0.3); }
+        
+        .welcome-modal-content{ background:#2a4535; border-radius:20px; padding:40px; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; position:relative; color:#fff; scrollbar-width:thin; scrollbar-color:#4a9060 #1a2f23; }
+        .welcome-modal-content::-webkit-scrollbar{ width:6px; }
+        .welcome-modal-content::-webkit-scrollbar-track{ background:#1a2f23; border-radius:3px; }
+        .welcome-modal-content::-webkit-scrollbar-thumb{ background:#4a9060; border-radius:3px; }
+        .welcome-modal-content::-webkit-scrollbar-thumb:hover{ background:#3a8050; }
+        .welcome-modal-title{ font-size:24px; font-weight:600; margin-bottom:30px; text-align:center; }
+        .welcome-close-modal-btn{ position:absolute; top:15px; right:15px; background:none; border:none; color:#fff; font-size:28px; cursor:pointer; width:35px; height:35px; display:flex; align-items:center; justify-content:center; }
+        .welcome-form-group{ margin-bottom:20px; }
+        .welcome-form-group label{ display:block; font-size:14px; color:#6b8e7b; margin-bottom:8px; }
+        .welcome-form-group input{ width:100%; padding:12px 15px; background:#1a2f23; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:14px; outline:none; }
+        .welcome-form-group input:focus{ border-color:#4a9060; }
+        .welcome-book-preview{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .welcome-add-form{ background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-top:15px; }
+        .welcome-meta-preview{ display:flex; flex-direction:column; gap:10px; margin-bottom:15px; }
+        .welcome-meta-item{ display:flex; gap:10px; align-items:center; }
+        .welcome-meta-item input{ flex:1; padding:10px 12px; background:#1a2f23; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:13px; outline:none; }
+        .welcome-meta-item input:focus{ border-color:#4a9060; }
+        .welcome-add-meta{ display:flex; gap:10px; }
+        .welcome-add-meta input{ flex:1; padding:10px 12px; background:#1a2f23; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:13px; outline:none; }
+        .welcome-preview-item{ width:80px; height:110px; border-radius:6px; overflow:hidden; position:relative; border:2px solid transparent; cursor:pointer; }
+        .welcome-preview-item.selected{ border-color:#4a9060; }
+        .welcome-preview-item img{ width:100%; height:100%; object-fit:cover; }
+        .welcome-preview-item .welcome-edit-btn{ position:absolute; top:5px; left:5px; width:20px; height:20px; background:rgba(74,144,96,0.8); border:none; color:#fff; font-size:10px; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        .welcome-preview-item .welcome-remove-btn{ position:absolute; top:5px; right:5px; width:20px; height:20px; background:rgba(0,0,0,0.7); border:none; color:#fff; font-size:12px; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        .welcome-link-info{ font-size:10px; color:#666; margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .welcome-upload-btn{ display:block; width:100%; padding:12px; background:#4a9060; border:none; border-radius:10px; color:#fff; font-size:14px; cursor:pointer; margin-bottom:15px; }
+        .welcome-upload-btn:hover{ background:#3a8050; }
+        .welcome-save-btn{ display:block; width:100%; padding:14px; background:#4a9060; border:none; border-radius:10px; color:#fff; font-size:16px; font-weight:600; cursor:pointer; }
+        .welcome-save-btn:hover{ background:#3a8050; }
+        .welcome-login-form{ text-align:center; }
+        .welcome-login-form input{ width:100%; padding:12px 15px; background:#1a2f23; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:14px; outline:none; margin-bottom:15px; }
+        .welcome-login-form input:focus{ border-color:#4a9060; }
+        .welcome-login-form button{ width:100%; padding:14px; background:#4a9060; border:none; border-radius:10px; color:#fff; font-size:16px; font-weight:600; cursor:pointer; }
+
+        #bookshelfPage{ display:none; }
+        #bookshelfPage.active{ display:block; }
+        
+        .main-content{ zoom:0.8; }
+        
+        .header{ display:flex; align-items:center; justify-content:space-between; padding:20px 30px; background:var(--card-bg); border-radius:var(--radius-lg); box-shadow:var(--shadow); margin-bottom:30px; }
+        .logo{ font-size:24px; font-weight:700; background:var(--primary-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; cursor:pointer; }
+        .header-right{ display:flex; align-items:center; gap:15px; }
+        .theme-toggle-btn{
+            width:40px; height:40px; border:none; border-radius:50%;
+            background:var(--card-bg); border:1px solid var(--border);
+            font-size:18px; cursor:pointer; transition:var(--transition-normal);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .theme-toggle-btn:hover{ transform:rotate(20deg); border-color:var(--primary); }
+        
+        .btn-common{ padding:12px 24px; border:none; border-radius:var(--radius-md); font-size:14px; font-weight:600; cursor:pointer; transition:var(--transition-normal); }
+        .btn-primary{ background:var(--primary-gradient); color:#fff; }
+        .btn-primary:hover{ transform:translateY(-2px); box-shadow:var(--shadow-hover); }
+        .btn-outline{ background:transparent; border:2px solid var(--primary); color:var(--primary); }
+        .btn-outline:hover{ background:var(--primary); color:#fff; }
+        .btn-secondary{ background:var(--secondary-gradient); color:#fff; }
+        .btn-sm{ padding:8px 16px; font-size:12px; }
+        
+        .search-box{ max-width:500px; width:100%; margin:0 auto 25px; position:relative; }
+        #searchInput{ width:100%; padding:16px 20px 16px 50px; border:1px solid var(--border); border-radius:var(--radius-xl); font-size:15px; background:var(--card-bg); color:var(--text-color); box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        #searchInput:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(141,110,99,0.2), inset 0 2px 5px rgba(0,0,0,0.05); }
+        .search-icon{ position:absolute; left:20px; top:50%; transform:translateY(-50%); color:var(--sub-text); font-size:18px; }
+        .search-result-count{ text-align:center; font-size:14px; color:var(--sub-text); margin-bottom:20px; min-height:20px; }
+        
+        .category-tabs{ display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-bottom:25px; }
+        .tab{ padding:12px 24px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-xl); font-size:15px; color:var(--text-color); cursor:pointer; transition:var(--transition-normal); }
+        .tab:hover{ border-color:var(--primary); color:var(--primary); }
+        .tab.active{ background:var(--primary-gradient); color:#fff; border:none; }
+        
+        .sort-box{ display:flex; justify-content:center; margin-bottom:20px; }
+        #sortSelect{ padding:10px 20px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-md); color:var(--text-color); font-size:14px; cursor:pointer; outline:none; }
+        
+        .bookshelf{ display:grid; grid-template-columns:repeat(6, 1fr); gap:20px; padding:0; max-width:1200px; margin:0 auto; }
+        .book-card{ background:var(--card-bg); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); transition:var(--transition-normal); position:relative; cursor:pointer; }
+        .book-card:hover{ transform:translateY(-8px); box-shadow:var(--shadow-hover); }
+        .book-card.top{ border:2px solid var(--primary); }
+        .book-cover{ width:100%; height:260px; object-fit:cover; display:block; }
+        .book-info{ padding:15px; text-align:center; }
+        .book-title{ font-size:15px; font-weight:600; color:var(--text-color); margin-bottom:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
+        .book-cate{ font-size:12px; color:var(--sub-text); padding:4px 10px; background:rgba(108,92,231,0.1); border-radius:var(--radius-sm); display:inline-block; }
+        
+        .top-tag{ position:absolute; top:10px; left:10px; background:var(--primary-gradient); color:#fff; padding:4px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; z-index:2; }
+        .top-btn, .del-btn, .edit-card-btn{
+            position:absolute; width:35px; height:35px; border:none; border-radius:50%; font-size:16px; cursor:pointer; transition:var(--transition-fast); display:none; align-items:center; justify-content:center;
+        }
+        .top-btn{ top:10px; right:10px; background:rgba(255,255,255,0.9); }
+        .del-btn{ bottom:10px; right:10px; background:rgba(255,107,107,0.9); color:#fff; }
+        .edit-card-btn{ bottom:10px; right:50px; background:rgba(108,92,231,0.9); color:#fff; font-size:14px; }
+        .admin-btns-show .top-btn, .admin-btns-show .del-btn, .admin-btns-show .edit-card-btn{ display:flex; }
+        
+        .upload-box{ background:var(--card-bg); border-radius:var(--radius-lg); padding:30px; box-shadow:var(--shadow); margin-bottom:30px; max-width:600px; margin-left:auto; margin-right:auto; }
+        .upload-box h3{ font-size:20px; margin-bottom:25px; color:var(--text-color); }
+        .form-group{ margin-bottom:20px; }
+        .form-group input, .form-group select{ width:100%; padding:14px 18px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; background:var(--card-bg); color:var(--text-color); outline:none; }
+        .form-group input:focus, .form-group select:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+        .form-group textarea{ width:100%; padding:14px 18px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; background:var(--card-bg); color:var(--text-color); outline:none; min-height:120px; resize:vertical; }
+        .form-group textarea:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+        .form-group label{ font-size:13px; color:var(--sub-text); margin-bottom:8px; display:block; }
+        
+        .upload-toggle-box{ text-align:center; margin-bottom:20px; }
+        #uploadToggle{ padding:12px 30px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-md); color:var(--text-color); font-size:14px; cursor:pointer; }
+        #uploadToggle:hover{ border-color:var(--primary); color:var(--primary); }
+        .hide-upload{ display:none; }
+        
+        .empty-tip{ text-align:center; padding:80px 20px; color:var(--sub-text); font-size:18px; }
+        
+        .read-page{
+            position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh;
+            background:var(--bg); z-index:9999;
+            display:none; flex-direction:column; align-items:center; justify-content:flex-start;
+            padding:40px 20px 80px; overflow-y:auto; margin:0;
+        }
+        .read-page.show{ display:flex; }
+        .read-back-btn{
+            position:fixed; top:25px; left:25px; padding:12px 28px;
+            border-radius:var(--radius-xl); border:none; background:var(--primary-gradient); color:#fff;
+            font-size:15px; cursor:pointer; box-shadow:0 4px 15px rgba(141,110,99,0.3);
+            z-index:10; transition:all 0.3s ease; font-weight:500;
+        }
+        .read-back-btn:hover{ transform:translateY(-3px); box-shadow:0 6px 20px rgba(141,110,99,0.4); }
+        .read-content{ max-width:700px; width:100%; text-align:center; padding-top:80px; padding-bottom:50px; }
+        .read-cover{ width:100%; max-width:350px; border-radius:var(--radius-lg); box-shadow:var(--shadow-hover); margin:0 auto 30px; border:1px solid var(--border); }
+        .read-title{ font-size:32px; font-weight:700; margin-bottom:15px; color:var(--text-color); line-height:1.3; }
+        .read-cate{ font-size:14px; color:var(--primary); padding:5px 14px; background:rgba(108,92,231,0.1); border-radius:var(--radius-md); display:inline-block; margin-bottom:15px; font-weight:500; }
+        .read-tags{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:10px 0 15px; }
+        .read-tag{ font-size:12px; color:var(--primary); padding:4px 10px; background:rgba(108,92,231,0.08); border-radius:var(--radius-md); font-weight:500; }
+        .read-desc{ font-size:16px; color:var(--text-color); line-height:1.8; margin:20px 0; padding:15px; background:rgba(141,110,99,0.05); border-radius:var(--radius-md); direction:rtl; text-align:justify; unicode-bidi:plaintext; }
+        .read-actions{ display:flex; gap:18px; justify-content:center; margin:25px 0; flex-wrap:wrap; }
+        .read-btn{ padding:14px 28px; border-radius:var(--radius-xl); background:var(--primary-gradient); color:white; border:none; cursor:pointer; font-size:15px; transition:all 0.3s; font-weight:500; min-width:150px; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .read-btn:hover{ transform:translateY(-3px); box-shadow:0 6px 15px rgba(0,0,0,0.2); }
+        
+        .edit-modal{ background:var(--card-bg); border-radius:var(--radius-lg); padding:30px; max-width:600px; width:100%; max-height:90vh; overflow-y:auto; position:relative; }
+        .edit-modal h2{ font-size:22px; margin-bottom:25px; color:var(--text-color); }
+        .modal-close-btn{ position:absolute; top:15px; right:15px; background:none; border:none; color:var(--text-color); font-size:28px; cursor:pointer; width:35px; height:35px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background 0.2s; }
+        .modal-close-btn:hover{ background:rgba(0,0,0,0.1); }
+        
+        .login-modal{ background:var(--card-bg); border-radius:var(--radius-lg); padding:50px 40px 40px; max-width:400px; width:100%; position:relative; text-align:center; }
+        .login-modal h2{ font-size:24px; margin-bottom:30px; color:var(--text-color); }
+        .login-modal input{ width:100%; padding:14px 18px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; background:var(--card-bg); color:var(--text-color); outline:none; margin-bottom:20px; }
+        .login-modal input:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+        .login-modal button{ width:100%; padding:14px; background:var(--primary-gradient); border:none; border-radius:var(--radius-md); color:#fff; font-size:16px; font-weight:600; cursor:pointer; }
+        
+        .toast{ position:fixed; top:20px; right:20px; padding:16px 24px; border-radius:var(--radius-md); color:#fff; font-size:14px; font-weight:600; z-index:20000; animation:slideIn 0.3s ease; }
+        .toast-success{ background:var(--success); }
+        .toast-error{ background:var(--error); }
+        .toast-info{ background:var(--info); }
+        @keyframes slideIn{ from{ transform:translateX(100%); opacity:0; } to{ transform:translateX(0); opacity:1; } }
+        
+        .yazmilar-list{ display:flex; flex-direction:column; gap:25px; max-width:800px; margin:0 auto; }
+        .yazmilar-item{ background:var(--card-bg); border-radius:var(--radius-lg); padding:30px 40px; box-shadow:var(--shadow); position:relative; transition:transform 0.3s ease, box-shadow 0.3s ease; cursor:pointer; }
+        .yazmilar-item:hover{ transform:translateX(8px); box-shadow:var(--shadow-hover); }
+        .yazmilar-text{ font-size:17px; color:var(--text-color); line-height:1.8; text-align:justify; margin-bottom:15px; }
+        .yazmilar-meta{ display:flex; justify-content:space-between; align-items:center; }
+        .yazmilar-tags{ display:flex; flex-wrap:wrap; gap:6px; }
+        .yazmilar-tag{ font-size:11px; color:var(--primary); padding:2px 8px; background:rgba(108,92,231,0.1); border-radius:var(--radius-sm); }
+        
+        .carousel-container{ position:relative; width:100%; max-width:1200px; margin:0 auto 30px; overflow:hidden; border-radius:var(--radius-lg); }
+        .carousel{ display:flex; transition:transform 0.5s ease; }
+        .carousel-slide{ min-width:100%; height:400px; position:relative; cursor:pointer; }
+        .carousel-slide img{ width:100%; height:100%; object-fit:cover; }
+        .carousel-overlay{ position:absolute; top:0; left:0; right:0; bottom:0; background:transparent; }
+        .carousel-caption{ position:absolute; bottom:40px; left:40px; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.5); }
+        .carousel-caption h3{ font-size:28px; margin-bottom:10px; }
+        .carousel-caption p{ font-size:16px; opacity:0.9; }
+        .carousel-controls{ position:absolute; top:50%; transform:translateY(-50%); width:100%; display:flex; justify-content:space-between; padding:0 10px; pointer-events:none; }
+        .carousel-controls button{ width:36px; height:36px; border:none; border-radius:50%; background:rgba(255,255,255,0.2); color:#fff; font-size:14px; cursor:pointer; opacity:0.6; transition:all 0.3s ease; pointer-events:auto; }
+        .carousel-controls button:hover{ background:rgba(255,255,255,0.4); opacity:1; }
+        .carousel-indicators{ position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:10px; }
+        .carousel-indicator{ width:12px; height:12px; border:none; border-radius:50%; background:rgba(255,255,255,0.5); cursor:pointer; }
+        .carousel-indicator.active{ background:#fff; }
+        .carousel-edit-btn{ position:absolute; top:20px; right:20px; z-index:10; }
+        
+        .lazy-img{ background:#f5f5f5; }
+        .lazy-img.loaded{ background:none; }
+        
+        @media (max-width:768px){
+            .welcome-container{ padding:40px 30px; }
+            .welcome-title{ font-size:28px; }
+            .welcome-book-cover{ width:100px; height:145px; }
+            .welcome-input-row{ flex-direction:column; }
+            .header{ padding:15px 20px; flex-direction:column; gap:15px; }
+            .bookshelf{ grid-template-columns:repeat(3, 1fr); gap:15px; max-width:100%; }
+            .book-cover{ height:220px; }
+            .search-box{ padding:0 10px; }
+        }
+    </style>
 </head>
 <body>
-<div class="bg-decoration"></div>
-
-<!-- 首页欢迎弹窗 + 二维码 -->
-<div class="modal-overlay welcome-modal" id="welcomeModal">
-    <div class="welcome-box">
-        <h2 class="welcome-title">📚 欢迎关注公众号：Hekaya小故事</h2>
-        <div class="qrcode-wrap">
-            <img id="qrcodeImg" src="" alt="公众号二维码">
-            <button class="qrcode-btn" onclick="triggerQrcode()">🔄 更换二维码</button>
-            <input type="file" id="qrcodeFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="handleQrcodeUpload(this)">
-            <input type="text" id="qrcodeUrl" placeholder="或输入网络图片链接" style="display:none;">
+    <div id="welcomePage">
+        <div class="welcome-container">
+            <button class="welcome-login-btn" onclick="openWelcomeLoginModal()">🔐 管理员登录</button>
+            <button class="welcome-edit-btn" onclick="openWelcomeEditModal()">✏️ 编辑页面</button>
+            <div class="welcome-top-label" id="welcomeTopLabel">2026 HEKAYA 小故事｜个人书架</div>
+            <h1 class="welcome-title" id="welcomePageTitle">Bü Gün Kitap Uqudigizmu</h1>
+            <div class="welcome-books-container" id="welcomeBooksContainer">
+                <div class="welcome-book-cover" onclick="goToBookshelf()"><img src="https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover" alt="Book 1"></div>
+                <div class="welcome-book-cover" onclick="goToBookshelf()"><img src="https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3" alt="Book 2"></div>
+                <div class="welcome-book-cover" onclick="goToBookshelf()"><img src="https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover" alt="Book 3"></div>
+                <div class="welcome-book-cover" onclick="goToBookshelf()"><img src="https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover" alt="Book 4"></div>
+            </div>
+            <div class="welcome-meta-info" id="welcomeMetaInfo" onclick="location.reload();">4 BOOKS · 4 WEEKS · JUNE 2026</div>
+            <button class="start-reading-btn" onclick="goToBookshelf()" title="进入书架">📚</button>
         </div>
-        <button class="close-welcome" onclick="closeWelcome()">进入主页</button>
     </div>
-</div>
 
-<div class="main-content">
-<div class="top-bar">
-    <div class="header"><h1>Hekaya小故事</h1></div>
-    <div>
-        <button id="loginBtn" class="btn-common" onclick="openLoginModal()">🔐 管理员登录</button>
-        <button id="logoutBtn" class="btn-common" onclick="logout()" style="display:none;">🚪 退出登录</button>
-        <button id="exportDataBtn" class="btn-common" onclick="exportBooksData()" style="display:none;">📥 导出数据</button>
-        <button id="darkToggle" class="btn-common" onclick="toggleDark()">🌙 暗黑模式</button>
+    <div id="bookshelfPage">
+        <div class="main-content">
+            <header class="header">
+                <div class="logo" onclick="goToWelcome()">Hekaya📚</div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" title="切换主题">🌙</button>
+                    <button class="btn-common btn-outline btn-sm" id="loginBtn" onclick="openLoginModal()">🔐 登录</button>
+                    <button class="btn-common btn-outline btn-sm" id="logoutBtn" onclick="logout()" style="display:none;">🚪 退出登录</button>
+                    <button class="btn-common btn-primary" id="uploadBtn" onclick="toggleUploadBox()" style="display:none;">📁 添加书籍</button>
+                    <button class="btn-common btn-secondary" id="exportBtn" onclick="exportData()" style="display:none;">📥 导出数据</button>
+                </div>
+            </header>
+            <div class="carousel-container">
+                <div class="carousel" id="carousel">
+                    <div class="carousel-slide"><img src="https://picsum.photos/1200/400?random=1" alt="Slide 1"><div class="carousel-overlay"></div><div class="carousel-caption"><h3>欢迎来到 Hekaya</h3><p>发现精彩的维吾尔语书籍</p></div></div>
+                    <div class="carousel-slide"><img src="https://picsum.photos/1200/400?random=2" alt="Slide 2"><div class="carousel-overlay"></div><div class="carousel-caption"><h3>每日推荐</h3><p>精选好书，每日更新</p></div></div>
+                    <div class="carousel-slide"><img src="https://picsum.photos/1200/400?random=3" alt="Slide 3"><div class="carousel-overlay"></div><div class="carousel-caption"><h3>阅读分享</h3><p>与朋友分享阅读心得</p></div></div>
+                </div>
+                <div class="carousel-controls"><button onclick="prevSlide()">‹</button><button onclick="nextSlide()">›</button></div>
+                <div class="carousel-indicators" id="carouselIndicators">
+                    <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
+                    <button class="carousel-indicator" onclick="goToSlide(1)"></button>
+                    <button class="carousel-indicator" onclick="goToSlide(2)"></button>
+                </div>
+                <button class="carousel-edit-btn btn-common" id="carouselEditBtn" onclick="openCarouselEdit()" style="display:none;">✏️ 编辑轮播</button>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="搜索书名/标签/分类/简介..." oninput="filterBooks()">
+            </div>
+            <div class="search-result-count" id="searchResultCount"></div>
+            <div class="category-tabs">
+                <button class="tab active" data-cate="all">全部</button>
+                <button class="tab" data-cate="Roman">Roman</button>
+                <button class="tab" data-cate="Hekaya">Hekaya</button>
+                <button class="tab" data-cate="Rasimlik">Rasimlik</button>
+                <button class="tab" data-cate="Adibiy Aser">Adibiy Aser</button>
+                <button class="tab" data-cate="Awazlik">Awazlik</button>
+                <button class="tab" data-cate="Yazmilar">Yazmilar</button>
+            </div>
+            <div class="sort-box">
+                <select id="sortSelect" onchange="sortBooks()">
+                    <option value="default">📌 默认排序（置顶优先）</option>
+                    <option value="random">🎲 随机排序</option>
+                    <option value="title-asc">🔤 书名升序</option>
+                    <option value="title-desc">🔠 书名降序</option>
+                    <option value="cate-asc">🏷️ 分类升序</option>
+                </select>
+            </div>
+            <div class="upload-toggle-box" id="uploadToggleBox" style="display:none;">
+                <button id="uploadToggle" onclick="toggleUploadBox()">📁 展开/隐藏上传区域</button>
+            </div>
+            <div class="upload-box hide-upload" id="uploadBox">
+                <h3>➕ 添加新图书</h3>
+                <div class="form-group"><input type="text" id="book-title" placeholder="📝 输入图书名称 *"></div>
+                <div class="form-group">
+                    <select id="book-category">
+                        <option value="">🏷️ 选择分类 *</option>
+                        <option value="Roman">Roman</option>
+                        <option value="Hekaya">Hekaya</option>
+                        <option value="Rasimlik">Rasimlik</option>
+                        <option value="Adibiy Aser">Adibiy Aser</option>
+                        <option value="Awazlik">Awazlik</option>
+                        <option value="Yazmilar">Yazmilar</option>
+                    </select>
+                </div>
+                <div class="form-group"><textarea id="book-desc" placeholder="📖 图书简介（可选）"></textarea></div>
+                <div class="form-group"><input type="text" id="book-tags" placeholder="🏷️ 标签，用逗号分隔（可选）"></div>
+                <div class="form-group"><input type="text" id="book-link" placeholder="🔗 阅读链接（可选）"></div>
+                <div class="form-group"><input type="text" id="book-cover" placeholder="🖼️ 封面图片链接（可选）"></div>
+                <button class="btn-common btn-primary" onclick="uploadBook()">✅ 确认添加</button>
+            </div>
+            <div class="bookshelf" id="bookshelf"></div>
+        </div>
     </div>
-</div>
 
-<!-- 轮播图 -->
-<div class="carousel" id="carousel">
-    <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-item">
-            <img src="https://via.placeholder.com/1200x320?text=Banner+1" alt="轮播图1">
-            <div class="carousel-overlay">
-                <div class="carousel-title">欢迎来到 Hekaya 小故事</div>
-                <div class="carousel-desc">探索精彩的维吾尔文学世界</div>
+    <div class="read-page" id="readPage">
+        <button class="read-back-btn" onclick="closeReadPage()">← 返回书架</button>
+        <div class="read-content">
+            <img id="readCover" class="read-cover" alt="封面">
+            <h2 id="readTitle" class="read-title"></h2>
+            <div id="readCate" class="read-cate"></div>
+            <div id="readTags" class="read-tags"></div>
+            <div id="readDesc" class="read-desc"></div>
+            <div class="read-actions">
+                <button class="read-btn" id="readLinkBtn" onclick="openBookLink()">🔗 打开阅读链接</button>
             </div>
         </div>
-        <div class="carousel-item">
-            <img src="https://via.placeholder.com/1200x320?text=Banner+2" alt="轮播图2">
-            <div class="carousel-overlay">
-                <div class="carousel-title">每日精选好书</div>
-                <div class="carousel-desc">发现更多精彩内容</div>
-            </div>
-        </div>
-        <div class="carousel-item">
-            <img src="https://via.placeholder.com/1200x320?text=Banner+3" alt="轮播图3">
-            <div class="carousel-overlay">
-                <div class="carousel-title">有声读物上线</div>
-                <div class="carousel-desc">用耳朵感受文学的魅力</div>
-            </div>
-        </div>
     </div>
-    <button class="carousel-prev" onclick="prevSlide()">‹</button>
-    <button class="carousel-next" onclick="nextSlide()">›</button>
-    <div class="carousel-indicators" id="carouselIndicators">
-        <button class="carousel-indicator active" onclick="goToSlide(0)"></button>
-        <button class="carousel-indicator" onclick="goToSlide(1)"></button>
-        <button class="carousel-indicator" onclick="goToSlide(2)"></button>
-    </div>
-    <button class="carousel-edit-btn btn-common" onclick="openCarouselEdit()" style="display:none;">✏️ 编辑轮播</button>
-</div>
 
-<!-- 搜索框 -->
-<div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="搜索书名/标签/分类..." oninput="filterBooks()">
-</div>
-
-<!-- 分类标签 -->
-<div class="category-tabs">
-    <button class="tab active" data-cate="all">全部</button>
-    <button class="tab" data-cate="Roman">Roman</button>
-    <button class="tab" data-cate="Hekaya">Hekaya</button>
-    <button class="tab" data-cate="Rasimlik">Rasimlik</button>
-    <button class="tab" data-cate="Adibiy Aser">Adibiy Aser</button>
-    <button class="tab" data-cate="Awazlik">Awazlik</button>
-</div>
-
-<!-- 排序控件 -->
-<div class="sort-box">
-    <select id="sortSelect" onchange="sortBooks()">
-        <option value="default">📌 默认排序（置顶优先）</option>
-        <option value="title-asc">🔤 书名升序</option>
-        <option value="title-desc">🔠 书名降序</option>
-        <option value="cate-asc">🏷️ 分类升序</option>
-    </select>
-</div>
-
-<div class="upload-toggle-box">
-    <button id="uploadToggle" onclick="toggleUploadBox()">📁 展开/隐藏上传区域</button>
-</div>
-
-<!-- 上传面板 -->
-<div class="upload-box" id="uploadBox">
-    <h3>➕ 添加新图书</h3>
-    <div class="form-group">
-        <input type="text" id="book-title" placeholder="📝 输入图书名称 *">
-    </div>
-    <div class="form-group">
-        <select id="book-category">
-            <option value="">🏷️ 选择分类 *</option>
-            <option value="Roman">Roman</option>
-            <option value="Hekaya">Hekaya</option>
-            <option value="Rasimlik">Rasimlik</option>
-            <option value="Adibiy Aser">Adibiy Aser</option>
-            <option value="Awazlik">Awazlik</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <textarea id="book-desc" placeholder="💬 输入书籍简介（选填）"></textarea>
-    </div>
-    <div class="form-group">
-        <input type="text" id="book-tags" placeholder="🏷️ 输入标签，多个标签用逗号分隔（选填）">
-    </div>
-    <div class="form-group">
-        <input type="text" id="book-link" placeholder="🔗 填写阅读链接/本地文件地址（选填）">
-    </div>
-    <div class="form-group">
-        <input type="text" id="cover-url" placeholder="🖼️ 封面图片网络链接（选填）">
-    </div>
-    <div class="form-group">
-        <input type="file" id="cover-input" accept="image/*" onchange="showFileName(this, 'coverFileTip', '📸 未选择封面图片')">
-        <div class="file-tip" id="coverFileTip">📸 未选择封面图片</div>
-    </div>
-    <div class="form-group">
-        <input type="file" id="book-file" accept=".txt,.pdf,.epub" onchange="showFileName(this, 'bookFileTip', '📚 未选择电子书')">
-        <label style="font-size:13px;color:var(--sub-text)">📚 上传电子书（txt/pdf/epub）</label>
-        <div class="file-tip" id="bookFileTip">📖 未选择电子书</div>
-    </div>
-    <div class="form-group">
-        <input type="file" id="audio-file" accept="audio/*" onchange="showFileName(this, 'audioFileTip', '🎵 未选择音频文件')">
-        <label style="font-size:13px;color:var(--sub-text)">🔊 上传有声读物（mp3/wav）</label>
-        <div class="file-tip" id="audioFileTip">🎵 未选择音频文件</div>
-    </div>
-    <button class="add-btn" onclick="addBook()">➕ 加入书架</button>
-</div>
-
-<div class="bookshelf" id="bookshelf"></div>
-</div>
-
-<!-- 登录弹窗 -->
-<div class="modal-overlay login-modal" id="loginModal" style="display:none;" onclick="closeLoginModal()">
-    <div class="login-content" onclick="event.stopPropagation()">
-        <button class="close-edit-btn" onclick="closeLoginModal()">×</button>
-        <h3>🔐 管理员登录</h3>
-        <div class="login-form-group">
-            <label>👤 账号</label>
-            <input type="text" id="loginUser" placeholder="输入管理员账号">
-        </div>
-        <div class="login-form-group">
-            <label>🔒 密码</label>
-            <input type="password" id="loginPwd" placeholder="输入管理员密码">
-        </div>
-        <div class="login-error" id="loginError"></div>
-        <button class="login-btn" onclick="doLogin()">登录</button>
-    </div>
-</div>
-
-<!-- 阅读弹窗 -->
-<div class="read-page" id="readPage">
-    <button class="read-back-btn" onclick="closeReadPage()">← 返回书架</button>
-    <div class="read-content">
-        <img id="readCover" class="read-cover" alt="封面">
-        <h2 id="readTitle" class="read-title"></h2>
-        <div id="readCate" class="read-cate"></div>
-        <div id="readTags" class="read-tags"></div>
-        <div id="readDesc" class="read-desc"></div>
+    <script>
+        let isAdminLogin = false, uploadBoxShow = false, currentSlide = 0, slides = [];
+        const WELCOME_STORAGE_KEY = 'welcome_page_data';
         
-        <div class="read-actions">
-            <button class="read-btn book" id="readLinkBtn" onclick="openBookLink()">🔗 打开阅读链接</button>
-            <button class="read-btn book" id="readBookBtn" onclick="openBookFile()">📖 下载电子书</button>
-            <button class="read-btn audio" id="playAudioBtn" onclick="openAudioPlayer()">🔊 播放有声书</button>
-        </div>
-    </div>
-</div>
-
-<!-- 音频播放弹窗 -->
-<div class="modal-overlay audio-modal" id="audioModal" onclick="closeAudioModal()">
-    <div class="audio-box" onclick="event.stopPropagation()">
-        <h3 class="audioTitle" id="audioTitle"></h3>
-        <audio id="bookAudio" controls></audio>
-        <button class="close-audio-btn" onclick="closeAudioModal()">❌ 关闭并返回</button>
-    </div>
-</div>
-
-<!-- 编辑弹窗 -->
-<div class="modal-overlay edit-modal" id="editModal">
-    <div class="edit-content">
-        <button class="close-edit-btn" onclick="closeEditModal()">×</button>
-        <h3>✏️ 编辑图书信息</h3>
-        <input type="hidden" id="edit-book-id">
+        function escapeHtml(str){
+            if(!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
         
-        <div class="form-group">
-            <input type="text" id="edit-book-title" placeholder="📝 书名 *">
-        </div>
-        <div class="form-group">
-            <select id="edit-book-category">
-                <option value="">🏷️ 选择分类 *</option>
-                <option value="Roman">Roman</option>
-                <option value="Hekaya">Hekaya</option>
-                <option value="Rasimlik">Rasimlik</option>
-                <option value="Adibiy Aser">Adibiy Aser</option>
-                <option value="Awazlik">Awazlik</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <textarea id="edit-book-desc" placeholder="💬 简介"></textarea>
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-book-tags" placeholder="🏷️ 标签">
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-book-link" placeholder="🔗 阅读链接/本地文件地址（选填）">
-        </div>
-        <div class="form-group">
-            <input type="text" id="edit-cover-url" placeholder="🖼️ 封面网络链接">
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-cover-input" accept="image/*" onchange="showFileName(this, 'editCoverFileTip', '📸 未选择新封面', '✅ 已选择新封面：')">
-            <div class="file-tip" id="editCoverFileTip">📸 未选择新封面</div>
-        </div>
-        <div class="form-group">
-            <img id="edit-cover-preview" style="width:120px;height:150px;object-fit:cover;border-radius:var(--radius-md);display:block;margin:0 auto;">
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-book-file" accept=".txt,.pdf,.epub" onchange="showFileName(this, 'editBookFileTip', '📚 未选择新电子书', '✅ 已选择新电子书：')">
-            <div class="file-tip" id="editBookFileTip">📖 未选择新电子书</div>
-        </div>
-        <div class="form-group">
-            <input type="file" id="edit-audio-file" accept="audio/*" onchange="showFileName(this, 'editAudioFileTip', '🎵 未选择新音频', '✅ 已选择新音频：')">
-            <div class="file-tip" id="editAudioFileTip">🎵 未选择新音频</div>
-        </div>
-        <button class="save-btn" onclick="saveEditBook()">💾 保存修改</button>
-    </div>
-</div>
+        let welcomeData = {
+            topLabel: '2026 HEKAYA 小故事｜个人书架',
+            pageTitle: 'Bü Gün Kitap Uqudigizmu',
+            books: [
+                { title: '爱的如诉', author: '维吾尔语小说', cover: 'https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover', link: 'https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02' },
+                { title: '老人与海', author: '海明威', cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3', link: 'https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437' },
+                { title: '假如给我三天光明', author: '海伦凯勒', cover: 'https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover', link: 'https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2' },
+                { title: '西游记', author: '吴承恩', cover: 'https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover', link: 'https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f' },
+                { title: '神秘岛', author: '凡尔纳', cover: 'https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover', link: 'https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23' },
+                { title: '流浪者酒家', author: '双语', cover: 'https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover', link: 'https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2' }
+            ],
+            metaInfo: ['4 BOOKS · 4 WEEKS · JUNE 2026', '每天一本书 开阔视野', 'سۆي ئاڭلىغاچان كىتاپ ئۆزگەرگەن كىتاپ ئىلكىسىنى بىلىپ بولغان كىتاپتۇر']
+        };
 
-<script>
-// 全局图书数据（所有上传的内容都存在这里，直接写在代码中）
-let allBooks = [
-    // 预设书籍（示例）
-    {
-        "id": 1,
-        "title": "爱的如诉muhabbat uzi sozlaydu",
-        "cate": "Roman",
-        "desc": "",
-        "tags": "爱的如诉、muhabbat uzi sozlaydu、小说",
-        "link": "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02",
-        "cover": "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 2,
-        "title": "بوۋاي ۋە دېڭىز",
-        "cate": "Roman",
-        "desc": "«بوۋاي ۋە دېڭىز»ئامېرىكىلىق يازغۇچى ئونېست ھېمىڭۋاي 1951-يىلى كۇبادا يازغان بىر پارچە پوۋېست، تۆۋەندە سىزگە تەپسىلىي تونۇشتۇرىمىز:\n\n###ھېكايىنىڭ ئومۇمىي ئەھۋالى روماندا سانتىياگو ئىسىملىك بىر ياشانغان بېلىقچى چۆرىدىلگەن بولۇپ، ئۇ ئۇدا 84 كۈن بېلىق تۇتالمىغان، باشقىلارنىڭ نەزىرىدە ئۇ بىر مەغلۇبىيەتچى ئىدى. لېكىن ئۇ ۋاز كەچمەي، 85-كۈنى ئۆزى يالغۇز قولۋاقنى ھەيدەپ يىراق دېڭىزغا قاراپ يۈرۈپ كېتىدۇ. جاپالىق ئېلىشىش ئارقىلىق، ئۇ ئاخىرى غايەت زور بىر مالىن بېلىقىنى تۇتىدۇ. لېكىن، بۇ بېلىق ھەقىقەتەن بەك چوڭ بولغاچقا، قولۋاقنى سۆرەپ توپتوغرا ئىككى كېچە-كۈندۈز لەيلەپ يۈرىدۇ. بوۋاي بۇ ئىككى كېچە-كۈندۈزدە ئەزەلدىن باشتىن كەچۈرۈپ باقمىغان جاپالىق سىناقلارنى باشتىن كەچۈرىدۇ.قەيسەر ئىرادىسى ۋە كۈچلۈك غەيرىتىگە تايىنىپ، ئەڭ ئاخىرىدا چوڭ بېلىقنى بويسۇندۇرۇپتۇ ھەمدە ئۇنى كېمىنىڭ بىر تەرىپىگە باغلاپ قويۇپتۇ.\n\nلېكىن قايتىش سەپىرىدە، لەھەڭ چوڭ بېلىقنىڭ قان پۇرىقىنى پۇراپ قېلىپ، ئارقا-ئارقىدىن ھۇجۇم قىلىپ يېمەكلىك تالاشقان. بوۋاي لەھەڭ بىلەن پۈتۈن كۈچى بىلەن ئېلىشىپ، بېلىق ۋىلكىسى، پالاق قاتارلىق بارلىق قورال قىلغىلى بولىدىغان نەرسىلەر بىلەن لەھەڭگە تاقابىل تۇرغان بولسىمۇ، لېكىن لەھەڭ يەنىلا يېيەلەيدىغان گۆشلەرنىڭ ھەممىسىنى يەپ تۈگەتكەن. ئۇ پورتقا قايتىپ كەلگەندە، چوڭ بېلىقنىڭ پەقەت غايەت زور بىر سۆڭەك جازىسىلا قالغان.",
-        "tags": "老人与海、bowway、degiz、",
-        "link": "https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437",
-        "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 3,
-        "title": "كۆزۈم ئۈچ كۈنلا ئېچىلسا ئىدى",
-        "cate": "Roman",
-        "desc": "بۇ كىتاب خېللىن كېللىرنىڭ تەرجىمىھال خاراكتېرلىك ئەسىرى بولۇپ، ئالدىنقى يېرىم قىسمىدا ئاساسلىقى خېللىننىڭ ئەما، گاس-گاچىغا ئايلانغاندىن كېيىنكى تۇرمۇشى يېزىلغان، ئۇنىڭ ئوقۇتقۇچىسى ئاننى سالىۋېننىڭ ياردىمىدە قىيىنچىلىقلارنى قانداق يېڭىپ، ئوقۇش، يېزىقچىلىق ۋە سۆزلەش جەريانىنى تەسۋىرلىگەن؛ كېيىنكى يېرىم قىسمىدا ئۇنىڭ تەرەپ-تەرەپتىن بىلىم ئېلىش ۋە خەير-ساخاۋەت ئىشلىرىغا ئاكتىپ ئاتلىنىش كەچۈرمىشلىرى تونۇشتۇرۇلغان.",
-        "tags": "假如给我三天光明、kuzum",
-        "link": "https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 4,
-        "title": "غەرىبكە ساياھەت1",
-        "cate": "Roman",
-        "desc": "«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن، جۇڭگونىڭ قەدىمكى دەۋرىدىكى تۇنجى رومانتىزملىق بابلىق رومان. -تىياتىر مەزمۇنى:پۈتۈن كىتابتا ئاساسلىقى سۈن ۋۇكۇڭنىڭ دۇنياغا كېلىشى ۋە تيەنگۇڭ نى قالايمىقان قىلغاندىن كېيىن، تاڭ سېڭ، جۇ باجيې، شا سېڭ ۋە ئاق ئات بىلەن ئۇچرىشىپ، غەربكە نوم ئالغىلى بېرىشى، yol بويى جىن-ئالۋاستىلارنى يوقىتىپ، توقسان سەككىز قىيىنچىلىقنى باشتىن كەچۈرۈپ، ئەڭ ئاخىرىدا غەربكە يېتىپ بېرىپ تاتاگاتۇ بۇدساتۋا بىلەن كۆرۈشۈپ، ھەقىقىي نومغا ئېرىشكەنلىكى توغرىسىدىكى ھېكايە تەسۋىرلەنگەن. -سەنئەت ئالاھىدىلىكى ۋە تەسىرى:«غەربكە ساياھەت»mol، غەلىتە بەدىئىي تەسەۋۋۇر، جانلىق، ئەگرى-توقاي ھېكايە ۋەقەلىكى، جانلىق پېرسوناژ ئوبرازى، يۇمۇرىستىك تىل بىلەن ئۆزگىچە ئالاھىدىلىككە ئىگە سېھىرلىك دۇنيانى بەرپا قىلغان. ئۇ جۇڭگو سېھىرلىك ھېكايىلىرىنىڭ كىلاسسىك ئەسىرى بولۇپ، قەدىمكى رومانتىزملىق رومانلارنىڭ يۇقىرى پەللىسىگە يەتكەن، «ئۈچ پادىشاھلىق ھەققىدە قىسسە»، «سۇ بويىدا»، «قىزىل راۋاقتىكى چۈش»بىلەن قوشۇلۇپ جۇڭگو كىلاسسىك ئەسەرلىرىنىڭ تۆت چوڭ مەشھۇر ئەسىرى دەپ ئاتالغان. بۇ ئەسەر كېيىنكى ئەدەبىيات، كىنو-تېلېۋىزىيە، تىياتىر قاتارلىق سەنئەت شەكىللىرىگە چوڭقۇر تەسىر كۆرسەتكەن.",
-        "tags": "西游记维吾尔语版、维吾尔语",
-        "link": "https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f",
-        "cover": "https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 5,
-        "title": "سىرلىق ئارال",
-        "cate": "Roman",
-        "desc": "ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن بولۇپ، جەنۇبىي ئارمىيەگە قاپسىلىپ قالغان بىر توپ شىماللىقلار پۇرسەتتىن پايدىلىنىپ شار بىلەن قېچىپ كەتكەن. -ۋەقەلىك:ئۇلار يېرىم yolدا بوران-چاپقۇنغا ئۇچراپ، تىنچ ئوكياندىكى بىر قاقاس ئارالغا تاشلىنىپ قالىدۇ. بۇ سىرلىق ئارالدا، ئۇلار ئۆزلىرىنىڭ ئەقىل-پاراسىتى ۋە قەيسەر ئىرادىسىگە تايىنىپ ساپال بۇيۇملار، ئەينەك، شامال تۈگمىنى، تېلېگرامما ئاپپاراتى قاتارلىقلارنى ياساپ چىقىپ، تۇرمۇشىنى ياخشىلايدۇ. ئۇلار يەنە دېڭىز قاراقچىلىرىنىڭ ھۇجۇمى، يانار تاغ پارتلاش قاتارلىق ھەر خىل خەۋپ-خەتەرلەرگە yolۇقىدۇ. ئەسلىدە، بۇ ئارالدا ئىزچىل بىر سىرلىق ئادەم يoshۇرۇن ھالدا ئۇلارغا ياردەم قىلىپ كەلگەن بولۇپ، بۇ ئادەم دەل «دېڭىز ئاستىدىكى 20 مىڭ چاقىرىم»دىكى كاپىتان نىمو ئىدى. ئاخىرىدا،يانار تاغ پارتلاپ ئارال چۆكۈپ كېتىش ئالدىدا تۇرغاندا، ئۇلار كاپىتان گىرانتنىڭ ئوغلى قوماندانلىق قىلغان «دېڭكېن»ناملىق پاراخوتقا ئولتۇرۇپ ئارالدىكى تۇرمۇشىنى ئاخىرلاشتۇرغان.\n\n###باش تېما ۋە ئالاھىدىلىك -باش تېما:روماندا ئىنسانلارنىڭ yol ئېچىش روھى ۋە ئىجادچانلىقى نامايان قىلىنغان، كوللېكتىپ ھەمكارلىشىش ۋە قەتئىي تەۋرەنمەس پەزىلەت مەدھىيەلەنگەن. شۇنىڭ بىلەن بىر ۋاقىتتا، تەبىئەتكە بولغان ھۆرمەت ۋە پەن-تېخنىكىغا بولغان ھۆرمەت ئىپادىلەنگەن. -ئالاھىدىلىكى:ۋېرنېر ئىلىم-پەن بىلىملىرى بىلەن خەتەرلىك، ھاياجانلىق تەۋەككۈلچىلىك ۋەقەلىكىنى ئەپچىللىك بىلەن بىرلەشتۈرۈپ، ئوقۇرمەنلەرگە خىيالىي تۈسكە تولغان دۇنيانى نامايان قىلغان. ئۇنىڭ ھەر خىل ئىلىم-پەن ھادىسىلىرى ۋە كەشپىياتلارنى تەسۋىرلىشى ئوقۇرمەنلەرنى ئوقۇش بىلەن بىر ۋاقىتتا مول بىلىملەرنى ئۆگىنىش ئىمكانىيىتىگە ئىگە قىلغان.\n\n###ئەسەرنىڭ تەسىرى «سىرلىق ئارال»ۋېرننىڭ فانتازىيەلىك ھېكايىلىرىنىڭ ۋەكىللىك ئەسەرلىرىدىن بىرى بولۇپ، «كاپىتان گىرانتنىڭ بالىلىرى»، «دېڭىز ئاستىدىكى ئىككى تۈمەن چاقىرىم»بىلەن قوشۇلۇپ «ۋېرننىڭ ئۈچ كۈيى»دەپ ئاتالغان. ئۇ ئۆزىنىڭ قالتىس ھېكايىسى ۋە چوڭقۇر ئىدىيەسى بىلەن پۈتۈن دۇنيادىكى ئوقۇرمەنلەرنىڭ ياقتۇرۇشىغا ئېرىشكەن، كىشىلەرنى نامەلۇملۇق ئۈستىدە ئىزدىنىشكە، ئۆزىگە جەڭ ئېلان قىلىشقا ئىلھاملاندۇرۇپ، كېيىنكى فانتازىيەلىك ئەدەبىي ئىجادىيەتلەرگە چوڭقۇر تەسىر كۆرسەتكەن.",
-        "tags": "神秘岛、维吾尔语",
-        "link": "https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23",
-        "cover": "https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 6,
-        "title": "مۇساپىرلار قاۋىقىدا",
-        "cate": "Roman",
-        "desc": "",
-        "tags": "流浪者酒家、双语、musapirlar",
-        "link": "https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2",
-        "cover": "https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    },
-    {
-        "id": 7,
-        "title": "دېڭىز بۆرىسى",
-        "cate": "Roman",
-        "desc": "«دېڭىز بۆرىسى»1904-يىلى نەشر قىلىنغان، بۇ ئەسەردە دېڭىزدىكى تەۋەككۈلچىلىك بىلەن ئىنسان تەبىئىتى، ياشاش قاتارلىق مەسىلىلەر ئۈستىدە چوڭقۇر ئويلىنىش بىرلەشتۈرۈلگەن بولۇپ، جېك لوندوننىڭ ۋەكىللىك ئەسەرلىرىنىڭ بىرى.\n\n###ھېكايىنىڭ ئومۇمىي ئەھۋالى -كېمىگە تاسادىپىي چىقىپ قېلىش:باش پېرسوناژ ھېنف بىر سىپايە تالىپ. ئۇ بىر قېتىم كېمىگە ئولتۇرۇپ ساياھەت قىلىۋاتقاندا، ئۇ ئولتۇرغان كېمە ھادىسىگە ئۇچراپ، «ئالۋاستى»ناملىق تىيۇلېن كېمىسى تەرىپىدىن قۇتقۇزۇۋېلىنىدۇ. «ئالۋاستى»ناملىق كېمىنىڭ كاپىتانى لاسېن چەكسىز كۈچتۈڭگۈر، رەھىمسىز ھەم ئىرادىسى كۈچلۈك ئادەم بولۇپ، «دېڭىز بۆرىسى»دەپ ئاتىلىدۇ. ھېنف دەسلەپتە كېمىدە لاسېننىڭ بوزەك قىلىشىغا ئۇچرايدۇ، لېكىن ئۇ كېمىدىكى تۇرمۇشقا ماسلىشىشقا تىرىشىدۇ. -ئىچكى كۈرەش:كېمىدىكى ماتروسلار لاسېننىڭ ۋەھشىي ھۆكۈمرانلىقىدىن نارازى بولۇپ، بىر مەيدان ئىچكى كۈرەش تەدرىجىي قانات يايدۇرۇلىدۇ. ھېنف بۇ جەرياندا ئايال مۇخبىر مود بىلەن تونۇشىدۇ، ئىككىسى بىر-بىرىنى قوللايدۇ. -نەتىجە:كېيىن لاسېن ئاغرىپ قېلىپ، تېنى ۋە روھىي جەھەتتىن بارا-بارا ئاجىزلاپ كېتىدۇ. ھېنف بىلەن مود پۇرسەتتىن پايدىلىنىپ «ئالۋاستى»ناملىق كېمىنى كونترول قىلىۋالىدۇ ھەمدە قۇرۇقلۇققا قاراپ ماڭماقچى بولىدۇ. ئاخىرىدا لاسېن ئۈمىدسىزلىك ئىچىدە چۆكۈپ كېتىش ئالدىدا تۇرغان كېمىدە قېلىشنى تاللايدۇ، ھېنف بىلەن مود ئوڭۇشلۇق قۇتقۇزۇۋېلىنىدۇ.\n\n###باش تېمىنى مۇھاكىمە قىلىش -ئىنسان تەبىئىتىنىڭ مۇرەككەپلىكى:روماندا لاسېندىن ئىبارەت بۇ پېرسوناژ ئوبرازى ئارقىلىق ئىنسان تەبىئىتىنىڭ رەھىمسىز، شەخسىيەتچى تەرىپى نامايان قىلىنغان، شۇنىڭ بىلەن بىر ۋاقىتتا ھېنپنىڭ ئۆزگىرىشى ئارقىلىق ئىنسان تەبىئىتىنىڭ ناچار مۇھىتتىكى چىدامچانلىقى ۋە ئاق كۆڭۈللۈكى مۇھاكىمە قىلىنغان. -ياشاش ئۈچۈن جان تالىشىش:كىتابتا دېڭىزدىكى ناچار مۇھىتتا، كىشىلەرنىڭ ياشاش ئۈچۈن ئېلىپ بارغان كەسكىن كۈرەشلىرى تەسۋىرلەنگەن بولۇپ، ياشاشنىڭ مۈشكۈللۈكى ۋە ھاياتلىقنىڭ قەيسەرلىكى نامايان قىلىنغان. -كۈچ ۋە ئەخلاق:لاسېن كۈچلۈك كۈچىگە تايىنىپ «ئالۋاستى ناملىق پاراخوت»قا ھۆكۈمرانلىق قىلىدۇ، لېكىن ئۇنىڭدا ئەخلاق چەكلىمىسى كەمچىل؛ ھېنپنىڭ تېنى ئاجىز بولسىمۇ، لېكىن ئەخلاقنىڭ تۆۋەن چېكىدە چىڭ تۇرىدۇ. رومان ئوقۇرمەنلەرنىڭ كۈچ ۋە ئەخلاق مۇناسىۋىتى توغرىسىدىكى ئويلىنىشىنى قوزغىدى.\n\n###سەنئەت ئالاھىدىلىكى -جىددىي، ھاياجانلىق ۋەقەلىك:جېك لوندون ئۆزىنىڭ ئېسىل بايان قىلىش ئۇسۇلى ئارقىلىق، جىددىي، ھاياجانلىق دېڭىز ئۈستى تەۋەككۈلچىلىك كەيپىياتىنى يارىتىپ، ئوقۇرمەنلەرنى خۇددى شۇ مۇھىتتا تۇرغاندەك ھېس قىلدۇرغان. -چوڭقۇر پېرسوناژ تەسۋىرى:لاسېن، ھېنف قاتارلىق ئاساسلىق پېرسوناژلارنىڭ تەسۋىرى ئىنچىكە بولۇپ، ئوقۇرمەنلەرگە ئۇلارنىڭ ئىچكى دۇنياسى ۋە خاراكتېر ئالاھىدىلىكىنى چوڭقۇر چۈشەندۈرىدۇ.",
-        "tags": "海狼、维吾尔语、degiz",
-        "link": "https://weread.qq.com/web/reader/a72426a3643425f416d7031383731365838774537346337354a386e58326c5360d",
-        "cover": "https://res.weread.qq.com/wrepub/CB_Amp18716X8wE74c75J8nX2lS_parsecover",
-        "bookFile": "",
-        "audioFile": "",
-        "isTop": false,
-        "topOrder": 0
-    }
-];
+        let allBooks = [
+            { id: 1, title: '爱的如诉muhabbat uzi sozlaydu', cate: 'Roman', desc: '', tags: '爱的如诉、muhabbat uzi sozlaydu、小说', link: 'https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02', cover: 'https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
+            { id: 2, title: 'بوۋاي ۋە دېڭىز', cate: 'Roman', desc: '«بوۋاي ۋە دېڭىز» ئامېرىكىلىق يازغۇچى ئونېست ھېمىڭۋاي 1951-يىلى كۇبادا يازغان بىر پارچە پوۋېست بولۇپ، ئۇ ئۆزىنىڭ ئەڭ مۇھىم ئەسىرىدىن بىرى بولىدۇ. ھېكايە ئەتىگى بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ. ھېكايە بىر ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ. ھېكايە ئەتىگى بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ.', tags: '老人与海、bowway、degiz', link: 'https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437', cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
+            { id: 3, title: 'كۆزۈم ئۈچ كۈنلا ئېچىلسا ئىدى', cate: 'Roman', desc: 'بۇ كىتاب خېللىن كېللىرنىڭ تەرجىمىھال خاراكتېرلىك ئەسىرى بولۇپ...', tags: '假如给我三天光明、kuzum', link: 'https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2', cover: 'https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
+            { id: 4, title: 'غەرىبكە ساياھەت1', cate: 'Roman', desc: '«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن...', tags: '西游记维吾尔语版、维吾尔语', link: 'https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f', cover: 'https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
+            { id: 5, title: 'سىرلىق ئارال', cate: 'Roman', desc: 'ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن...', tags: '神秘岛、维吾尔语', link: 'https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23', cover: 'https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
+            { id: 6, title: 'مۇساپىرلار قاۋىقىدا', cate: 'Roman', desc: '', tags: '流浪者酒家、双语、musapirlar', link: 'https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2', cover: 'https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 }
+        ];
 
-let uploadBoxShow = true;
-let currentEditBook = null;
-let currentBook = null;
-let isAdminLogin = false;
-let qrCodeData = "";
+        function goToBookshelf(){
+            document.getElementById('welcomePage').classList.add('hidden');
+            document.getElementById('bookshelfPage').classList.add('active');
+            document.getElementById('bookshelfPage').classList.remove('hidden');
+            renderBooks();
+        }
+        
+        function goToWelcome(){
+            document.getElementById('bookshelfPage').classList.remove('active');
+            document.getElementById('bookshelfPage').classList.add('hidden');
+            document.getElementById('welcomePage').classList.remove('hidden');
+        }
 
-function escapeHtml(str) {
-    if (!str) return "";
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+        function loadWelcomeData(){
+            try{ const saved = localStorage.getItem(WELCOME_STORAGE_KEY); if(saved) welcomeData = JSON.parse(saved); }catch(e){}
+        }
 
-function debounce(func, delay) {
-    let timer = null;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => func.apply(this, args), delay);
-    };
-}
+        function saveWelcomeData(){
+            try{ localStorage.setItem(WELCOME_STORAGE_KEY, JSON.stringify(welcomeData)); showToast('✅ 保存成功！', 'success'); }catch(e){ showToast('❌ 保存失败', 'error'); }
+        }
 
-// 页面加载初始化
-window.onload = async ()=>{
-    renderBooks();
-    initTab();
-    initCarousel();
-    initLazyLoad();
-    
-    // 初始化暗黑模式
-    if(localStorage.getItem('dark')==='1'){
-        document.body.classList.add('dark');
-        document.getElementById('darkToggle').innerHTML = '☀️ 浅色模式';
-    }
-    
-    // 初始化管理员状态
-    if(sessionStorage.getItem('isAdminLogin')==='1'){
-        isAdminLogin = true;
-        updateAdminUI();
-    }
-    
-    // 尝试从localStorage恢复二维码数据
-    const savedQRCode = localStorage.getItem('qrCodeData');
-    if(savedQRCode) {
-        document.getElementById("qrcodeImg").src = savedQRCode;
-        qrCodeData = savedQRCode;
-    } else {
-        // 如果没有保存的二维码，则使用默认二维码
-        document.getElementById("qrcodeImg").src = "https://res.cloudinary.com/dkmruvbxp/image/upload/v1719920604/qrcode_hxu84o.png";
-        qrCodeData = "https://res.cloudinary.com/dkmruvbxp/image/upload/v1719920604/qrcode_hxu84o.png";
-    }
-};
+        function updateWelcomePage(){
+            document.getElementById('welcomeTopLabel').textContent = welcomeData.topLabel;
+            document.getElementById('welcomePageTitle').textContent = welcomeData.pageTitle;
+            const metaInfoList = Array.isArray(welcomeData.metaInfo) ? welcomeData.metaInfo : [welcomeData.metaInfo];
+            const randomMeta = metaInfoList[Math.floor(Math.random() * metaInfoList.length)];
+            document.getElementById('welcomeMetaInfo').textContent = randomMeta || '';
+            renderWelcomeBooks(welcomeData.books);
+        }
 
-function triggerQrcode(){
-    if(!isAdminLogin){
-        alert("⚠️ 仅管理员账号可更换二维码！");
-        return;
-    }
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay utility-modal';
-    
-    const content = document.createElement('div');
-    content.className = 'utility-modal-content';
-    
-    const title = document.createElement('h3');
-    title.className = 'utility-modal-title';
-    title.textContent = '🔄 选择二维码上传方式';
-    
-    const localBtn = document.createElement('button');
-    localBtn.className = 'utility-btn utility-btn-primary';
-    localBtn.textContent = '📸 上传本地图片';
-    
-    const networkBtn = document.createElement('button');
-    networkBtn.className = 'utility-btn utility-btn-blue';
-    networkBtn.textContent = '🌐 输入网络图片链接';
-    
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'utility-btn utility-btn-gray';
-    cancelBtn.textContent = '❌ 取消';
-    
-    localBtn.onclick = () => {
-        document.body.removeChild(modal);
-        document.getElementById("qrcodeFile").value = "";
-        document.getElementById("qrcodeFile").click();
-    };
-    
-    networkBtn.onclick = () => {
-        document.body.removeChild(modal);
-        const url = prompt("请输入网络图片链接:");
-        if(url) {
-            if (!/^https?:\/\/.+\..+/.test(url)) {
-                alert("❌ 请输入有效的URL");
+        function renderWelcomeBooks(books){
+            const shuffled = [...books].sort(() => Math.random() - 0.5);
+            const displayed = shuffled.slice(0, 4);
+            document.getElementById('welcomeBooksContainer').innerHTML = displayed.map(book => `<div class="welcome-book-cover" onclick="openBookLink('${book.link}')"><img src="${book.cover}" alt="${escapeHtml(book.title)}"></div>`).join('');
+        }
+        
+        function openBookLink(link){
+            if(link && link.trim()){
+                window.open(link, '_blank');
+            }else{
+                goToBookshelf();
+            }
+        }
+
+        function openWelcomeLoginModal(){
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `<div class="welcome-modal-content"><button class="welcome-close-modal-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2 class="welcome-modal-title">🔐 管理员登录</h2><div class="welcome-login-form"><input type="password" id="welcomeLoginPassword" placeholder="请输入管理员密码"><button onclick="welcomeLogin()">登录</button></div></div>`;
+            document.body.appendChild(modal);
+        }
+
+        function openWelcomeEditModal(){
+            if(!isAdminLogin){ showToast('请先登录管理员！', 'error'); return; }
+            const metaInfoList = Array.isArray(welcomeData.metaInfo) ? welcomeData.metaInfo : [welcomeData.metaInfo];
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = function(e){ if(e.target === modal) return; };
+            
+            const metaHtml = metaInfoList.map((m,i) => `<div class="welcome-meta-item"><input type="text" value="${escapeHtml(m)}" onchange="updateMetaInfo(${i}, this.value)"><button class="welcome-remove-btn" onclick="removeMetaInfo(${i})">×</button></div>`).join('');
+            const booksHtml = welcomeData.books.map((b,i) => `<div class="welcome-preview-item" onclick="selectWelcomeBookPreview(${i})"><img src="${b.cover}" alt="${escapeHtml(b.title)}"><button class="welcome-edit-btn" onclick="event.stopPropagation();openEditBookModal(${i})">✏️</button><button class="welcome-remove-btn" onclick="event.stopPropagation();removeWelcomeBook(${i})">×</button><div class="welcome-link-info">${escapeHtml(b.link || '(无链接)')}</div></div>`).join('');
+            
+            modal.innerHTML = `
+                <div class="welcome-modal-content">
+                    <button class="welcome-close-modal-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
+                    <h2 class="welcome-modal-title">✏️ 编辑欢迎页</h2>
+                    <div class="welcome-form-group"><label>顶部标签</label><input type="text" id="editWelcomeTopLabel" value="${escapeHtml(welcomeData.topLabel)}"></div>
+                    <div class="welcome-form-group"><label>页面标题</label><input type="text" id="editWelcomePageTitle" value="${escapeHtml(welcomeData.pageTitle)}"></div>
+                    <div class="welcome-form-group">
+                        <label>元信息列表（每次刷新随机显示一条）</label>
+                        <div class="welcome-meta-preview" id="editWelcomeMetaPreview">${metaHtml}</div>
+                        <div class="welcome-add-meta">
+                            <input type="text" id="newMetaInfo" placeholder="输入新的元信息">
+                            <button class="welcome-upload-btn" onclick="addMetaInfo()">➕ 添加</button>
+                        </div>
+                    </div>
+                    <div class="welcome-form-group">
+                        <label>书籍封面列表</label>
+                        <div class="welcome-book-preview" id="editWelcomeBooksPreview">${booksHtml}</div>
+                    </div>
+                    <div class="welcome-add-form" id="welcomeAddForm">
+                        <div class="welcome-form-group"><label>封面图片链接</label><input type="text" id="newBookCover" placeholder="https://example.com/cover.jpg"></div>
+                        <div class="welcome-form-group"><label>阅读链接地址（可选）</label><input type="text" id="newBookLink" placeholder="https://example.com/read"></div>
+                        <button class="welcome-upload-btn" onclick="addWelcomeBook()">➕ 添加封面</button>
+                    </div>
+                    <button class="welcome-save-btn" onclick="saveWelcomeEdit()">保存修改</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function selectWelcomeBookPreview(index){
+            document.querySelectorAll('.welcome-preview-item').forEach((p,i) => p.classList.toggle('selected', i === index));
+        }
+        
+        function updateMetaInfo(index, value){
+            if(!Array.isArray(welcomeData.metaInfo)) welcomeData.metaInfo = [welcomeData.metaInfo];
+            welcomeData.metaInfo[index] = value.trim();
+        }
+        
+        function removeMetaInfo(index){
+            if(!Array.isArray(welcomeData.metaInfo)) welcomeData.metaInfo = [welcomeData.metaInfo];
+            welcomeData.metaInfo.splice(index, 1);
+            updateMetaPreview();
+        }
+        
+        function addMetaInfo(){
+            const newMeta = document.getElementById('newMetaInfo').value.trim();
+            if(!newMeta) return;
+            if(!Array.isArray(welcomeData.metaInfo)) welcomeData.metaInfo = [welcomeData.metaInfo];
+            welcomeData.metaInfo.push(newMeta);
+            document.getElementById('newMetaInfo').value = '';
+            updateMetaPreview();
+        }
+        
+        function updateMetaPreview(){
+            const metaInfoList = Array.isArray(welcomeData.metaInfo) ? welcomeData.metaInfo : [welcomeData.metaInfo];
+            document.getElementById('editWelcomeMetaPreview').innerHTML = metaInfoList.map((m,i) => `<div class="welcome-meta-item"><input type="text" value="${escapeHtml(m)}" onchange="updateMetaInfo(${i}, this.value)"><button class="welcome-remove-btn" onclick="removeMetaInfo(${i})">×</button></div>`).join('');
+        }
+
+        function addWelcomeBook(){
+            const cover = document.getElementById('newBookCover').value.trim();
+            const link = document.getElementById('newBookLink').value.trim();
+            if(!cover){ showToast('请填写封面图片链接！', 'error'); return; }
+            welcomeData.books.push({ title: '', author: '', cover: cover, link: link });
+            document.getElementById('newBookCover').value = '';
+            document.getElementById('newBookLink').value = '';
+            updateWelcomeEditPreview();
+        }
+
+        function removeWelcomeBook(index){
+            welcomeData.books.splice(index, 1);
+            updateWelcomeEditPreview();
+        }
+        
+        function openEditBookModal(index){
+            const book = welcomeData.books[index];
+            if(!book) return;
+            const editModal = document.createElement('div');
+            editModal.className = 'modal-overlay';
+            editModal.innerHTML = `<div class="welcome-modal-content"><button class="welcome-close-modal-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2 class="welcome-modal-title">✏️ 编辑封面</h2><div class="welcome-form-group"><label>封面图片链接</label><input type="text" id="editBookCover" value="${escapeHtml(book.cover)}"></div><div class="welcome-form-group"><label>阅读链接地址（可选）</label><input type="text" id="editBookLink" value="${escapeHtml(book.link || '')}"></div><button class="welcome-save-btn" onclick="saveEditBook(${index})">保存修改</button></div>`;
+            document.body.appendChild(editModal);
+        }
+        
+        function saveEditBook(index){
+            const book = welcomeData.books[index];
+            if(!book) return;
+            const cover = document.getElementById('editBookCover').value.trim();
+            const link = document.getElementById('editBookLink').value.trim();
+            if(!cover){ showToast('请填写封面图片链接！', 'error'); return; }
+            book.cover = cover;
+            book.link = link;
+            document.querySelector('.modal-overlay:last-child').remove();
+            updateWelcomeEditPreview();
+        }
+
+        function updateWelcomeEditPreview(){
+            document.getElementById('editWelcomeBooksPreview').innerHTML = welcomeData.books.map((b,i) => `<div class="welcome-preview-item" onclick="selectWelcomeBookPreview(${i})"><img src="${b.cover}" alt="${escapeHtml(b.title)}"><button class="welcome-edit-btn" onclick="event.stopPropagation();openEditBookModal(${i})">✏️</button><button class="welcome-remove-btn" onclick="event.stopPropagation();removeWelcomeBook(${i})">×</button><div class="welcome-link-info">${escapeHtml(b.link || '(无链接)')}</div></div>`).join('');
+        }
+
+        function saveWelcomeEdit(){
+            welcomeData.topLabel = document.getElementById('editWelcomeTopLabel').value;
+            welcomeData.pageTitle = document.getElementById('editWelcomePageTitle').value;
+            saveWelcomeData();
+            updateWelcomePage();
+            document.querySelector('.modal-overlay').remove();
+        }
+
+        function uploadBook(){
+            const title = document.getElementById('book-title').value.trim();
+            const cate = document.getElementById('book-category').value;
+            if(!title || !cate){ showToast('请填写书名和分类！', 'error'); return; }
+            const newId = allBooks.length > 0 ? Math.max(...allBooks.map(b => b.id)) + 1 : 1;
+            allBooks.push({
+                id: newId, title: title, cate: cate,
+                desc: document.getElementById('book-desc').value.trim(),
+                tags: document.getElementById('book-tags').value.trim(),
+                link: document.getElementById('book-link').value.trim(),
+                cover: document.getElementById('book-cover').value.trim() || 'https://via.placeholder.com/150x240?text=Cover',
+                bookFile: '', audioFile: '', isTop: false, topOrder: 0
+            });
+            saveBooks(); renderBooks();
+            document.getElementById('book-title').value = ''; document.getElementById('book-category').value = '';
+            document.getElementById('book-desc').value = ''; document.getElementById('book-tags').value = '';
+            document.getElementById('book-link').value = ''; document.getElementById('book-cover').value = '';
+            toggleUploadBox(); showToast('✅ 书籍添加成功！', 'success');
+        }
+
+        function saveBooks(){ localStorage.setItem('allBooks', JSON.stringify(allBooks)); }
+        function loadBooks(){ const saved = localStorage.getItem('allBooks'); if(saved) allBooks = JSON.parse(saved); }
+
+        function deleteBook(id){
+            if(!confirm('确定要删除这本书吗？')) return;
+            allBooks = allBooks.filter(b => b.id !== id);
+            saveBooks(); renderBooks(); showToast('🗑️ 书籍已删除', 'info');
+        }
+
+        function openEditModal(id){
+            const book = allBooks.find(b => b.id === id);
+            if(!book) return;
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `<div class="edit-modal"><button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2>✏️ 编辑书籍</h2><div class="form-group"><input type="text" id="edit-title" value="${escapeHtml(book.title)}" placeholder="书名"></div><div class="form-group"><select id="edit-category"><option value="Roman" ${book.cate==='Roman'?'selected':''}>Roman</option><option value="Hekaya" ${book.cate==='Hekaya'?'selected':''}>Hekaya</option><option value="Rasimlik" ${book.cate==='Rasimlik'?'selected':''}>Rasimlik</option><option value="Adibiy Aser" ${book.cate==='Adibiy Aser'?'selected':''}>Adibiy Aser</option><option value="Awazlik" ${book.cate==='Awazlik'?'selected':''}>Awazlik</option><option value="Yazmilar" ${book.cate==='Yazmilar'?'selected':''}>Yazmilar</option></select></div><div class="form-group"><textarea id="edit-desc" placeholder="简介">${escapeHtml(book.desc)}</textarea></div><div class="form-group"><input type="text" id="edit-tags" value="${escapeHtml(book.tags)}" placeholder="标签"></div><div class="form-group"><input type="text" id="edit-link" value="${escapeHtml(book.link)}" placeholder="链接"></div><div class="form-group"><input type="text" id="edit-cover" value="${escapeHtml(book.cover)}" placeholder="封面链接"></div><button class="btn-common btn-primary" onclick="saveEdit(${book.id})">✅ 保存修改</button></div>`;
+            document.body.appendChild(modal);
+        }
+
+        function saveEdit(id){
+            const book = allBooks.find(b => b.id === id);
+            if(!book) return;
+            book.title = document.getElementById('edit-title').value.trim();
+            book.cate = document.getElementById('edit-category').value;
+            book.desc = document.getElementById('edit-desc').value.trim();
+            book.tags = document.getElementById('edit-tags').value.trim();
+            book.link = document.getElementById('edit-link').value.trim();
+            book.cover = document.getElementById('edit-cover').value.trim() || 'https://via.placeholder.com/150x240?text=Cover';
+            saveBooks(); renderBooks();
+            document.querySelector('.modal-overlay').remove();
+            showToast('✅ 修改成功！', 'success');
+        }
+
+        let currentBook = null;
+        function openReadPage(book){
+            currentBook = book;
+            const coverImg = document.getElementById('readCover');
+            coverImg.src = book.cover;
+            coverImg.onerror = () => { coverImg.src = 'https://via.placeholder.com/350x450?text=Cover'; };
+            document.getElementById('readTitle').innerText = book.title;
+            document.getElementById('readCate').innerText = book.cate;
+            document.getElementById('readDesc').innerText = book.desc || '📋 无简介';
+            
+            const tagsContainer = document.getElementById('readTags');
+            tagsContainer.innerHTML = '';
+            if(book.tags){
+                book.tags.split(',').forEach(tag => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'read-tag';
+                    tagEl.innerText = tag.trim();
+                    tagsContainer.appendChild(tagEl);
+                });
+            }
+            
+            const linkBtn = document.getElementById('readLinkBtn');
+            linkBtn.style.display = book.link ? 'flex' : 'none';
+            
+            document.getElementById('readPage').classList.add('show');
+        }
+        function closeReadPage(){
+            document.getElementById('readPage').classList.remove('show');
+        }
+        function openBookLink(){
+            if(!currentBook || !currentBook.link) return;
+            window.open(currentBook.link, '_blank');
+        }
+
+        function openLoginModal(){
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `<div class="login-modal"><button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2>🔐 管理员登录</h2><input type="password" id="adminPassword" placeholder="请输入管理员密码"><button onclick="login()">登录</button></div>`;
+            document.body.appendChild(modal);
+        }
+
+        function updateAdminUI(){
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const carouselEditBtn = document.getElementById('carouselEditBtn');
+            const bookshelf = document.getElementById('bookshelf');
+            const uploadToggleBox = document.getElementById('uploadToggleBox');
+
+            if(loginBtn) loginBtn.style.display = isAdminLogin ? 'none' : 'inline-block';
+            if(logoutBtn) logoutBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
+            if(uploadBtn) uploadBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
+            if(exportBtn) exportBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
+            if(carouselEditBtn) carouselEditBtn.style.display = isAdminLogin ? 'block' : 'none';
+            if(bookshelf) bookshelf.classList.toggle('admin-btns-show', isAdminLogin);
+            if(uploadToggleBox) uploadToggleBox.style.display = isAdminLogin ? 'block' : 'none';
+        }
+
+        function toggleUploadBox(){
+            const uploadBox = document.getElementById('uploadBox');
+            uploadBoxShow = !uploadBoxShow;
+            uploadBox.classList.toggle('hide-upload', !uploadBoxShow);
+        }
+
+        function showToast(message, type='info'){
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function toggleTop(id){
+            const book = allBooks.find(b => b.id === id);
+            if(!book) return;
+            book.isTop = !book.isTop;
+            book.topOrder = book.isTop ? Date.now() : 0;
+            saveBooks(); renderBooks();
+            showToast(book.isTop ? '📌 已置顶' : '🔽 已取消置顶', 'info');
+        }
+
+        function sortBooksData(books, sortType){
+            const type = sortType || document.getElementById('sortSelect').value;
+            switch(type){
+                case 'title-asc': return [...books].sort((a,b) => a.title.localeCompare(b.title));
+                case 'title-desc': return [...books].sort((a,b) => b.title.localeCompare(a.title));
+                case 'cate-asc': return [...books].sort((a,b) => a.cate.localeCompare(b.cate));
+                case 'random': return [...books].sort(() => Math.random() - 0.5);
+                default: return [...books].sort((a,b) => { if(a.isTop && !b.isTop) return -1; if(!a.isTop && b.isTop) return 1; return b.topOrder - a.topOrder; });
+            }
+        }
+
+        function sortBooks(){ renderBooks(); }
+
+        function debounce(func, delay){
+            let timer = null;
+            return function(){ if(timer) clearTimeout(timer); timer = setTimeout(func, delay); };
+        }
+
+        function renderBooks(){
+            const shelf = document.getElementById('bookshelf');
+            if(!shelf) return;
+            const activeCate = document.querySelector('.tab.active').dataset.cate;
+            const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            let filteredBooks = allBooks.filter(book => {
+                const excludeFromAll = activeCate === 'all' && (book.cate === 'Yazmilar' || book.cate === 'Yzamlilar');
+                const cateMatch = activeCate === 'all' || book.cate === activeCate;
+                const searchMatch = !searchText || book.title.toLowerCase().includes(searchText) || book.tags.toLowerCase().includes(searchText) || book.cate.toLowerCase().includes(searchText) || (book.desc && book.desc.toLowerCase().includes(searchText));
+                return !excludeFromAll && cateMatch && searchMatch;
+            });
+            
+            filteredBooks = sortBooksData(filteredBooks);
+            
+            const resultCount = document.getElementById('searchResultCount');
+            if(resultCount) resultCount.textContent = searchText ? `🔍 搜索 "${searchText}" 找到 ${filteredBooks.length} 本书` : '';
+            
+            if(filteredBooks.length === 0){
+                shelf.innerHTML = '<div class="empty-tip">📚 暂无匹配书籍</div>';
                 return;
             }
-
-            const img = new Image();
-            img.onload = () => {
-                document.getElementById("qrcodeImg").src = url;
-                qrCodeData = url;
-                localStorage.setItem('qrCodeData', url);
-                alert("✅ 二维码更换成功！");
-            };
-            img.onerror = () => {
-                alert("❌ 图片无法加载，请检查链接是否有效");
-            };
-            img.src = url;
+            
+            if(activeCate === 'Yazmilar'){
+                renderYazmilar(filteredBooks, shelf);
+            }else{
+                const fragment = document.createDocumentFragment();
+                filteredBooks.forEach(book => {
+                    const card = document.createElement('div');
+                    card.className = `book-card ${book.isTop ? 'top' : ''}`;
+                    card.onclick = () => openReadPage(book);
+                    const topTag = isAdminLogin && book.isTop ? '<div class="top-tag">📌 置顶</div>' : '';
+                    const topBtnText = book.isTop ? '🔽' : '🔼';
+                    const topBtnClass = book.isTop ? 'top-btn untop-btn' : 'top-btn';
+                    const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
+                    const delBtnHtml = isAdminLogin ? `<button class="del-btn" onclick="event.stopPropagation();deleteBook(${book.id})">🗑️</button>` : '';
+                    const editBtnHtml = isAdminLogin ? `<button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>` : '';
+                    card.innerHTML = `${topTag}<img class="book-cover lazy-img" data-src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'"><div class="book-info"><div class="book-title">${escapeHtml(book.title)}</div><div class="book-cate">${escapeHtml(book.cate)}</div></div>${topBtnHtml}${delBtnHtml}${editBtnHtml}`;
+                    fragment.appendChild(card);
+                });
+                shelf.innerHTML = '';
+                shelf.appendChild(fragment);
+                initLazyLoad();
+            }
         }
-    };
-    
-    cancelBtn.onclick = () => {
-        document.body.removeChild(modal);
-    };
-    
-    content.appendChild(title);
-    content.appendChild(localBtn);
-    content.appendChild(networkBtn);
-    content.appendChild(cancelBtn);
-    modal.appendChild(content);
-    document.body.appendChild(modal);
-}
 
-async function handleQrcodeUpload(fileDom){
-    const file = fileDom.files[0];
-    if(!file) return;
-    const allowType = ["image/png","image/jpeg","image/gif", "image/webp"];
-    if(!allowType.includes(file.type)){
-        alert("❌ 请选择 PNG / JPG / JPEG / GIF / WEBP 格式图片！");
-        return;
-    }
-    if(file.size > 2 * 1024 * 1024){
-        alert("❌ 图片大小不能超过 2MB！");
-        return;
-    }
-    const base64 = await fileToBase64(file);
-    document.getElementById("qrcodeImg").src = base64;
-    qrCodeData = base64; // 保存二维码数据到变量
-    
-    // 将新的二维码数据保存到localStorage
-    localStorage.setItem('qrCodeData', base64);
-    
-    alert("✅ 二维码更换成功！");
-}
-
-function showFileName(el, tipId, emptyText, prefix = "✅ 已选择："){
-    const tip = document.getElementById(tipId);
-    tip.innerText = el.files[0] ? prefix + el.files[0].name : emptyText;
-}
-
-// 关闭欢迎弹窗
-function closeWelcome(){
-    document.getElementById("welcomeModal").style.display = "none";
-}
-
-// 更新管理员UI
-function updateAdminUI(){
-    if(isAdminLogin){
-        document.body.classList.add("admin-login");
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        document.getElementById('exportDataBtn').style.display = 'inline-block';
-        document.getElementById('uploadToggle').classList.add('show');
-        document.getElementById('uploadBox').classList.add('show');
-        document.getElementById('bookshelf').classList.add('admin-btns-show');
-        const carouselEditBtn = document.querySelector('.carousel-edit-btn');
-        if(carouselEditBtn) carouselEditBtn.style.display = 'block';
-    }else{
-        document.body.classList.remove("admin-login");
-        document.getElementById('loginBtn').style.display = 'inline-block';
-        document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('exportDataBtn').style.display = 'none';
-        document.getElementById('uploadToggle').classList.remove('show');
-        document.getElementById('uploadBox').classList.remove('show');
-        document.getElementById('bookshelf').classList.remove('admin-btns-show');
-        const carouselEditBtn = document.querySelector('.carousel-edit-btn');
-        if(carouselEditBtn) carouselEditBtn.style.display = 'none';
-    }
-}
-
-// 登录
-function openLoginModal(){
-    const modal = document.getElementById('loginModal');
-    modal.style.display = 'flex';
-    document.getElementById('loginError').innerText = '';
-}
-
-function doLogin(){
-    const user = document.getElementById('loginUser').value.trim();
-    const pwd = document.getElementById('loginPwd').value.trim();
-    if(user==='Hekaya' && pwd==='sss'){
-        isAdminLogin = true;
-        sessionStorage.setItem('isAdminLogin','1');
-        document.getElementById('loginModal').style.display = 'none';
-        updateAdminUI();
-        renderBooks();
-    }else{
-        document.getElementById('loginError').innerText = '❌ 账号或密码错误';
-    }
-}
-
-function logout(){
-    isAdminLogin = false;
-    sessionStorage.removeItem('isAdminLogin');
-    updateAdminUI();
-    renderBooks();
-}
-
-function closeLoginModal(){
-    document.getElementById('loginModal').style.display = 'none';
-    document.getElementById('loginUser').value = '';
-    document.getElementById('loginPwd').value = '';
-    document.getElementById('loginError').innerText = '';
-}
-
-// 文件转Base64
-function fileToBase64(file){
-    return new Promise((res)=>{
-        const fr = new FileReader();
-        fr.onload = ()=>res(fr.result);
-        fr.readAsDataURL(file);
-    });
-}
-
-// 添加书籍
-async function addBook(){
-    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
-    const title = document.getElementById('book-title').value.trim();
-    const cate = document.getElementById('book-category').value;
-    const desc = document.getElementById('book-desc').value.trim();
-    const tags = document.getElementById('book-tags').value.trim();
-    const link = document.getElementById('book-link').value.trim();
-    const coverUrl = document.getElementById('cover-url').value.trim();
-    const coverFile = document.getElementById('cover-input').files[0];
-    const bookFile = document.getElementById('book-file').files[0];
-    const audioFile = document.getElementById('audio-file').files[0];
-    
-    if(!title || !cate){alert('📋 书名和分类为必填项');return;}
-    
-    let cover = '';
-    if(coverUrl) cover = coverUrl;
-    else if(coverFile) cover = await fileToBase64(coverFile);
-    else {alert('🖼️ 请填写封面链接或上传封面图片');return;}
-    
-    let bookBase64 = '';
-    if(bookFile) bookBase64 = await fileToBase64(bookFile);
-    
-    let audioBase64 = '';
-    if(audioFile) audioBase64 = await fileToBase64(audioFile);
-    
-    // 生成新ID
-    const newId = allBooks.length > 0 ? Math.max(...allBooks.map(b => b.id)) + 1 : 1;
-    
-    // 添加到全局数组
-    const newBook = {
-        id: newId,
-        title,
-        cate,
-        desc,
-        tags,
-        link,
-        cover,
-        bookFile: bookBase64,
-        audioFile: audioBase64,
-        isTop: false,
-        topOrder: 0
-    };
-    allBooks.push(newBook);
-    
-    // 重新渲染
-    renderBooks();
-    
-    // 清空表单
-    document.getElementById('book-title').value='';
-    document.getElementById('book-category').value='';
-    document.getElementById('book-desc').value='';
-    document.getElementById('book-tags').value='';
-    document.getElementById('book-link').value='';
-    document.getElementById('cover-url').value='';
-    document.getElementById('cover-input').value = '';
-    document.getElementById('book-file').value = '';
-    document.getElementById('audio-file').value = '';
-    document.getElementById('coverFileTip').innerText = "📸 未选择封面图片";
-    document.getElementById('bookFileTip').innerText = "📚 未选择电子书";
-    document.getElementById('audioFileTip').innerText = "🎵 未选择音频文件";
-    
-    alert("✅ 书籍添加成功！请点击「导出数据」并更新代码，否则换电脑后会丢失！");
-}
-
-// 删除书籍
-function deleteBook(id){
-    if(!confirm('⚠️ 确定要删除这本书吗？')) return;
-    allBooks = allBooks.filter(book => book.id !== id);
-    renderBooks();
-    alert("✅ 书籍删除成功！请点击「导出数据」并更新代码！");
-}
-
-// 编辑书籍
-function openEditModal(id){
-    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
-    const book = allBooks.find(b=>b.id===id);
-    if(!book) return;
-    
-    currentEditBook = book;
-    document.getElementById('edit-book-id').value = book.id;
-    document.getElementById('edit-book-title').value = book.title;
-    document.getElementById('edit-book-category').value = book.cate;
-    document.getElementById('edit-book-desc').value = book.desc;
-    document.getElementById('edit-book-tags').value = book.tags;
-    document.getElementById('edit-book-link').value = book.link;
-    document.getElementById('edit-cover-url').value = book.cover;
-    document.getElementById('edit-cover-preview').src = book.cover;
-    
-    // 清空编辑表单的文件提示
-    document.getElementById('editCoverFileTip').innerText = "📸 未选择新封面";
-    document.getElementById('editBookFileTip').innerText = "📚 未选择新电子书";
-    document.getElementById('editAudioFileTip').innerText = "🎵 未选择新音频";
-    
-    // 显示编辑弹窗
-    document.getElementById('editModal').classList.add('show');
-}
-
-async function saveEditBook(){
-    if(!currentEditBook) return;
-    
-    const id = parseInt(document.getElementById('edit-book-id').value);
-    const title = document.getElementById('edit-book-title').value.trim();
-    const cate = document.getElementById('edit-book-category').value;
-    const desc = document.getElementById('edit-book-desc').value.trim();
-    const tags = document.getElementById('edit-book-tags').value.trim();
-    const link = document.getElementById('edit-book-link').value.trim();
-    const coverUrl = document.getElementById('edit-cover-url').value.trim();
-    const coverFile = document.getElementById('edit-cover-input').files[0];
-    const bookFile = document.getElementById('edit-book-file').files[0];
-    const audioFile = document.getElementById('edit-audio-file').files[0];
-    
-    if(!title || !cate){alert('📋 书名和分类为必填项');return;}
-    
-    // 处理封面
-    let cover = coverUrl;
-    if(coverFile){
-        cover = await fileToBase64(coverFile);
-    }else if(!coverUrl){
-        cover = currentEditBook.cover; // 保留原封面
-    }
-    
-    // 处理电子书
-    let bookBase64 = currentEditBook.bookFile;
-    if(bookFile){
-        bookBase64 = await fileToBase64(bookFile);
-    }
-    
-    // 处理音频
-    let audioBase64 = currentEditBook.audioFile;
-    if(audioFile){
-        audioBase64 = await fileToBase64(audioFile);
-    }
-    
-    // 更新书籍数据
-    const bookIndex = allBooks.findIndex(b => b.id === id);
-    if(bookIndex !== -1){
-        allBooks[bookIndex] = {
-            ...allBooks[bookIndex],
-            title,
-            cate,
-            desc,
-            tags,
-            link,
-            cover,
-            bookFile: bookBase64,
-            audioFile: audioBase64
-        };
-    }
-    
-    // 关闭弹窗并重新渲染
-    closeEditModal();
-    renderBooks();
-    alert("✅ 书籍修改成功！请点击「导出数据」并更新代码！");
-}
-
-function closeEditModal(){
-    document.getElementById('editModal').classList.remove('show');
-    currentEditBook = null;
-}
-
-// 置顶/取消置顶
-function toggleTop(id){
-    if(!isAdminLogin){
-        alert('🔐 请先登录管理员账号');
-        return;
-    }
-    const book = allBooks.find(b => b.id === id);
-    if(book){
-        book.isTop = !book.isTop;
-        if(book.isTop){
-            book.topOrder = Date.now();
-        }
-        renderBooks();
-    }
-}
-
-// 打开阅读页
-function openReadPage(book){
-    currentBook = book;
-    const coverImg = document.getElementById('readCover');
-    coverImg.src = book.cover;
-    coverImg.onerror = () => { coverImg.src = 'https://via.placeholder.com/350x450?text=Cover'; };
-    document.getElementById('readTitle').innerText = book.title;
-    document.getElementById('readCate').innerText = book.cate;
-    document.getElementById('readDesc').innerText = book.desc || '📋 无简介';
-    
-    const tagsContainer = document.getElementById('readTags');
-    tagsContainer.innerHTML = '';
-    if(book.tags){
-        book.tags.split(',').forEach(tag => {
-            const tagEl = document.createElement('div');
-            tagEl.className = 'read-tag';
-            tagEl.innerText = tag.trim();
-            tagsContainer.appendChild(tagEl);
-        });
-    }
-    
-    // 控制按钮显示
-    document.getElementById('readLinkBtn').style.display = book.link ? 'inline-block' : 'none';
-    document.getElementById('readBookBtn').style.display = book.bookFile ? 'inline-block' : 'none';
-    document.getElementById('playAudioBtn').style.display = book.audioFile ? 'inline-block' : 'none';
-    
-    document.getElementById('readPage').classList.add('show');
-}
-
-function closeReadPage(){
-    document.getElementById('readPage').classList.remove('show');
-}
-
-// 阅读链接 & 电子书
-function openBookLink(){
-    if(!currentBook.link) return;
-    window.open(currentBook.link,'_blank');
-}
-
-function openBookFile(){
-    if(!currentBook.bookFile) return;
-    const a = document.createElement('a');
-    a.href = currentBook.bookFile;
-    a.download = currentBook.title;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-// 播放有声书 + 关闭返回
-function openAudioPlayer(){
-    if(!currentBook.audioFile) return;
-    document.getElementById('audioTitle').innerText = currentBook.title;
-    document.getElementById('bookAudio').src = currentBook.audioFile;
-    document.getElementById('audioModal').classList.add('show');
-}
-
-function closeAudioModal(){
-    const audio = document.getElementById('bookAudio');
-    audio.pause();
-    audio.src = "";
-    document.getElementById('audioModal').classList.remove('show');
-}
-
-// 渲染书籍列表
-function renderBooks(){
-    const shelf = document.getElementById('bookshelf');
-    const activeCate = document.querySelector('.tab.active').dataset.cate;
-    const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    let filteredBooks = allBooks.filter(book => {
-        const cateMatch = activeCate === 'all' || book.cate === activeCate;
-        const searchMatch = 
-            book.title.toLowerCase().includes(searchText) || 
-            book.tags.toLowerCase().includes(searchText) || 
-            book.cate.toLowerCase().includes(searchText);
-        return cateMatch && searchMatch;
-    });
-    
-    filteredBooks = sortBooksData(filteredBooks);
-    
-    if(filteredBooks.length === 0){
-        shelf.innerHTML = '<div class="empty-tip">📚 暂无书籍，快去添加一本吧！</div>';
-        return;
-    }
-    
-    const fragment = document.createDocumentFragment();
-    
-    filteredBooks.forEach(book => {
-        const card = document.createElement('div');
-        card.className = `book-card ${book.isTop ? 'top' : ''}`;
-        card.onclick = () => openReadPage(book);
-        
-        const topTag = isAdminLogin && book.isTop ? '<div class="top-tag">📌 置顶</div>' : '';
-        
-        const topBtnText = book.isTop ? '🔽' : '🔼';
-        const topBtnClass = book.isTop ? 'top-btn untop-btn' : 'top-btn';
-        const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
-        
-        card.innerHTML = `
-            ${topTag}
-            <img class="book-cover lazy-img" data-src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'">
-            <div class="book-info">
-                <div class="book-title">${escapeHtml(book.title)}</div>
-                <div class="book-cate">${escapeHtml(book.cate)}</div>
-            </div>
-            ${topBtnHtml}
-            <button class="del-btn" onclick="event.stopPropagation();deleteBook(${book.id})">🗑️</button>
-            <button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>
-        `;
-        
-        fragment.appendChild(card);
-    });
-    
-    shelf.innerHTML = '';
-    shelf.appendChild(fragment);
-    
-    initLazyLoad();
-}
-
-// 排序书籍
-function sortBooksData(books){
-    const sortType = document.getElementById('sortSelect').value;
-    let sortedBooks = [...books];
-    
-    switch(sortType){
-        case 'title-asc':
-            sortedBooks.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
-            break;
-        case 'title-desc':
-            sortedBooks.sort((a, b) => b.title.localeCompare(a.title, 'zh-CN'));
-            break;
-        case 'cate-asc':
-            sortedBooks.sort((a, b) => a.cate.localeCompare(b.cate, 'zh-CN'));
-            break;
-        default: // 默认：置顶优先，按置顶时间倒序
-            sortedBooks.sort((a, b) => {
-                if(a.isTop && !b.isTop) return -1;
-                if(!a.isTop && b.isTop) return 1;
-                return b.topOrder - a.topOrder;
+        function renderYazmilar(books, container){
+            const yazmilarList = document.createElement('div');
+            yazmilarList.className = 'yazmilar-list';
+            books.forEach(book => {
+                const item = document.createElement('div');
+                item.className = 'yazmilar-item';
+                item.onclick = () => openReadPage(book);
+                const topBtnText = book.isTop ? '🔽' : '🔼';
+                const topBtnClass = book.isTop ? 'top-btn untop-btn' : 'top-btn';
+                const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
+                const delBtnHtml = isAdminLogin ? `<button class="del-btn" onclick="event.stopPropagation();deleteBook(${book.id})">🗑️</button>` : '';
+                const editBtnHtml = isAdminLogin ? `<button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>` : '';
+                item.innerHTML = `<div class="yazmilar-text">${escapeHtml(book.desc) || escapeHtml(book.title)}</div><div class="yazmilar-meta"><div class="yazmilar-tags">${book.tags ? book.tags.split(',').map(t => `<span class="yazmilar-tag">${escapeHtml(t.trim())}</span>`).join('') : ''}</div></div>${topBtnHtml}${delBtnHtml}${editBtnHtml}`;
+                yazmilarList.appendChild(item);
             });
-            break;
-    }
-    
-    return sortedBooks;
-}
+            container.innerHTML = '';
+            container.appendChild(yazmilarList);
+        }
 
-function sortBooks(){
-    renderBooks();
-}
+        const filterBooks = debounce(() => { renderBooks(); }, 300);
 
-const filterBooks = debounce(() => {
-    renderBooks();
-}, 300);
+        let lazyLoadObserver = null;
 
-let lazyLoadObserver = null;
+        function initLazyLoad(){
+            if(lazyLoadObserver) lazyLoadObserver.disconnect();
+            const lazyImages = document.querySelectorAll('.lazy-img');
+            if('IntersectionObserver' in window){
+                lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if(entry.isIntersecting){
+                            const img = entry.target;
+                            const src = img.getAttribute('data-src');
+                            if(src){ img.src = src; img.classList.add('loaded'); observer.unobserve(img); }
+                        }
+                    });
+                }, { rootMargin: '50px', threshold: 0.1 });
+                lazyImages.forEach(img => lazyLoadObserver.observe(img));
+            }else{
+                lazyImages.forEach(img => { const src = img.getAttribute('data-src'); if(src){ img.src = src; img.classList.add('loaded'); } });
+            }
+        }
 
-function initLazyLoad(){
-    if(lazyLoadObserver){
-        lazyLoadObserver.disconnect();
-    }
-    
-    const lazyImages = document.querySelectorAll('.lazy-img');
-    
-    if('IntersectionObserver' in window){
-        lazyLoadObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting){
-                    const img = entry.target;
-                    const src = img.getAttribute('data-src');
-                    if(src){
-                        img.src = src;
-                        img.classList.add('loaded');
-                        observer.unobserve(img);
+        function initTab(){
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderBooks();
+                });
+            });
+        }
+
+        function exportData(){
+            const data = { books: allBooks, welcomeData: welcomeData, exportTime: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `hekaya-backup-${new Date().toLocaleDateString()}.json`;
+            a.click(); URL.revokeObjectURL(url);
+            showToast('📥 数据已导出', 'success');
+        }
+
+        
+
+        function nextSlide(){ currentSlide = (currentSlide + 1) % slides.length; updateCarousel(); }
+        function prevSlide(){ currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateCarousel(); }
+        function goToSlide(index){ currentSlide = index; updateCarousel(); }
+
+        function updateCarousel(){
+            const carousel = document.getElementById('carousel');
+            if(carousel) carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.carousel-indicator').forEach((ind, idx) => ind.classList.toggle('active', idx === currentSlide));
+        }
+
+        function openCarouselEdit(){
+            if(!isAdminLogin){ showToast('请先登录管理员！', 'error'); return; }
+            const existingData = slides.map(s => `${s.url}|${s.link || ''}|${s.title || ''}|${s.desc || ''}`).join('\n');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `<div class="edit-modal"><button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2>✏️ 编辑轮播图</h2><div class="form-group"><label>轮播图数据 (每行一个，格式: 图片URL|跳转链接|标题|描述)</label><textarea id="carouselImages" rows="6" placeholder="https://example.com/img1.jpg|https://link.com|标题|描述">${existingData}</textarea></div><button class="btn-common btn-primary" onclick="saveCarousel()">✅ 保存</button></div>`;
+            document.body.appendChild(modal);
+        }
+
+        function saveCarousel(){
+            const textarea = document.getElementById('carouselImages');
+            if(!textarea) return;
+            const lines = textarea.value.split('\n').map(l => l.trim()).filter(l => l);
+            if(lines.length === 0){ showToast('请至少输入一个图片URL！', 'error'); return; }
+            const carouselData = lines.map((line, index) => {
+                const parts = line.split('|');
+                return {
+                    url: parts[0] || '',
+                    link: parts[1] || '',
+                    title: parts[2] || ['欢迎来到 Hekaya', '每日推荐', '阅读分享'][index % 3] || '轮播图',
+                    desc: parts[3] || ['发现精彩的维吾尔语书籍', '精选好书，每日更新', '与朋友分享阅读心得'][index % 3] || ''
+                };
+            });
+            localStorage.setItem('carouselData', JSON.stringify(carouselData));
+            renderCarousel(carouselData);
+            document.querySelector('.modal-overlay').remove();
+            showToast('✅ 轮播图已保存！', 'success');
+        }
+
+        function renderCarousel(data){
+            slides = data;
+            const carousel = document.getElementById('carousel');
+            const indicators = document.getElementById('carouselIndicators');
+            if(!carousel || !indicators) return;
+            
+            carousel.innerHTML = slides.map((slide, index) => `
+                <div class="carousel-slide" onclick="openCarouselLink(${index})">
+                    <img src="${escapeHtml(slide.url)}" alt="Slide ${index+1}" onerror="this.src='https://picsum.photos/1200/400?random=${index}'">
+                    <div class="carousel-overlay"></div>
+                    <div class="carousel-caption">
+                        <h3>${escapeHtml(slide.title)}</h3>
+                        <p>${escapeHtml(slide.desc)}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            indicators.innerHTML = slides.map((_, index) => `
+                <button class="carousel-indicator ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></button>
+            `).join('');
+            
+            currentSlide = 0;
+        }
+
+        function openCarouselLink(index){
+            const slide = slides[index];
+            if(slide && slide.link){
+                window.open(slide.link, '_blank');
+            }
+        }
+
+        function loadCarouselData(){
+            try{
+                const saved = localStorage.getItem('carouselData');
+                if(saved){
+                    const data = JSON.parse(saved);
+                    if(data && Array.isArray(data) && data.length > 0){
+                        renderCarousel(data);
+                        return;
                     }
                 }
-            });
-        }, {
-            rootMargin: '50px',
-            threshold: 0.1
-        });
-        
-        lazyImages.forEach(img => {
-            lazyLoadObserver.observe(img);
-        });
-    }else{
-        lazyImages.forEach(img => {
-            const src = img.getAttribute('data-src');
-            if(src){
-                img.src = src;
-                img.classList.add('loaded');
-            }
-        });
-    }
-}
+            }catch(e){}
+            renderCarousel([
+                { url: 'https://picsum.photos/1200/400?random=1', title: '欢迎来到 Hekaya', desc: '发现精彩的维吾尔语书籍' },
+                { url: 'https://picsum.photos/1200/400?random=2', title: '每日推荐', desc: '精选好书，每日更新' },
+                { url: 'https://picsum.photos/1200/400?random=3', title: '阅读分享', desc: '与朋友分享阅读心得' }
+            ]);
+        }
 
-// 初始化分类标签
-function initTab(){
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+        function initPage(){
+            loadTheme();
+            loadBooks();
+            loadWelcomeData();
+            loadCarouselData();
+            updateWelcomePage();
+            initTab();
+            initLazyLoad();
+            if(sessionStorage.getItem('isAdminLogin') === 'true'){
+                isAdminLogin = true;
+                document.body.classList.add('admin-login');
+                updateAdminUI();
+            }
+        }
+
+        function login(){
+            const password = document.getElementById('adminPassword').value;
+            if(password === 'admin'){
+                isAdminLogin = true;
+                sessionStorage.setItem('isAdminLogin', 'true');
+                document.body.classList.add('admin-login');
+                updateAdminUI();
+                renderBooks();
+                document.querySelector('.modal-overlay').remove();
+                showToast('✅ 登录成功！', 'success');
+            }else{
+                showToast('❌ 密码错误！', 'error');
+            }
+        }
+
+        function welcomeLogin(){
+            const password = document.getElementById('welcomeLoginPassword').value;
+            if(password === 'admin'){
+                isAdminLogin = true;
+                sessionStorage.setItem('isAdminLogin', 'true');
+                document.body.classList.add('admin-login');
+                document.querySelector('.modal-overlay').remove();
+                showToast('✅ 登录成功！', 'success');
+                updateAdminUI();
+            }else{
+                showToast('❌ 密码错误！', 'error');
+            }
+        }
+
+        function logout(){
+            if(!confirm('确定要退出登录吗？')) return;
+            isAdminLogin = false;
+            sessionStorage.removeItem('isAdminLogin');
+            document.body.classList.remove('admin-login');
+            updateAdminUI();
             renderBooks();
-        });
-    });
-}
-
-// 切换上传面板
-function toggleUploadBox(){
-    const uploadBox = document.getElementById('uploadBox');
-    uploadBoxShow = !uploadBoxShow;
-    if(uploadBoxShow){
-        uploadBox.classList.add('show');
-        uploadBox.classList.remove('hide-upload');
-    }else{
-        uploadBox.classList.remove('show');
-        uploadBox.classList.add('hide-upload');
-    }
-}
-
-// 切换暗黑模式
-function toggleDark(){
-    const isDark = document.body.classList.toggle('dark');
-    localStorage.setItem('dark', isDark ? '1' : '0');
-    document.getElementById('darkToggle').innerHTML = isDark ? '☀️ 浅色模式' : '🌙 暗黑模式';
-}
-
-function exportBooksData(){
-    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
-    
-    const dataCode = `// 全局图书数据
-let allBooks = ${JSON.stringify(allBooks, null, 4)};
-
-// 二维码数据
-let qrCodeData = "${qrCodeData}";
-
-// 轮播图数据
-let carouselData = ${JSON.stringify(carouselData, null, 4)};`;
-    
-    const exportModal = document.createElement('div');
-    exportModal.className = 'modal-overlay export-modal';
-    
-    const exportBox = document.createElement('div');
-    exportBox.className = 'export-box';
-    
-    const exportTitle = document.createElement('h3');
-    exportTitle.className = 'export-title';
-    exportTitle.innerText = "📋 复制以下代码（包含图书、二维码、轮播图数据）";
-    
-    const codeArea = document.createElement('textarea');
-    codeArea.className = 'export-code';
-    codeArea.value = dataCode;
-    
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'export-btn';
-    copyBtn.innerHTML = "📋 复制代码";
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'export-close-btn';
-    closeBtn.innerHTML = "❌ 关闭";
-    
-    copyBtn.onclick = async () => {
-        try {
-            await navigator.clipboard.writeText(dataCode);
-            alert('✅ 代码复制成功！');
-        } catch (err) {
-            codeArea.select();
-            document.execCommand('copy');
-            alert('✅ 代码复制成功！');
+            showToast('🚪 已退出登录', 'info');
         }
-    };
-    
-    closeBtn.onclick = () => {
-        document.body.removeChild(exportModal);
-    };
-    
-    exportBox.appendChild(exportTitle);
-    exportBox.appendChild(codeArea);
-    exportBox.appendChild(copyBtn);
-    exportBox.appendChild(closeBtn);
-    exportModal.appendChild(exportBox);
-    document.body.appendChild(exportModal);
-}
 
-// 轮播图功能
-let currentSlide = 0;
-let carouselTimer = null;
-const CAROUSEL_STORAGE_KEY = 'hekaya_carousel_data';
-let carouselData = [
-     {
-        "image": "https://pic.rmb.bdstatic.com/bjh/3ea623fd09b/251219/b5f9926ca4051316036ea37bf18cfe79.png",
-        "title": "欢迎来到 Hekaya 小故事",
-        "desc": "探索精彩的维吾尔文学世界",
-        "link": ""
-    },
-    {
-        "image": "https://img1.baidu.com/it/u=1817117755,432099410&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=934&amp;h=500",
-        "title": "每日精选好书",
-        "desc": "发现更多精彩内容",
-        "link": ""
-    },
-    {
-        "image": "https://i1.hdslb.com/bfs/archive/e08d1fe76da38ffd24c3057d20239ac1a0a73c39.jpg",
-        "title": "有声读物上线",
-        "desc": "用耳朵感受文学的魅力",
-        "link": ""
-    },
-    {
-        "image": "https://img2.baidu.com/it/u=2531817659,4171588850&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=1025&amp;h=574",
-        "title": "维吾尔语文案 | ئۇيغۇرچە يازمىلار",
-        "desc": "كۈندە نادىر يازمىلار يوللىنىدۇ",
-        "link": "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzYzMTk3OTQ1Nw==&amp;amp;amp;amp;action=getalbum&amp;amp;amp;amp;album_id=4585847137669218304&amp;amp;amp;amp;subscene=126&amp;amp;amp;amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzYzMTk3OTQ1Nw%3D%3D%26mid%3D2247483771%26idx%3D1%26sn%3D6e7c75c0ea6392e09a56b0332e174ae2%26chksm%3Df19ce04ba45222917b07b4a19a050454160af92fb0407db507e879a4b1525f85432de5b7bf5b%26scene%3D126%26sessionid%3D1783478147%26subscene%3Dundefined%26clicktime%3D1783478155%26enterid%3D1783478155%26click_id%3D813300684%26key%3Ddaf9bdc5abc4e8d090b4df174ebe2bf1ae759f8c1d37b6abb307dac590633a333376e74e8abb304e7545037068fa9a6ee502c24a0f2ff4a65bc4f7ea7868e061c586308356b705affcab4c9f27db08cd65e57ed3c0f3aa32b86243d005c4bd3ba59e3f759de1d46e5dd10f80bae7ed900b5dc8fd776feab29b3e1f0af6b968e8%26ascene%3D1%26uin%3DMjEzNDQzMTI2MQ%253D%253D%26devicetype%3DUnifiedPCWindows%26version%3Df2541a1d%26lang%3Dzh_CN%26countrycode%3DCN%26exportkey%3Dn_ChQIAhIQLZ3mUF%252BWCaPnjBP18cJo%252BhLnAQIE97dBBAEAAAAAAGd5LKt0REcAAAAOpnltbLcz9gKNyK89dVj0zg9gOMNcK0EhSQuRTTWmXXgawQMkd4kA3Fj72WipFWYqACnnevFe1CcsTT4T%252FHwpKZikcGMLosMWXqLe9niD6L3tOai%252FoQNacxge7EU%252FkcFIovJ%252B4FALHbFQzqqyjd1ftAIq4Lx%252F2xZgZQJZGdBpG2hWXLOzauGO3yPdDnYKYhPs7Oq%252FTCcB7NmYFDyWplBCL%252FN5fNdAAZFFWFm3UEgs1BdfYwli8hJr3833vsTobpaQKd3LqtxZ1ZZl8NY40RSRWQ%253D%253D%26acctmode%3D1%26pass_ticket%3DYhhOZzV4husvRkxro4KnvjGWF8OsdDBWJ6LkER3%252F9EjTjpMpI8ZgnEwXu6QW0iol%26wx_header%3D0%26fasttmpl_type%3D0%26fasttmpl_fullversion%3D8335294-zh_CN-html%26from_xworker%3D1&amp;amp;amp;amp;nolastread=1&amp;amp;amp;amp;sessionid=#wechat_redirect"
-    }
-];
+        function toggleTheme(){
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            const btn = document.querySelector('.theme-toggle-btn');
+            if(btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
 
-function initCarousel(){
-    loadCarouselData();
-    renderCarousel();
-    startCarousel();
-}
-
-function loadCarouselData(){
-    try{
-        const saved = localStorage.getItem(CAROUSEL_STORAGE_KEY);
-        if(saved){
-            const parsed = JSON.parse(saved);
-            if(Array.isArray(parsed) && parsed.length > 0){
-                carouselData = parsed.map(item => ({
-                    image: item.image || '',
-                    title: item.title || '',
-                    desc: item.desc || '',
-                    link: item.link || ''
-                }));
+        function loadTheme(){
+            const saved = localStorage.getItem('theme');
+            const isDark = saved === 'dark' || saved === null;
+            if(isDark){
+                document.body.classList.add('dark');
+                const btn = document.querySelector('.theme-toggle-btn');
+                if(btn) btn.textContent = '☀️';
             }
         }
-    }catch(e){
-        console.error('加载轮播图数据失败:', e);
-    }
-}
 
-function saveCarouselToStorage(){
-    try{
-        localStorage.setItem(CAROUSEL_STORAGE_KEY, JSON.stringify(carouselData));
-    }catch(e){
-        console.error('保存轮播图数据失败:', e);
-        alert('⚠️ 保存失败，请检查浏览器存储权限');
-    }
-}
+        let carouselTimer = null;
 
-function renderCarousel(){
-    const track = document.getElementById('carouselTrack');
-    const indicators = document.getElementById('carouselIndicators');
-    track.innerHTML = '';
-    indicators.innerHTML = '';
-    
-    carouselData.forEach((item, index) => {
-        const slide = document.createElement('div');
-        slide.className = 'carousel-item';
-        if(item.link){
-            slide.style.cursor = 'pointer';
-            slide.onclick = () => {
-                if(item.link.startsWith('http://') || item.link.startsWith('https://')){
-                    window.open(item.link, '_blank');
-                }else{
-                    window.location.href = item.link;
-                }
-            };
+        function startCarousel(){
+            carouselTimer = setInterval(nextSlide, 5000);
         }
-        slide.innerHTML = `
-            <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/1200x320?text=Banner'">
-            <div class="carousel-overlay">
-                <div class="carousel-title">${escapeHtml(item.title)}</div>
-                <div class="carousel-desc">${escapeHtml(item.desc)}</div>
-                ${item.link ? '<div class="carousel-link-icon">🔗</div>' : ''}
-            </div>
-        `;
-        track.appendChild(slide);
-        
-        const indicator = document.createElement('button');
-        indicator.className = `carousel-indicator ${index === currentSlide ? 'active' : ''}`;
-        indicator.onclick = () => goToSlide(index);
-        indicators.appendChild(indicator);
-    });
-}
 
-function startCarousel(){
-    stopCarousel();
-    carouselTimer = setInterval(nextSlide, 5000);
-}
+        function stopCarousel(){
+            if(carouselTimer){ clearInterval(carouselTimer); carouselTimer = null; }
+        }
 
-function stopCarousel(){
-    if(carouselTimer){
-        clearInterval(carouselTimer);
-        carouselTimer = null;
-    }
-}
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            startCarousel();
+        });
 
-function nextSlide(){
-    currentSlide = (currentSlide + 1) % carouselData.length;
-    updateCarousel();
-}
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape'){
+                const modal = document.querySelector('.modal-overlay');
+                if(modal) modal.remove();
+                const readPage = document.getElementById('readPage');
+                if(readPage && readPage.classList.contains('show')) closeReadPage();
+            }
+        });
 
-function prevSlide(){
-    currentSlide = (currentSlide - 1 + carouselData.length) % carouselData.length;
-    updateCarousel();
-}
-
-function goToSlide(index){
-    currentSlide = index;
-    updateCarousel();
-}
-
-function updateCarousel(){
-    const track = document.getElementById('carouselTrack');
-    const indicators = document.querySelectorAll('.carousel-indicator');
-    track.style.transform = `translateX(-${currentSlide * 100}%)`;
-    indicators.forEach((ind, i) => {
-        ind.classList.toggle('active', i === currentSlide);
-    });
-}
-
-// 轮播图管理
-function openCarouselEdit(){
-    if(!isAdminLogin){alert('🔐 请先登录管理员账号');return;}
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay utility-modal';
-    modal.id = 'carouselEditModal';
-    
-    const content = document.createElement('div');
-    content.className = 'utility-modal-content';
-    content.style.maxWidth = '500px';
-    content.style.maxHeight = '80vh';
-    content.style.overflowY = 'auto';
-    
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-    header.style.marginBottom = '20px';
-    
-    const title = document.createElement('h3');
-    title.textContent = '✏️ 编辑轮播图';
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'btn-close';
-    closeBtn.innerHTML = '×';
-    closeBtn.style.fontSize = '24px';
-    closeBtn.style.width = '32px';
-    closeBtn.style.height = '32px';
-    closeBtn.style.display = 'flex';
-    closeBtn.style.alignItems = 'center';
-    closeBtn.style.justifyContent = 'center';
-    closeBtn.onclick = closeCarouselEdit;
-    
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-    content.appendChild(header);
-    
-    const formContainer = document.createElement('div');
-    formContainer.id = 'carouselFormContainer';
-    renderCarouselForm(formContainer);
-    content.appendChild(formContainer);
-    
-    const addBtn = document.createElement('button');
-    addBtn.className = 'add-btn';
-    addBtn.textContent = '➕ 添加轮播图';
-    addBtn.style.width = '100%';
-    addBtn.style.marginTop = '15px';
-    addBtn.onclick = addCarouselItem;
-    content.appendChild(addBtn);
-    
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'btn-common';
-    saveBtn.textContent = '💾 保存';
-    saveBtn.style.width = '100%';
-    saveBtn.style.marginTop = '10px';
-    saveBtn.onclick = saveCarouselData;
-    content.appendChild(saveBtn);
-    
-    modal.appendChild(content);
-    modal.onclick = (e) => {
-        if(e.target === modal) closeCarouselEdit();
-    };
-    content.onclick = e => e.stopPropagation();
-    document.body.appendChild(modal);
-}
-
-function closeCarouselEdit(){
-    const modal = document.getElementById('carouselEditModal');
-    if(modal){
-        modal.remove();
-    }
-}
-
-function renderCarouselForm(container){
-    container.innerHTML = '';
-    carouselData.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.style.border = '1px solid var(--border)';
-        itemDiv.style.borderRadius = 'var(--radius-md)';
-        itemDiv.style.padding = '15px';
-        itemDiv.style.marginBottom = '15px';
-        
-        const imgGroup = document.createElement('div');
-        imgGroup.className = 'form-group';
-        const imgInput = document.createElement('input');
-        imgInput.type = 'text';
-        imgInput.placeholder = '图片链接';
-        imgInput.value = escapeHtml(item.image);
-        imgInput.id = `carousel-img-${index}`;
-        imgGroup.appendChild(imgInput);
-        itemDiv.appendChild(imgGroup);
-        
-        const titleGroup = document.createElement('div');
-        titleGroup.className = 'form-group';
-        const titleInput = document.createElement('input');
-        titleInput.type = 'text';
-        titleInput.placeholder = '标题';
-        titleInput.value = escapeHtml(item.title);
-        titleInput.id = `carousel-title-${index}`;
-        titleGroup.appendChild(titleInput);
-        itemDiv.appendChild(titleGroup);
-        
-        const descGroup = document.createElement('div');
-        descGroup.className = 'form-group';
-        const descInput = document.createElement('input');
-        descInput.type = 'text';
-        descInput.placeholder = '描述';
-        descInput.value = escapeHtml(item.desc);
-        descInput.id = `carousel-desc-${index}`;
-        descGroup.appendChild(descInput);
-        itemDiv.appendChild(descGroup);
-        
-        const linkGroup = document.createElement('div');
-        linkGroup.className = 'form-group';
-        const linkInput = document.createElement('input');
-        linkInput.type = 'text';
-        linkInput.placeholder = '跳转链接（可选，支持 http/https）';
-        linkInput.value = escapeHtml(item.link || '');
-        linkInput.id = `carousel-link-${index}`;
-        linkGroup.appendChild(linkInput);
-        itemDiv.appendChild(linkGroup);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn-common';
-        deleteBtn.textContent = '🗑️ 删除';
-        deleteBtn.style.width = '100%';
-        deleteBtn.style.marginTop = '5px';
-        deleteBtn.onclick = () => deleteCarouselItem(index);
-        itemDiv.appendChild(deleteBtn);
-        
-        container.appendChild(itemDiv);
-    });
-}
-
-function addCarouselItem(){
-    carouselData.push({
-        image: '',
-        title: '',
-        desc: '',
-        link: ''
-    });
-    renderCarouselForm(document.getElementById('carouselFormContainer'));
-}
-
-function deleteCarouselItem(index){
-    if(carouselData.length <= 1){
-        alert('⚠️ 至少保留一张轮播图');
-        return;
-    }
-    carouselData.splice(index, 1);
-    renderCarouselForm(document.getElementById('carouselFormContainer'));
-}
-
-function saveCarouselData(){
-    carouselData.forEach((item, index) => {
-        item.image = document.getElementById(`carousel-img-${index}`).value || 'https://via.placeholder.com/1200x320?text=Banner';
-        item.title = document.getElementById(`carousel-title-${index}`).value || '未命名';
-        item.desc = document.getElementById(`carousel-desc-${index}`).value || '';
-        item.link = document.getElementById(`carousel-link-${index}`).value || '';
-    });
-    saveCarouselToStorage();
-    closeCarouselEdit();
-    renderCarousel();
-    alert('✅ 轮播图保存成功！');
-}
-
-</script>
-
+        document.addEventListener('click', (e) => {
+            if(e.target.classList && e.target.classList.contains('modal-overlay')){
+                e.target.remove();
+            }
+        });
+    </script>
 </body>
 </html>
