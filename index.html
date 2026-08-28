@@ -21,7 +21,7 @@
             --border:#2d2d44; --shadow:0 4px 15px rgba(0,0,0,0.2); --shadow-hover:0 12px 40px rgba(108,92,231,0.3);
         }
         body{ background:var(--bg); color:var(--text-color); min-height:100vh; overflow-x:hidden; overflow-y:auto; }
-         
+        
         .modal-overlay{
             position:fixed; top:0; left:0; width:100%; height:100%;
             background:rgba(0,0,0,0.5); backdrop-filter: blur(15px); z-index:10000;
@@ -403,21 +403,8 @@
         }
     </style>
     
-    <!-- 不蒜子 - 真实访客统计 (busuanzi.pure.mini.js) -->
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    
-    <!-- 百度统计 - 详细分析 (注册后替换siteId) -->
-    <!-- 请访问 https://tongji.baidu.com 注册获取您的站点ID，替换下方 hm.js? 后的参数 -->
-    <script>
-        var _hmt = _hmt || [];
-        // 百度统计代码 - 请替换为您的站点ID
-        // (function() {
-        //     var hm = document.createElement("script");
-        //     hm.src = "https://hm.baidu.com/hm.js?您的站点ID";
-        //     var s = document.getElementsByTagName("script")[0];
-        //     s.parentNode.insertBefore(hm, s);
-        // })();
-    </script>
+    <!-- 不蒜子 3.6.9 新版 - 免注册真实访客统计（部署到 GitHub Pages 后自动生效，本地打开显示 "--" 属正常） -->
+    <script src="https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js" defer></script>
 </head>
 <body>
     <div id="welcomePage">
@@ -520,8 +507,8 @@
                             <span>Hekaya 小故事</span>
                         </div>
                         <div class="footer-social">
-                            <div class="footer-social-btn" title="سالون" onclick="showToast('Salon: hekaya小故事', 'info')">💬</div>
-                            <div class="footer-social-btn" title="QQ" onclick="showToast('QQ: 381566542', 'info')">👤</div>
+                            <div class="footer-social-btn" title="微信" onclick="showToast('微信号: hekaya_2026', 'info')">💬</div>
+                            <div class="footer-social-btn" title="QQ" onclick="showToast('QQ: 123456789', 'info')">👤</div>
                             <div class="footer-social-btn" title="微博" onclick="showToast('微博: @hekaya', 'info')">🌟</div>
                             <div class="footer-social-btn" title="邮箱" onclick="showToast('邮箱: contact@hekaya.com', 'info')">✉️</div>
                         </div>
@@ -530,7 +517,7 @@
                     <div class="footer-stats" id="footerStats">
                         <div class="stat-item">
                             <div class="stat-label">👁 今日访问</div>
-                            <div class="stat-value"><span id="busuanzi_container_page_pv">--</span></div>
+                            <div class="stat-value" id="busuanzi_today_pv">--</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">📖 书籍总数</div>
@@ -542,11 +529,11 @@
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">👥 总访客数</div>
-                            <div class="stat-value blue"><span id="busuanzi_container_site_uv">--</span></div>
+                            <div class="stat-value blue" id="busuanzi_site_uv">--</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">📊 总访问量</div>
-                            <div class="stat-value purple"><span id="busuanzi_container_site_pv">--</span></div>
+                            <div class="stat-value purple" id="busuanzi_site_pv">--</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">⏱ 页面加载</div>
@@ -558,7 +545,7 @@
                         <div class="footer-copyright">
                             <span>© 2026 Hekaya 小故事 · 维吾尔语阅读平台</span>
                             <span style="color:var(--border)">|</span>
-                            <span>数据来源: 第三方统计</span>
+                            <span>数据来源: 不蒜子真实统计</span>
                         </div>
                         <button class="footer-stats-toggle" onclick="toggleFooterStats()">
                             <span id="statsToggleText">收起统计</span>
@@ -1136,7 +1123,9 @@
             ]);
         }
 
-        // ===== Site Stats (Real Data) =====
+        // ===== Site Stats =====
+        // 访客数据由不蒜子 3.6.9 自动填充（busuanzi_today_pv / busuanzi_site_uv / busuanzi_site_pv）
+        // 部署到 GitHub Pages 后生效；本地 file:// 打开时保持 "--" 属正常现象
         
         function initSiteStats(){
             updateRealStats();
