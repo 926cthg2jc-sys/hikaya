@@ -265,6 +265,126 @@
         .lazy-img{ background:#f5f5f5; }
         .lazy-img.loaded{ background:none; }
         
+        /* ===== Footer ===== */
+        .site-footer{
+            max-width:1200px; margin:40px auto 0; padding:0 20px;
+        }
+        .footer-inner{
+            background:var(--card-bg); border:1px solid var(--border);
+            border-radius:var(--radius-lg); padding:24px 30px;
+            box-shadow:var(--shadow);
+        }
+        .footer-top{
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+            gap:16px; margin-bottom:18px;
+        }
+        .footer-brand{
+            display:flex; align-items:center; gap:10px;
+            font-size:16px; font-weight:700; color:var(--text-color);
+        }
+        .footer-brand .logo-icon{
+            width:32px; height:32px; border-radius:10px;
+            background:var(--primary-gradient);
+            display:flex; align-items:center; justify-content:center;
+            font-size:16px; color:#fff;
+        }
+        .footer-social{
+            display:flex; gap:10px;
+        }
+        .footer-social-btn{
+            width:36px; height:36px; border-radius:50%;
+            background:var(--bg); border:1px solid var(--border);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:all 0.3s ease;
+            font-size:15px;
+        }
+        .footer-social-btn:hover{
+            background:var(--primary); border-color:var(--primary);
+            transform:translateY(-2px); box-shadow:0 4px 12px rgba(108,92,231,0.3);
+        }
+        .footer-stats{
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+            gap:12px 20px; padding:16px 0;
+            border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+        }
+        .stat-item{
+            display:flex; flex-direction:column; gap:3px;
+        }
+        .stat-label{
+            font-size:12px; color:var(--sub-text);
+            display:flex; align-items:center; gap:5px;
+        }
+        .stat-value{
+            font-size:18px; font-weight:700; color:var(--text-color);
+            font-variant-numeric:tabular-nums;
+            background:var(--primary-gradient);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .stat-value span, .stat-value.green span, .stat-value.orange span, 
+        .stat-value.blue span, .stat-value.purple span{
+            -webkit-text-fill-color:inherit;
+        }
+        .stat-value.green, .stat-value.green span{
+            background:linear-gradient(135deg,#00b894,#00cec9);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .stat-value.orange, .stat-value.orange span{
+            background:linear-gradient(135deg,#fdcb6e,#fd79a8);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .stat-value.blue, .stat-value.blue span{
+            background:linear-gradient(135deg,#74b9ff,#0984e3);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .stat-value.purple, .stat-value.purple span{
+            background:linear-gradient(135deg,#a29bfe,#6c5ce7);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .footer-bottom{
+            display:flex; align-items:center; justify-content:space-between;
+            padding-top:16px; font-size:12px; color:var(--sub-text);
+            flex-wrap:wrap; gap:10px;
+        }
+        .footer-copyright{
+            display:flex; align-items:center; gap:6px;
+        }
+        .footer-stats-toggle{
+            background:none; border:1px solid var(--border);
+            color:var(--sub-text); padding:6px 14px;
+            border-radius:20px; font-size:12px; cursor:pointer;
+            transition:all 0.3s ease;
+        }
+        .footer-stats-toggle:hover{
+            border-color:var(--primary); color:var(--primary);
+        }
+        .footer-stats.collapsed .stat-item,
+        .footer-stats.collapsed .stat-label,
+        .footer-stats.collapsed .stat-value{
+            display:none;
+        }
+        .footer-stats.collapsed{
+            border-top:none; border-bottom:none; padding:0;
+        }
+        .footer-stats.collapsed::before{
+            content:'📊 统计数据'; display:block; text-align:center;
+            color:var(--sub-text); font-size:13px; padding:8px 0;
+        }
+        .footer-hidden-msg{
+            text-align:center; padding:8px; color:var(--sub-text);
+            font-size:12px; cursor:pointer;
+        }
+        .footer-hidden-msg:hover{ color:var(--primary); }
+        
         @media (max-width:768px){
             .welcome-container{ padding:40px 30px; }
             .welcome-title{ font-size:28px; }
@@ -274,8 +394,30 @@
             .bookshelf{ grid-template-columns:repeat(3, 1fr); gap:15px; max-width:100%; }
             .book-cover{ height:220px; }
             .search-box{ padding:0 10px; }
+            .site-footer{ margin:20px auto 0; }
+            .footer-inner{ padding:16px 20px; }
+            .footer-stats{ grid-template-columns:repeat(2, 1fr); gap:10px; }
+            .stat-value{ font-size:16px; }
+            .footer-top{ flex-direction:column; align-items:flex-start; }
+            .footer-bottom{ flex-direction:column; text-align:center; }
         }
     </style>
+    
+    <!-- 不蒜子 - 真实访客统计 (busuanzi.pure.mini.js) -->
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- 百度统计 - 详细分析 (注册后替换siteId) -->
+    <!-- 请访问 https://tongji.baidu.com 注册获取您的站点ID，替换下方 hm.js? 后的参数 -->
+    <script>
+        var _hmt = _hmt || [];
+        // 百度统计代码 - 请替换为您的站点ID
+        // (function() {
+        //     var hm = document.createElement("script");
+        //     hm.src = "https://hm.baidu.com/hm.js?您的站点ID";
+        //     var s = document.getElementsByTagName("script")[0];
+        //     s.parentNode.insertBefore(hm, s);
+        // })();
+    </script>
 </head>
 <body>
     <div id="welcomePage">
@@ -368,6 +510,62 @@
                 <button class="btn-common btn-primary" onclick="uploadBook()">✅ 确认添加</button>
             </div>
             <div class="bookshelf" id="bookshelf"></div>
+            
+            <!-- ===== Site Footer ===== -->
+            <footer class="site-footer" id="siteFooter">
+                <div class="footer-inner">
+                    <div class="footer-top">
+                        <div class="footer-brand">
+                            <div class="logo-icon">📚</div>
+                            <span>Hekaya 小故事</span>
+                        </div>
+                        <div class="footer-social">
+                            <div class="footer-social-btn" title="微信" onclick="showToast('微信号: hekaya_2026', 'info')">💬</div>
+                            <div class="footer-social-btn" title="QQ" onclick="showToast('QQ: 123456789', 'info')">👤</div>
+                            <div class="footer-social-btn" title="微博" onclick="showToast('微博: @hekaya', 'info')">🌟</div>
+                            <div class="footer-social-btn" title="邮箱" onclick="showToast('邮箱: contact@hekaya.com', 'info')">✉️</div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-stats" id="footerStats">
+                        <div class="stat-item">
+                            <div class="stat-label">👁 今日访问</div>
+                            <div class="stat-value"><span id="busuanzi_container_page_pv">--</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">📖 书籍总数</div>
+                            <div class="stat-value green" id="statBookCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">🏷️ 分类数量</div>
+                            <div class="stat-value orange" id="statCategoryCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">👥 总访客数</div>
+                            <div class="stat-value blue"><span id="busuanzi_container_site_uv">--</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">📊 总访问量</div>
+                            <div class="stat-value purple"><span id="busuanzi_container_site_pv">--</span></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">⏱ 页面加载</div>
+                            <div class="stat-value" id="statLoadTime">计算中...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-bottom">
+                        <div class="footer-copyright">
+                            <span>© 2026 Hekaya 小故事 · 维吾尔语阅读平台</span>
+                            <span style="color:var(--border)">|</span>
+                            <span>数据来源: 第三方统计</span>
+                        </div>
+                        <button class="footer-stats-toggle" onclick="toggleFooterStats()">
+                            <span id="statsToggleText">收起统计</span>
+                        </button>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -400,426 +598,14 @@
             topLabel: '2026 HEKAYA 小故事｜个人书架',
             pageTitle: 'Bü Gün Kitap Uqudigizmu',
             books: [
-               {
-        "title": "爱的如诉",
-        "author": "维吾尔语小说",
-        "cover": "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
-        "link": "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02"
-      },
-      {
-        "title": "老人与海",
-        "author": "海明威",
-        "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3",
-        "link": "https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437"
-      },
-      {
-        "title": "假如给我三天光明",
-        "author": "海伦凯勒",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover",
-        "link": "https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2"
-      },
-      {
-        "title": "西游记",
-        "author": "吴承恩",
-        "cover": "https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover",
-        "link": "https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f"
-      },
-      {
-        "title": "神秘岛",
-        "author": "凡尔纳",
-        "cover": "https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover",
-        "link": "https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23"
-      },
-      {
-        "title": "流浪者酒家",
-        "author": "双语",
-        "cover": "https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover",
-        "link": "https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2"
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_3gr5Dp5FHFfj75575J2x18OE_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_6k35D55FHFfj75575J3i92cw_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_E5R5EH5FHFfj75575J8I90a9_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_BNo5Bo5B6Ffj75575JGmG1B7_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_3ox19n1Ae8wE74c75J1Z7CpM_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9JJ5BJ5B6Ffj75575J7zaBtf_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_Adh5B75B6Ffj75575J3LKAZf_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9B55BL5B6Ffj75575J8IiB06_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_74S18y1Ae8wE74c75J84W5LJ_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_Ftc5Aq5B6Ffj75575J0deDab_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_GxQ5Aa5B6Ffj75575J8Gu3DA_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_7fV18r1Ae8wE74c75JC5UG29_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_7T858c5B6Ffj75575J0VS5eu_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_Amp18716X8wE74c75J8nX2lS_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9B517T16X8wE74c75J2mlDMY_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9JJ17R16X8wE74c75JBnUGcF_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_9yZ17P16X8wE74c75JCrG35R_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_7bM58a5B6Ffj75575JAVLEQ1_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_4Dl59Z5B6Ffj75575J7pUEJn_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_8Gc58Y5B6Ffj75575J64kBoi_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/625/699625/t6_699625.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/641/584641/t6_584641.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_EcL36136dFwB75175J3sPGmB_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://res.weread.qq.com/wrepub/CB_DQJ1Eh1EpAOe74C75J6fX5Nd_parsecover",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/70/cpplatform_hgfxfnaxphmgs4drsj52ic/t6_cpplatform_hgfxfnaxphmgs4drsj52ic1674034605.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/309/464309/t6_464309.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/12/yuewen_23182387/t6_yuewen_231823871727668825.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/76/YueWen_38118788/t6_YueWen_38118788.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/330/23784330/t6_23784330.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/63/YueWen_26796641/t6_YueWen_26796641.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/426/23914426/t6_23914426.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/801/27110801/t6_27110801.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/65/YueWen_165467/t6_YueWen_165467.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/52/cpplatform_ran3ppbntf4f9u5fufem5x/t6_cpplatform_ran3ppbntf4f9u5fufem5x1765446855.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/82/cpplatform_3jqow5emclteuorwvun1yj/t6_cpplatform_3jqow5emclteuorwvun1yj1710143955.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/599/38625599/t6_38625599.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/30/cpplatform_mqpb2gwvdjyqrcnel6tv2q/t6_cpplatform_mqpb2gwvdjyqrcnel6tv2q1767508016.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/1/yuewen_834464/t6_yuewen_8344641758521403.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://cdn.weread.qq.com/weread/cover/46/yuewen_546339/t6_yuewen_5463391747707629.jpg",
-        "link": "https://weread.qq.com/web/reader/0d332e805856230d3bebc23"
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1325803064590336/3b7b6e70-5b98-41f9-a917-88540a7ed97f.jpg",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/3753062618103808/2d666258-1f0d-4adc-9e12-71853fd15adc.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/3756093845798912/ac10b035-b590-4399-814a-03140ddd0619.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/2937655757897728/ebbd3005-fc6a-402d-b09c-33d86226d5ab.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/919784265089024/7822fb80-e5f8-42b6-8f65-c1a32494b5d3.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1661081089330.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/9989587208830976/50b80ae3-dd7c-4bc6-8bbe-43bdc1ed36cc.png?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/9987640489738240/f3e3c59e-9494-4d31-a122-a4e84283dc19.png?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/9989240105009152/beb99aab-e692-47d2-bfaf-680dff6563ba.png?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/9985980510044160/ef1c47cb-a434-42ac-a7a4-681e64fcb750.png?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344225516.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344225349.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344225084.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344224059.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344224152.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344223923.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344225868.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/1729344225952.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/37438051844096/777bfd89-255f-4839-82f9-b01483f1562e.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/35655321649152/20d0045d-28e4-44b9-8d27-a086e3539643.jpg?imageHeight=1000",
-        "link": ""
-      },
-      {
-        "title": "",
-        "author": "",
-        "cover": "https://www.dudu-book365.com/pmtse-img/34661737168896/4329080a-ebd8-49ef-9cf9-75d19ba9134e.jpg?imageHeight=1000",
-        "link": ""
-      }
-    ],
-            metaInfo: [ "4 BOOKS · 4 WEEKS · JUNE 2026",
-      "每天一本书 开阔视野",
-      "كۆپ كىشىگە ئارىلاشماي يۈرىدىغان كىشى ئاللىقاچان ئۆزىگە نىمىنىڭ كىرەكلىكىنى بىلىپ بولغان كىشىدۇر",
-      "كار قىلماس بەزىدە تەغدىرگە تەدبىر  كۆرمەيمەن دىگەننى كۆرسىتەر تەغدىر",
-      "دۇنيا يالغاندۇر  قوللىرىدا تاش كۆردۈم   توغرا ياشاپ راسچىل يۈرگەننىڭ كۆزلىرىدە ياش كۆردۈم",
-      "بۇ يىللاردا ھېچكىم بىكار قالمىدى،  ھەممىمىز جاننى تىكىپ قويۇپ ئىشلەۋاتىمىز.  يا گۈل-گۈلىگە كېلىدۇ،  يا كۈلمىز كۆككە سورلىدۇ.   يەنە مەيلى",
-      "ئۆزڭىزگىمۇ  راھەتلىك  بىرىڭ    !كىم قويۇپتۇ ！ تۆمۈردەك چىداملىق ، كۆمۈردەك پىداكار بولۇشنى…ھەممە ئىشلا لايىقىدا بۇلۇش كىرەككەن ئەسلى",
-      "سۆزلەشكە  تىگىشلىك نۇرغۇن نەرسىلەر  بولىشى مۇمكىن  ، لىكىن  بەزىدە سۆزلىمەسلىكنى تاللاپ قالىمىز",
-      "خۇش بولغاندا يەرگە قارىغىن، مىسكىن بولغاندا ئاسمانغا! … چۈنكى تۇپراقتا تەمكىنلىك، كۆكلەردە ئەركىنلىك بار",
-      "تەڭشەش ئەڭ تەس بوغۇنى، بۈگۈن ئوڭشاپ قويسا ئەتە بۇزۇلىۋاتقان كەيپىياتلا",
-      "كۆيۈنۈشلەرگە موھتاج ئىدۇقئەكسىچە، كۆنۈشلەرگە مەجبۇر بولدۇق",
-      "نۇر چاچقان چىراقنىڭ پەرۋانىسى كۆپ،ئاقكۆڭۈل ئادەمنىڭ ھېكايىسى كۆپ.كەلمەكچى بولغاننى تاغلار توسالماس،كەتمەكچى بولغاننىڭ باھانىسى كۆپ",
-      "ئويغانغىڭ كەلمەيدىغان چۈشلىرىڭ بولىدۇ، چۈش بولۇپ قېلىشنى ئارزۇ قىلدىغان رىئاللىق ھەم بولىدۇ",
-      "بۇھاياتنىڭ ئىگىز پەس يوللىرىدا ھەركىمنىڭ دەردى باشقىلارغا ھىكايە",
-      "ھەممە ئادەمنىڭ ساڭا  قىزىقىشى  ئىنىق  لىكىن  ھەققى مىھىر بىرشى  ناتايىن",
-      "بەخىت باھارلىق نەرسىلەرگە ئىگە بولۇش ئەمەس ، بەلىكى ئۆزىگە بىرلىگەنىگە قانىغۇچە ھۇزۇرلىنىش",
-      "داداڭ يۆلەك بولمىغان ھاياتنى داۋام ئەتمەك شۇ قەدەر قىيىن بولدىكەن",
-      "يول قويغاننىڭ ھەممىسى ھۆرمەت ئەمەس ، بەزىدە ساڭا بېرىلگەن پۇرسەت",
-      "پۇلى بولمىسىمۇ كۈيۈمى بولسا، سىنى سىغدۇرالىغۇدەك يۈرىكى بولسا، ئالدىراش ۋاقىتلىرىدىمۇ نىمە قىلىۋاتىسەن، نىمە يىدىڭ دىگۈدەك گېپى بولسا مانا سەن ھەممىدىن بەخىتلىك",
-      "تۇلكىدەك بولالىغان چاغدا ئاندىن باشقىلار سىنى ياقتۇرىدۇ ساپ كۆڭۇللەر ھىچقاچان قەدىرلەنگەن ئەمەس",
-      "ساداقەت-بىر ئىنساننىڭ يەنە بىر ئىنسانغا بەرگەن ئەڭ چوڭ سوۋغىسىدۇر",
-      "كۆڭلىدە بولساڭ نەدە بولسۇن بىر ئاۋازىڭىنى ئاڭلاش ئۈچۈن ئامال تاپىدۇ، …كۆڭلىدە يوق بولساڭ باھانە💔"
-    ]
+                { title: '爱的如诉', author: '维吾尔语小说', cover: 'https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover', link: 'https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02' },
+                { title: '老人与海', author: '海明威', cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3', link: 'https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437' },
+                { title: '假如给我三天光明', author: '海伦凯勒', cover: 'https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover', link: 'https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2' },
+                { title: '西游记', author: '吴承恩', cover: 'https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover', link: 'https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f' },
+                { title: '神秘岛', author: '凡尔纳', cover: 'https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover', link: 'https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23' },
+                { title: '流浪者酒家', author: '双语', cover: 'https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover', link: 'https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2' }
+            ],
+            metaInfo: ['4 BOOKS · 4 WEEKS · JUNE 2026', '每天一本书 开阔视野', 'سۆي ئاڭلىغاچان كىتاپ ئۆزگەرگەن كىتاپ ئىلكىسىنى بىلىپ بولغان كىتاپتۇر']
         };
 
         let allBooks = [
@@ -1012,6 +798,7 @@
                 bookFile: '', audioFile: '', isTop: false, topOrder: 0
             });
             saveBooks(); renderBooks();
+            updateRealStats();
             document.getElementById('book-title').value = ''; document.getElementById('book-category').value = '';
             document.getElementById('book-desc').value = ''; document.getElementById('book-tags').value = '';
             document.getElementById('book-link').value = ''; document.getElementById('book-cover').value = '';
@@ -1024,7 +811,7 @@
         function deleteBook(id){
             if(!confirm('确定要删除这本书吗？')) return;
             allBooks = allBooks.filter(b => b.id !== id);
-            saveBooks(); renderBooks(); showToast('🗑️ 书籍已删除', 'info');
+            saveBooks(); renderBooks(); updateRealStats(); showToast('🗑️ 书籍已删除', 'info');
         }
 
         function openEditModal(id){
@@ -1045,7 +832,7 @@
             book.tags = document.getElementById('edit-tags').value.trim();
             book.link = document.getElementById('edit-link').value.trim();
             book.cover = document.getElementById('edit-cover').value.trim() || 'https://via.placeholder.com/150x240?text=Cover';
-            saveBooks(); renderBooks();
+            saveBooks(); renderBooks(); updateRealStats();
             document.querySelector('.modal-overlay').remove();
             showToast('✅ 修改成功！', 'success');
         }
@@ -1343,12 +1130,51 @@
                 }
             }catch(e){}
             renderCarousel([
-                { url: 'https://tukuimg.bdstatic.com/scrop/f66117e117070a808060a02b8901f35c.gif', title: '欢迎来到 Hekaya', desc: '发现精彩的维吾尔语书籍' },
+                { url: 'https://picsum.photos/1200/400?random=1', title: '欢迎来到 Hekaya', desc: '发现精彩的维吾尔语书籍' },
                 { url: 'https://picsum.photos/1200/400?random=2', title: '每日推荐', desc: '精选好书，每日更新' },
                 { url: 'https://picsum.photos/1200/400?random=3', title: '阅读分享', desc: '与朋友分享阅读心得' }
             ]);
         }
 
+        // ===== Site Stats (Real Data) =====
+        
+        function initSiteStats(){
+            updateRealStats();
+        }
+        
+        function updateRealStats(){
+            // Real data: book count and category count
+            const bookCountEl = document.getElementById('statBookCount');
+            if(bookCountEl) bookCountEl.textContent = allBooks.length;
+            
+            const categories = new Set(allBooks.map(b => b.cate));
+            const cateCountEl = document.getElementById('statCategoryCount');
+            if(cateCountEl) cateCountEl.textContent = categories.size;
+            
+            // Real page load time
+            const loadTimeEl = document.getElementById('statLoadTime');
+            if(loadTimeEl){
+                if(window.performance && window.performance.timing){
+                    const loadTime = (Date.now() - window.performance.timing.navigationStart) / 1000;
+                    loadTimeEl.textContent = loadTime.toFixed(2) + 's';
+                } else {
+                    loadTimeEl.textContent = '计算中...';
+                }
+            }
+        }
+        
+        function toggleFooterStats(){
+            const stats = document.getElementById('footerStats');
+            const text = document.getElementById('statsToggleText');
+            if(stats.classList.contains('collapsed')){
+                stats.classList.remove('collapsed');
+                text.textContent = '收起统计';
+            } else {
+                stats.classList.add('collapsed');
+                text.textContent = '展开统计';
+            }
+        }
+        
         function initPage(){
             loadTheme();
             loadBooks();
@@ -1357,6 +1183,8 @@
             updateWelcomePage();
             initTab();
             initLazyLoad();
+            initSiteStats();
+            renderBooks();
             if(sessionStorage.getItem('isAdminLogin') === 'true'){
                 isAdminLogin = true;
                 document.body.classList.add('admin-login');
