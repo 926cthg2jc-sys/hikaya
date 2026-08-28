@@ -321,6 +321,11 @@
             -webkit-background-clip:text;
             -webkit-text-fill-color:transparent;
             background-clip:text;
+            display:flex; align-items:center; min-height:24px;
+        }
+        .stat-value img{
+            height:20px; display:inline-block; border-radius:3px;
+            box-shadow:0 1px 3px rgba(0,0,0,0.2);
         }
         .stat-value span, .stat-value.green span, .stat-value.orange span, 
         .stat-value.blue span, .stat-value.purple span{
@@ -402,9 +407,6 @@
             .footer-bottom{ flex-direction:column; text-align:center; }
         }
     </style>
-    
-    <!-- 不蒜子 3.6.9 新版 - 免注册真实访客统计（部署到 GitHub Pages 后自动生效，本地打开显示 "--" 属正常） -->
-    <script src="https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js" defer></script>
 </head>
 <body>
     <div id="welcomePage">
@@ -517,7 +519,7 @@
                     <div class="footer-stats" id="footerStats">
                         <div class="stat-item">
                             <div class="stat-label">👁 今日访问</div>
-                            <div class="stat-value" id="busuanzi_today_pv">--</div>
+                            <div class="stat-value"><img id="badgeToday" alt="部署后显示"></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">📖 书籍总数</div>
@@ -529,11 +531,11 @@
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">👥 总访客数</div>
-                            <div class="stat-value blue" id="busuanzi_site_uv">--</div>
+                            <div class="stat-value"><img id="badgeVisitors" alt="部署后显示"></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">📊 总访问量</div>
-                            <div class="stat-value purple" id="busuanzi_site_pv">--</div>
+                            <div class="stat-value"><img id="badgeViews" alt="部署后显示"></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">⏱ 页面加载</div>
@@ -545,7 +547,7 @@
                         <div class="footer-copyright">
                             <span>© 2026 Hekaya 小故事 · 维吾尔语阅读平台</span>
                             <span style="color:var(--border)">|</span>
-                            <span>数据来源: 不蒜子真实统计</span>
+                            <span>数据来源: visitor-badge 实时统计</span>
                         </div>
                         <button class="footer-stats-toggle" onclick="toggleFooterStats()">
                             <span id="statsToggleText">收起统计</span>
@@ -1124,11 +1126,15 @@
         }
 
         // ===== Site Stats =====
-        // 访客数据由不蒜子 3.6.9 自动填充（busuanzi_today_pv / busuanzi_site_uv / busuanzi_site_pv）
-        // 部署到 GitHub Pages 后生效；本地 file:// 打开时保持 "--" 属正常现象
+        // 访客数据由 visitor-badge 实时统计（无域名限制，免注册）：
+        //   今日访问 = 按天计数的独立计数器（每日自动归零）
+        //   总访客数 = 每台浏览器只累计一次（近似独立访客）
+        //   总访问量 = 线上每次页面加载 +1
+        // 本地 file:// / localhost 打开时不计数，显示"部署后显示"
         
         function initSiteStats(){
             updateRealStats();
+            initViewBadges();
         }
         
         function updateRealStats(){
@@ -1150,6 +1156,46 @@
                     loadTimeEl.textContent = '计算中...';
                 }
             }
+        }
+        
+        function initViewBadges(){
+            const host = location.hostname;
+            const isLocal = !host || location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1';
+            const today = new Date().toISOString().slice(0, 10);
+            
+            const badges = [
+                { id: 'badgeToday',    key: 'daily.' + today, left: 'Today',    color: '#00b894', shouldInc: true },
+                { id: 'badgeVisitors', key: 'visitors',       left: 'Visitors', color: '#0984e3', shouldInc: false },
+                { id: 'badgeViews',    key: 'views',          left: 'Views',    color: '#6c5ce7', shouldInc: true }
+            ];
+            
+            badges.forEach(b => {
+                const img = document.getElementById(b.id);
+                if(!img) return;
+                
+                // 本地环境不接入统计，避免计入测试数据
+                if(isLocal){
+                    img.remove();
+                    const fallback = document.createElement('span');
+                    fallback.textContent = '部署后显示';
+                    fallback.style.cssText = 'font-size:13px;font-weight:500;';
+                    img.parentNode.appendChild(fallback);
+                    return;
+                }
+                
+                let shouldInc = b.shouldInc;
+                if(b.key === 'visitors'){
+                    // 每台浏览器只计数一次
+                    shouldInc = !localStorage.getItem('vb_counted');
+                    try { localStorage.setItem('vb_counted', '1'); } catch(e){}
+                }
+                
+                img.src = 'https://visitor-badge.laobi.icu/badge?page_id=' + encodeURIComponent(host + '.' + b.key) +
+                    '&left_text=' + b.left +
+                    '&left_color=%23595959&right_color=' + encodeURIComponent(b.color) +
+                    '&height=20&radius=3' +
+                    (shouldInc ? '' : '&query_only=true');
+            });
         }
         
         function toggleFooterStats(){
