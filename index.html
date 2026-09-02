@@ -237,6 +237,60 @@
         .toast-error{ background:var(--error); }
         .toast-info{ background:var(--info); }
         @keyframes slideIn{ from{ transform:translateX(100%); opacity:0; } to{ transform:translateX(0); opacity:1; } }
+
+        /* ----- Import / Export Modal ----- */
+        .dataio-modal{ background:var(--card-bg); border-radius:var(--radius-lg); padding:45px 40px 35px; max-width:720px; width:calc(100% - 40px); position:relative; max-height:calc(100vh - 40px); overflow-y:auto; overscroll-behavior:contain; }
+        .dataio-modal::-webkit-scrollbar{ width:10px; }
+        .dataio-modal::-webkit-scrollbar-track{ background:var(--bg); border-radius:5px; }
+        .dataio-modal::-webkit-scrollbar-thumb{ background:var(--primary); opacity:0.5; border-radius:5px; }
+        .dataio-modal::-webkit-scrollbar-thumb:hover{ background:#8b7ff0; }
+        .dataio-modal .modal-close-btn{
+            position:sticky; top:10px; margin-left:auto; margin-right:-10px;
+            float:right; z-index:10;
+            background:var(--card-bg); box-shadow:0 2px 8px rgba(0,0,0,0.15);
+        }
+        .dataio-modal h2{ font-size:22px; margin-bottom:15px; color:var(--text-color); }
+        .dataio-modal p{ color:var(--sub-text); font-size:13px; line-height:1.7; margin-bottom:18px; }
+        .dataio-tip{
+            background:rgba(108,92,231,0.08); border:1px solid rgba(108,92,231,0.2);
+            border-radius:var(--radius-md); padding:14px 16px; margin-bottom:20px;
+            font-size:13px; color:var(--text-color); line-height:1.8;
+        }
+        .dataio-tip strong{ color:var(--primary); }
+        .dataio-tip code{
+            display:inline-block; background:var(--bg); border:1px solid var(--border);
+            padding:2px 8px; border-radius:4px; font-family:Consolas,monospace; font-size:12px;
+            color:var(--primary); margin:0 2px;
+        }
+        .dataio-modal textarea{
+            width:100%; min-height:180px; padding:12px 14px;
+            border:1px solid var(--border); border-radius:var(--radius-md);
+            font-family:Consolas,monospace; font-size:12px; line-height:1.6;
+            background:var(--bg); color:var(--text-color); resize:vertical; outline:none;
+            box-sizing:border-box;
+        }
+        .dataio-modal textarea:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+        .dataio-actions{ display:flex; gap:12px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
+        .dataio-row{ display:flex; align-items:center; gap:10px; margin:8px 0; font-size:13px; }
+        .dataio-row .ok{ color:var(--success); font-weight:600; }
+        .dataio-row .bad{ color:var(--error); font-weight:600; }
+        .dataio-result{
+            background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md);
+            padding:14px; margin-top:14px; font-size:13px; line-height:1.9; display:none;
+        }
+        .dataio-result.show{ display:block; }
+        .dataio-btn-file{ position:relative; overflow:hidden; }
+        .dataio-btn-file input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .dataio-copy-preview{
+            background:#0f172a; color:#e2e8f0; border-radius:8px; padding:14px 16px;
+            font-family:Consolas,monospace; font-size:12px; line-height:1.7;
+            max-height:260px; overflow:auto; white-space:pre-wrap; word-break:break-all;
+            margin-top:10px;
+        }
+        .dataio-copy-preview .mark{
+            background:#facc15; color:#000; padding:2px 6px; border-radius:3px;
+            display:inline-block; margin:2px 0;
+        }
         
         .yazmilar-list{ display:flex; flex-direction:column; gap:25px; max-width:800px; margin:0 auto; }
         .yazmilar-item{ background:var(--card-bg); border-radius:var(--radius-lg); padding:30px 40px; box-shadow:var(--shadow); position:relative; transition:transform 0.3s ease, box-shadow 0.3s ease; cursor:pointer; }
@@ -420,6 +474,7 @@
                     <button class="btn-common btn-outline btn-sm" id="logoutBtn" onclick="logout()" style="display:none;">🚪 退出登录</button>
                     <button class="btn-common btn-primary" id="uploadBtn" onclick="toggleUploadBox()" style="display:none;">📁 添加书籍</button>
                     <button class="btn-common btn-secondary" id="exportBtn" onclick="exportData()" style="display:none;">📥 导出数据</button>
+                    <button class="btn-common btn-outline btn-sm" id="importBtn" onclick="openImportModal()" style="display:none;">📤 导入数据</button>
                 </div>
             </header>
             <div class="carousel-container">
@@ -567,28 +622,537 @@
             return div.innerHTML;
         }
         
+        // 默认欢迎页配置 — 首次打开页面时显示，管理员登录可在页面上编辑
         let welcomeData = {
-            topLabel: '2026 HEKAYA 小故事｜个人书架',
-            pageTitle: 'Bü Gün Kitap Uqudigizmu',
-            books: [
-                { title: '爱的如诉', author: '维吾尔语小说', cover: 'https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover', link: 'https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02' },
-                { title: '老人与海', author: '海明威', cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3', link: 'https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437' },
-                { title: '假如给我三天光明', author: '海伦凯勒', cover: 'https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover', link: 'https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2' },
-                { title: '西游记', author: '吴承恩', cover: 'https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover', link: 'https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f' },
-                { title: '神秘岛', author: '凡尔纳', cover: 'https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover', link: 'https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23' },
-                { title: '流浪者酒家', author: '双语', cover: 'https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover', link: 'https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2' }
-            ],
-            metaInfo: ['4 BOOKS · 4 WEEKS · JUNE 2026', '每天一本书 开阔视野', 'سۆي ئاڭلىغاچان كىتاپ ئۆزگەرگەن كىتاپ ئىلكىسىنى بىلىپ بولغان كىتاپتۇر']
+    "topLabel": "2026 HEKAYA 小故事｜个人书架",
+    "pageTitle": "Bü Gün kitap kördingizmu",
+    "books": [
+        {
+            "title": "爱的如诉",
+            "author": "维吾尔语小说",
+            "cover": "https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover",
+            "link": "https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02"
+        },
+        {
+            "title": "老人与海",
+            "author": "海明威",
+            "cover": "https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3",
+            "link": "https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437"
+        },
+        {
+            "title": "假如给我三天光明",
+            "author": "海伦凯勒",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover",
+            "link": "https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2"
+        },
+        {
+            "title": "西游记",
+            "author": "吴承恩",
+            "cover": "https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover",
+            "link": "https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f"
+        },
+        {
+            "title": "神秘岛",
+            "author": "凡尔纳",
+            "cover": "https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover",
+            "link": "https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23"
+        },
+        {
+            "title": "流浪者酒家",
+            "author": "双语",
+            "cover": "https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover",
+            "link": "https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2"
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_3gr5Dp5FHFfj75575J2x18OE_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_6k35D55FHFfj75575J3i92cw_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_E5R5EH5FHFfj75575J8I90a9_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_BNo5Bo5B6Ffj75575JGmG1B7_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_3ox19n1Ae8wE74c75J1Z7CpM_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9JJ5BJ5B6Ffj75575J7zaBtf_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_Adh5B75B6Ffj75575J3LKAZf_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9B55BL5B6Ffj75575J8IiB06_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_74S18y1Ae8wE74c75J84W5LJ_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_Ftc5Aq5B6Ffj75575J0deDab_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_GxQ5Aa5B6Ffj75575J8Gu3DA_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_7fV18r1Ae8wE74c75JC5UG29_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_7T858c5B6Ffj75575J0VS5eu_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_Amp18716X8wE74c75J8nX2lS_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9B517T16X8wE74c75J2mlDMY_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9JJ17R16X8wE74c75JBnUGcF_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_9yZ17P16X8wE74c75JCrG35R_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_7bM58a5B6Ffj75575JAVLEQ1_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_4Dl59Z5B6Ffj75575J7pUEJn_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_8Gc58Y5B6Ffj75575J64kBoi_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/625/699625/t6_699625.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/641/584641/t6_584641.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_EcL36136dFwB75175J3sPGmB_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_DQJ1Eh1EpAOe74C75J6fX5Nd_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/70/cpplatform_hgfxfnaxphmgs4drsj52ic/t6_cpplatform_hgfxfnaxphmgs4drsj52ic1674034605.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/309/464309/t6_464309.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/12/yuewen_23182387/t6_yuewen_231823871727668825.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/76/YueWen_38118788/t6_YueWen_38118788.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/330/23784330/t6_23784330.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/63/YueWen_26796641/t6_YueWen_26796641.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/426/23914426/t6_23914426.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/801/27110801/t6_27110801.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/65/YueWen_165467/t6_YueWen_165467.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/52/cpplatform_ran3ppbntf4f9u5fufem5x/t6_cpplatform_ran3ppbntf4f9u5fufem5x1765446855.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/82/cpplatform_3jqow5emclteuorwvun1yj/t6_cpplatform_3jqow5emclteuorwvun1yj1710143955.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://wfqqreader-1252317822.image.myqcloud.com/cover/599/38625599/t6_38625599.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/30/cpplatform_mqpb2gwvdjyqrcnel6tv2q/t6_cpplatform_mqpb2gwvdjyqrcnel6tv2q1767508016.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/1/yuewen_834464/t6_yuewen_8344641758521403.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://cdn.weread.qq.com/weread/cover/46/yuewen_546339/t6_yuewen_5463391747707629.jpg",
+            "link": "https://weread.qq.com/web/reader/0d332e805856230d3bebc23"
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1325803064590336/3b7b6e70-5b98-41f9-a917-88540a7ed97f.jpg",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/3753062618103808/2d666258-1f0d-4adc-9e12-71853fd15adc.jpg?imageHeight=1000",
+            "link": "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg4NTkxNjI1MQ==&action=getalbum&album_id=4270748111079063555&scene=126&sessionid=#wechat_redirect"
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/3756093845798912/ac10b035-b590-4399-814a-03140ddd0619.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/2937655757897728/ebbd3005-fc6a-402d-b09c-33d86226d5ab.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/919784265089024/7822fb80-e5f8-42b6-8f65-c1a32494b5d3.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1661081089330.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/9989587208830976/50b80ae3-dd7c-4bc6-8bbe-43bdc1ed36cc.png?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/9987640489738240/f3e3c59e-9494-4d31-a122-a4e84283dc19.png?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/9989240105009152/beb99aab-e692-47d2-bfaf-680dff6563ba.png?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/9985980510044160/ef1c47cb-a434-42ac-a7a4-681e64fcb750.png?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344225516.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344225349.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344225084.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344224059.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344224152.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344223923.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344225868.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/1729344225952.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/37438051844096/777bfd89-255f-4839-82f9-b01483f1562e.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/35655321649152/20d0045d-28e4-44b9-8d27-a086e3539643.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://www.dudu-book365.com/pmtse-img/34661737168896/4329080a-ebd8-49ef-9cf9-75d19ba9134e.jpg?imageHeight=1000",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_CiCGdoGbwDDW75e75J5fZDHS_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_6k35D55FHFfj75575J3i92cw_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_FtcGtYGsWDDW75e75J72X3X0_parsecover",
+            "link": ""
+        },
+        {
+            "title": "",
+            "author": "",
+            "cover": "https://res.weread.qq.com/wrepub/CB_6mF6FD6DNAq76yd6xPASCBkJ_parsecover",
+            "link": ""
+        }
+    ],
+    "metaInfo": [
+        "4 BOOKS · 4 WEEKS · JUNE 2026",
+        "每天一本书 开阔视野",
+        "كۆپ كىشىگە ئارىلاشماي يۈرىدىغان كىشى ئاللىقاچان ئۆزىگە نىمىنىڭ كىرەكلىكىنى بىلىپ بولغان كىشىدۇر",
+        "كار قىلماس بەزىدە تەغدىرگە تەدبىر  كۆرمەيمەن دىگەننى كۆرسىتەر تەغدىر",
+        "دۇنيا يالغاندۇر  قوللىرىدا تاش كۆردۈم   توغرا ياشاپ راسچىل يۈرگەننىڭ كۆزلىرىدە ياش كۆردۈم",
+        "بۇ يىللاردا ھېچكىم بىكار قالمىدى،  ھەممىمىز جاننى تىكىپ قويۇپ ئىشلەۋاتىمىز.  يا گۈل-گۈلىگە كېلىدۇ،  يا كۈلمىز كۆككە سورلىدۇ.   يەنە مەيلى",
+        "ئۆزڭىزگىمۇ  راھەتلىك  بىرىڭ    !كىم قويۇپتۇ ！ تۆمۈردەك چىداملىق ، كۆمۈردەك پىداكار بولۇشنى…ھەممە ئىشلا لايىقىدا بۇلۇش كىرەككەن ئەسلى",
+        "سۆزلەشكە  تىگىشلىك نۇرغۇن نەرسىلەر  بولىشى مۇمكىن  ، لىكىن  بەزىدە سۆزلىمەسلىكنى تاللاپ قالىمىز",
+        "خۇش بولغاندا يەرگە قارىغىن، مىسكىن بولغاندا ئاسمانغا! … چۈنكى تۇپراقتا تەمكىنلىك، كۆكلەردە ئەركىنلىك بار",
+        "تەڭشەش ئەڭ تەس بوغۇنى، بۈگۈن ئوڭشاپ قويسا ئەتە بۇزۇلىۋاتقان كەيپىياتلا",
+        "كۆيۈنۈشلەرگە موھتاج ئىدۇقئەكسىچە، كۆنۈشلەرگە مەجبۇر بولدۇق",
+        "نۇر چاچقان چىراقنىڭ پەرۋانىسى كۆپ،ئاقكۆڭۈل ئادەمنىڭ ھېكايىسى كۆپ.كەلمەكچى بولغاننى تاغلار توسالماس،كەتمەكچى بولغاننىڭ باھانىسى كۆپ",
+        "ئويغانغىڭ كەلمەيدىغان چۈشلىرىڭ بولىدۇ، چۈش بولۇپ قېلىشنى ئارزۇ قىلدىغان رىئاللىق ھەم بولىدۇ",
+        "بۇھاياتنىڭ ئىگىز پەس يوللىرىدا ھەركىمنىڭ دەردى باشقىلارغا ھىكايە",
+        "ھەممە ئادەمنىڭ ساڭا  قىزىقىشى  ئىنىق  لىكىن  ھەققى مىھىر بىرشى  ناتايىن",
+        "بەخىت باھارلىق نەرسىلەرگە ئىگە بولۇش ئەمەس ، بەلىكى ئۆزىگە بىرلىگەنىگە قانىغۇچە ھۇزۇرلىنىش",
+        "داداڭ يۆلەك بولمىغان ھاياتنى داۋام ئەتمەك شۇ قەدەر قىيىن بولدىكەن",
+        "يول قويغاننىڭ ھەممىسى ھۆرمەت ئەمەس ، بەزىدە ساڭا بېرىلگەن پۇرسەت",
+        "پۇلى بولمىسىمۇ كۈيۈمى بولسا، سىنى سىغدۇرالىغۇدەك يۈرىكى بولسا، ئالدىراش ۋاقىتلىرىدىمۇ نىمە قىلىۋاتىسەن، نىمە يىدىڭ دىگۈدەك گېپى بولسا مانا سەن ھەممىدىن بەخىتلىك",
+        "تۇلكىدەك بولالىغان چاغدا ئاندىن باشقىلار سىنى ياقتۇرىدۇ ساپ كۆڭۇللەر ھىچقاچان قەدىرلەنگەن ئەمەس",
+        "ساداقەت-بىر ئىنساننىڭ يەنە بىر ئىنسانغا بەرگەن ئەڭ چوڭ سوۋغىسىدۇر",
+        "كۆڭلىدە بولساڭ نەدە بولسۇن بىر ئاۋازىڭىنى ئاڭلاش ئۈچۈن ئامال تاپىدۇ، …كۆڭلىدە يوق بولساڭ باھانە💔"]
         };
 
         let allBooks = [
-            { id: 1, title: '爱的如诉muhabbat uzi sozlaydu', cate: 'Roman', desc: '', tags: '爱的如诉、muhabbat uzi sozlaydu、小说', link: 'https://weread.qq.com/web/reader/23042183643425f37436f46664346667538626437346637354a483167446349c02', cover: 'https://res.weread.qq.com/wrepub/CB_7CoFfCFfu8bd74f75JH1gDcI_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
-            { id: 2, title: 'بوۋاي ۋە دېڭىز', cate: 'Roman', desc: '«بوۋاي ۋە دېڭىز» ئامېرىكىلىق يازغۇچى ئونېست ھېمىڭۋاي 1951-يىلى كۇبادا يازغان بىر پارچە پوۋېست بولۇپ، ئۇ ئۆزىنىڭ ئەڭ مۇھىم ئەسىرىدىن بىرى بولىدۇ. ھېكايە ئەتىگى بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ. ھېكايە بىر ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ. ھېكايە ئەتىگى بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ، ئەتىگى بىر ياشتا بىر ئەڭ ئاشتۇرغان كىچىك ئەسىر بولۇپ.', tags: '老人与海、bowway、degiz', link: 'https://weread.qq.com/web/reader/9b742933643425f434a4f307243307068394f7a37345437354a46774e397279437', cover: 'https://tse2-mm.cn.bing.net/th/id/OIP-C.9_d8c-SQgZiSyISHKgoVQAHaKz?w=146&h=214&c=7&r=0&o=7&cb=thfvnextfalcon4&pid=1.7&rm=3', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
-            { id: 3, title: 'كۆزۈم ئۈچ كۈنلا ئېچىلسا ئىدى', cate: 'Roman', desc: 'بۇ كىتاب خېللىن كېللىرنىڭ تەرجىمىھال خاراكتېرلىك ئەسىرى بولۇپ...', tags: '假如给我三天光明、kuzum', link: 'https://weread.qq.com/web/reader/27b42fa3643425f394e57445a6544584739344f37345737354a35706f38727aab2', cover: 'https://res.weread.qq.com/wrepub/CB_9NWDZeDXG94O74W75J5po8rz_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
-            { id: 4, title: 'غەرىبكە ساياھەت1', cate: 'Roman', desc: '«غەربكە ساياھەت» -ئاساسىي ئۇچۇر:ئاپتورى مىڭ سۇلالىسى دەۋرىدىكى ۋۇ چېڭئېن...', tags: '西游记维吾尔语版、维吾尔语', link: 'https://weread.qq.com/web/reader/4b042d53643425f31634146664f46667538626437346637354a375143323732d5f', cover: 'https://res.weread.qq.com/wrepub/CB_1cAFfOFfu8bd74f75J7QC272_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
-            { id: 5, title: 'سىرلىق ئارال', cate: 'Roman', desc: 'ھېكايە ئامېرىكىنىڭ جەنۇب-شىمال ئۇرۇشى مەزگىلىدە يۈز بەرگەن...', tags: '神秘岛、维吾尔语', link: 'https://weread.qq.com/web/reader/b1542c03643425f31507a31395431416538774537346337354a46514b444e6be23', cover: 'https://res.weread.qq.com/wrepub/CB_1Pz19T1Ae8wE74c75JFQKDNk_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 },
-            { id: 6, title: 'مۇساپىرلار قاۋىقىدا', cate: 'Roman', desc: '', tags: '流浪者酒家、双语、musapirlar', link: 'https://weread.qq.com/web/reader/b7c42633643425f44397a31366431365838774537346337354a44444e3667461b2', cover: 'https://res.weread.qq.com/wrepub/CB_3za4OM4NiGmi6zk71XB2X9PE_parsecover', bookFile: '', audioFile: '', isTop: false, topOrder: 0 }
-        ];
+    {
+        "id": 1,
+        "title": "گرىم چۆچەكلىرى:  قىزىل بۆك",
+        "cate": "Hekaya",
+        "desc": "بۇرۇننىڭ بۇرۇنىسىدا چىرايلىق ۋە ئوماق بىر قىزچاق بار ئىكەن. ئۇنىڭغا ھەممەيلەن ئامراق ئىكەن. بولۇپمۇ ئۇ- نىڭ مومىسى قىزچاق ئۈچۈن جېنىنى بېرىشكىمۇ رازى ئى- كەن. بىر كۈنى مومىسى قىزچاققا قىزىل مامۇقتىن تىكىل- گەن بۆك سوۋغا قىپتۇ. بۇ بۆك ئۇنىڭغا شۇنچىلىك يارى- شىپتۇ. قىزچاق ئۇنى ھەمىشە كىيىپ يۈرىدىكەن. شۇڭا، قىزچاقنى ھەممە ئادەم قىزىل بۆك، دەپ ئاتايدىغان بوپتۇ. \n        بىر كۈنى ئاپىسى ئۇنىڭغا： \n      _ قىزىل بۆك، ماۋۇ قاتلىما نان بىلەن بىر بوتۇلكا ئۈزۈم ھارىقىنى موماڭغا ئاپىرىپ بېرىپ كەل. ئۇنىڭ تېنى ئاجىز، بۇلارنى يەپ - ئىچسە بىرئاز ماغدۇرىغا كېلىپ قالار. ھاۋا ئىسسىپ كەتكۈچە موماڭنىڭ قېشىغا بېرىۋال. يولدا شوخلۇق قىلماي تۈز ماڭغىن. يىقىلىپ چۈشسەڭ بو- تۇلكا چېقىلىپ ئۈزۈم ھارىقى تۆكۈلۈپ كېتىدۇ - دە، مو- ماڭغا ھېچنېمە قالمايدۇ. موماڭنىڭ يېنىغا كىرگەندە ھاڭۋاقتىلىق قىلماي، موما، ياخشى تۇردىڭىزمۇ؟ دەپ تىنچ- لىق سورا، _ دەپ تاپىلاپتۇ. \n      _ دېگەنلىرىڭىزنى چوقۇم قۇلىقىمدا تۇتىمەن، _دەپتۇ قىزىل بۆك ۋە ئاپىسى بىلەن خوشلىشىپ يولغا راۋان بوپتۇ. \nقىزىل بۆكنىڭ مومىسى ئورماندا تۇرىدىكەن. يېزىدىن ئۇ يەرگە يېرىم سائەتلەردە بارغىلى بولىدىكەن. قىزىل بۆك ئورمانغا يېتەي دەپ قالغاندا بۆرىگە ئۇچراپ قاپتۇ. ئۇ بۆرى- نىڭ بەكمۇ ۋەھشىي ھايۋان ئىكەنلىكىنى زادىلا ئاڭلىمىغا- نىكەن. شۇڭا، ئۇ بۆرىدىن قورقۇشنى خىيالىغىمۇ كەلتۈر- مەپتۇ.\n       _ ياخشى تۇرۇپسىز، قىزىل بۆك، _ دەپتۇ بۆرە.       _ رەھمەت سىزگە، بۆرىجان، _ دەپتۇ قىزىل بۆك.        _ قىزىل بۆك، مۇنچە ئەتىگەندە قاياققا يول ئالدىڭىز؟       — مومامنىڭكىگە       — ئېتىكىڭىزدىكى نېمە ئۇ؟_ قاتلىما نان بىلەن ئۈزۈم ھارىقى. تۈنۈگۈن ئاپام قاتلىما نان سالغانىدى. ئۇنى قۇۋۋەت بولسۇن، دەپ مومامغا ئەكېتىپ بارىمەن.       _ قىزىل بۆك، مومىڭىزنىڭ ئۆيى نەدىرەك؟      _ ئورماندا، يەنە چارەك سائەت ماڭساملا يېتىپ بارى- مەن. مومامنىڭ ئۆيى يوغان ئۈچ تۈپ كاۋچوك دەرىخىنىڭ ئاستىدا، ئۆپچۆرىسى ياڭاق شاخلىرى بىلەن قاشالانغان. سىز ئۇ يەرنى چوقۇم بىلىسىز. \n    «بۇ گۆدەك قىزچاقنىڭ گۆشى مومىسىنىڭكىگە قارىغاندا يۇمران ھەم تەملىك. مەن ھىيلە ئىشلىتىپ ھەر ئىككىلىسىنى قولۇمغا چۈشۈرەي» دەپ ئويلاپتۇ بۆرە ۋە كېتىپ بېرىپ قىزىل بۆككە دەپتۇ：      _ قىزىل بۆك، ئەتراپىڭىزدا شۇنچە چىرايلىق ئېچىلغان گۈللەر تۇرسىمۇ قاراپ قويمايدىكەنسىز، بۇلبۇللار شۇنچە يېقىملىق سايراۋاتسا قۇلاق سېلىپمۇ باقمايدىكەنسىز. خۇددى مەكتەپكە كېتىپ بارغان بالىدەك ئۇدۇل كېتىۋېرى- دىكەنسىز. ئورماننىڭ نەقەدەر كۆڭۈللۈك ئىكەنلىكىنى بىلمەيدىغان ئوخشايسىز - ھە؟\n      بۆرىنىڭ گېپىنى ئاڭلىغان قىزىل بۆك ئەتراپىغا شۇنداق قاراپتىكەن، پاھ، قۇياشنىڭ ئالتۇن رەڭ نۇرلىرى دەرەخ شاخلىرى ئارىسىدا خۇددى مۆكىمۆكىلەڭ ئويناۋاتقان- دەك گاھ كۆرۈنۈپ، گاھ يوقىلىپ تۇرغۇدەك، ھەممىلا يەردە رەڭگارەڭ گۈللەر ھۈپپىدە ئېچىلىپ كەتكەنمىش. «مومامغا بىر دەستە گۈل ئالغاچ بارسام، ئۇ تېخىمۇ خۇشال بولمامدۇ. تېخى ئەتىگەن تۇرسا، مومامنىڭكىگە بىردەمدىلا بارمامدىمەن» دەپ ئويلاپتۇ قىزىل بۆك چوڭ يولدىن چىقىپ گۈل تەرگىلى ئورماننىڭ ئىچىگە كىرىپتۇ. ئۇ بىر تال گۈلنى ئۈزۈشىگە، نېرىراقتىكى گۈل ئۇنىڭغا تېخىمۇ چىرايلىق كۆرۈنۈپ كېتىدىكەن. شۇنىڭ بىلەن، ئۇ يۈگۈرۈپ بېرىپ ئۇ گۈلنىمۇ ئۈزۈۋالىدىكەن. قىزىل بۆك شۇنداق قىلىپ گۈلدىن گۈلگە قونۇپ يۈرگەن كېپىنەككە ئوخشاش، ئورماننىڭ ئىچكىرىسىگە بارغانسېرى كىرىپ كېتىپتۇ.\n     شۇ ئەسنادا، بۆرە قىزىل بۆكنىڭ مومىسىنىڭكىگە بېرىپ ئىشىكنى چېكىپتۇ.\n      — كىم؟ _ دەپ سوراپتۇ مومىسى.     _ مەن، قىزىل بۆك، _ دەپتۇ بۆرە، _ موما، ئىشىكنى ئېچىڭ. سىزگە قاتلىما نان بىلەن ئۈزۈم ھارىقى ئەكەلدىم.      _ قوپقۇدەك ھالىم يوق، ئىشىكنى ئۆزۈڭ ئاچ. تۇت- قۇچنى بۇرىساڭلا ئۆزى ئېچىلىدۇ. \n      بۆرە ئىشىكنى ئېچىپ كىرىپلا ئۇدۇل قىزىل بۆكنىڭ مومىسى ياتقان كارىۋاتقا بېرىپتۇ - دە، ئۇنى بىر يالماپلا يۇتۇۋېتىپتۇ. ئاندىن ئۇنىڭ كۆڭلەك ۋە باشنىكىنى كىيىپ، كارىۋاتقا چىقىپ جىممىدە يېتىۋاپتۇ. .\n       ئەمدى قىزىل بۆككە كېلەيلى. ئۇ تەرەپ - تەرەپكە چېپىپ بىر قۇچاق گۈل تېرىپتۇ. گۈللەر ئۇنىڭ قۇچىقىغا پاتماي قالغاندىلا، ئۇ ئاندىن مومىسىنى يادىغا ئاپتۇ. ئۇ يول- غا چىقىپ مومىسىنىڭ ئۆيىگە راۋان بوپتۇ. مومىسىنىڭ ئۆيىگە كېلىپ ئىشىكنىڭ ئوچۇق تۇرغانلىقىنى كۆرۈپ ھەيران بوپتۇ. ئۆينىڭ ئىچىگە كىرىپمۇ سەل غەلىتىلىك ھېس قىپتۇ. ئۇ： «توۋا، بۈگۈن ئەجەب يۈرىكىم ئېغىپ تۇرىدۇيا، ئىلگىرى مومامنىڭكىگە كەلسەم كۆڭلۈم يايراپ كېتىدىغان» دەپ ئويلاپتۇ - دە: \n      ＿ موما، قانداق ئەھۋالىڭىز؟ _ دەپ سوراپتۇ.\n            جاۋاب بولماپتۇ. قىزىل بۆك كارىۋاتنىڭ يېنىغا كېلىپ  قارىسا، مومىسى كارىۋاتتا باشنىكىنى چۆكۈرۈپ كىيىپ ياتقۇدەك. ئۇنىڭ يۈزىنىمۇ كۆرگىلى بولمايدىكەن.\n      _ ئەي موما، قۇلىقىڭىز نېمانداق چوڭ؟ _ دەپ سوراپتۇ قىزىل بۆك.        _ چوڭ بولسا گېپىڭنى تېخىمۇ ئېنىقراق ئاڭلايمەن - دە، _ دەپ جاۋاب بېرىپتۇ بۆرە.       _ ئەي موما، كۆزىڭىز نېمانچە يوغان؟      _ چوڭ بولسا سېنى ئوچۇق كۆرەلەيمەن.      _ ئەي موما، قولىڭىز نېمانداق يوغان؟      _ چوڭ بولسا سېنى موككىدە تۇتالايمەن.   _موما، ئاغزىڭىز نېمىشقا ئادەمنىڭ قورققۇسى كەلگۈدەك يوغان؟      _ چوڭ بولسا سېنى يالماپ يۇتالايمەن، _ بۆرە شۇنداق دەپلا كارىۋاتتىن سەكرەپ چۈشۈپتۇ - دە، قىزىل بۆكنى ھاپلا قىلىپ يۇتۇۋېتىپتۇ.       بۆرە قورسىقىنى تويدۇرغاندىن كېيىن، كارىۋاتتا خورەك تارتىپ خاتىرجەم ئۇخلاشقا باشلاپتۇ. دەل شۇ چاغدا ئۆينىڭ ئالدىدىن بىر ئوۋچى ئۆتۈپ قاپتۇ. ئۇ ئۆي ئىچىدىن چىقىۋاتقان خورەكنى ئاڭلاپ: «موماي خورەككە چۈشۈپتۇ، قاراپ باقايچۇ؟ ئۇ ئاغرىپ قالغان بولمىسۇن يەنە» دەپ ئويلاپ ئۆيگە كىرىپتۇ ۋە كارىۋاتنىڭ ئالدىغا بېرىپ بۆرىنى كۆرۈپ قاپتۇ.\n     _ ۋۇي، ئىبلىس بۆرە، مەن سېنى ئىزدەپ يۈرەتتىم، ئەمدىغۇ قولۇمغا چۈشكەنسەن، _ ئوۋچى شۇنداق دەپلا بۆرىنى قارىغا ئاپتۇ. قارىغا ئاپتۇيۇ، توختاپ قاپتۇ، چۈنكى ئۇ بۆرە موماينى يۇتۇۋەتكەن ئوخشايدۇ، مەن ئۇنى قۇتۇلدۇراي دەپ ئويلىغانىكەن. شۇنىڭ بىلەن ئۇ قولىغا قايچا ئېلىپ بۆرىنىڭ قارنىنى شۇنداق يېرىپتىكەن، ئىچىدىن قىزىل بۆكلۈك بىر قىز سەكرەپ چىقىپتۇ. \n       _  ئەجەبمۇ قورقتۇما، بۆرىنىڭ قورسىقى بەكلا قاراڭغۇ بولىدىكەن ئەمەسمۇ ！     ئۇنىڭ كەينىدىنلا تۇنجۇقۇپ ئۆلگىلى تاس قالغان مومىسى چىقىپتۇ. قىزىل بۆك يۈگۈرۈپ تالاغا چىقىپ بىر- مۇنچە تاش ئەكىرىپتۇ - دە، بۆرىنىڭ قارنىغا تىقىپ توش- قۇزۇپ قويۇپتۇ. بۆرە ئويغىنىپ قاچماقچى بوپتىكەن، تاش- نىڭ ئېغىرلىقىدىن مىدىر - سىدىر قىلالماي، غىققىدە جېنى چىقىپ كېتىپتۇ.\n      ئۇلار شاد - خۇراملىققا چۆمۈپتۇ. ئوۋچى بۆرىنىڭ تې- رىسىنى ئېلىپ ئۆيىگە قايتىپتۇ. مومىسى قىزىل بۆك ئە- كېلىپ بەرگەن نەرسىلەرنى يەپ - ئىچىپ ماغدۇرىغا كى- رىپتۇ. قىزىل بۆكمۇ ئىچىدە: «ئاپام مېنى يولدىن چەتنەپ ئورمانغا يالغۇز كىرمە دېگەنىدى، ئەمدى ھەرگىزمۇ ئورمانغا كىرمىسەم بولغۇدەك» دەپ ئويلاپتۇ.  \nكىلەركى مەزمۇنىمىزدا: «ئورماندىكى كەپە» دىگەن چۆچەكدىن بەھرىمان بۇلىمىز .ھارمىغايسىلەر! ! ! \n有个可爱的小女孩，总戴着一顶红帽子，大家都叫她小红帽。\n一天，妈妈让小红帽提着蛋糕和红酒，去看望生病的外婆，叮嘱她千万别离开大路，不要和陌生人说话。\n小红帽走进森林，碰到了大灰狼。她天真地告诉大灰狼自己要去外婆家。大灰狼骗她去林中采漂亮的野花，自己抢先跑到外婆家，伪装成小红帽，骗开房门，一口吞下外婆，躺在床上假扮外婆。\n小红帽采完花来到小屋，走到床边，觉得十分奇怪。“外婆，你的耳朵为什么这么大？”“为了听清你的声音。”“外婆，你的眼睛为什么这么大？”“为了看清你的模样。”“外婆，你的手为什么这么大？”“为了抱住你。”“外婆，你的嘴巴怎么这么大？”\n大灰狼猛地扑过来，一口吃掉了小红帽。很快，吃饱的狼躺在床上沉沉睡去。\n路过的猎人发现了大灰狼，小心地剪开狼的肚子，救出了外婆和小红帽。三人找来大石头填满狼的肚子。狼醒后动弹不得，最后死掉了。\n小红帽明白了道理：不能随便相信陌生人，不能离开安全的道路。",
+        "tags": "格林童话，小红帽、kizil bok",
+        "link": "",
+        "cover": "https://img1.baidu.com/it/u=3300795450,387809443&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 2,
+        "title": "گرىم چۆچەكلىرى:ئورماندىكى كەپە",
+        "cate": "Hekaya",
+        "desc": "بۇرۇنقى زاماندا نامرات بىر ئوتۇنچى ئۆتكەنىكەن. ئۇ ئايالى، ئۈچ قىزى بىلەن ئورماندىكى بىر كەپىدە ياشايدى- كەن. بىر كۈنى ئۇ ئوتۇنغا ماڭغۇچە ئايالىغا：\n -چۈشلۈك تامىقىمنى چوڭ قىزىم ئورمانغا ئاپىرىپ بەرسۇن، بولمىسا ئىشىم ئاقساپ قالىدۇ، مەن يول بويى تې- رىق چېچىپ ماڭىمەن، ئۇ شۇنى بويلاپ ماڭسا مېنى تاپالاي- دۇ، _ دەپتۇ.  \nكۈن نەيزە بويى ئۆرلىگەندە، چوڭ قىز بىر كوزا شور- پىنى كۆتۈرۈپ يولغا چىقىپتۇ. شۇغىنىسى، ئورماندىكى قۇشلار يەرگە چېچىقلىق تېرىقنى تېرىپ يەۋالغاچقا، قىز يولدىن ئادىشىپ كېتىپتۇ. \nقىز بېشى قايغان، پۇتى تايغان تەرەپكە قاراپ مېڭىپتۇ، مېڭىپتۇ، كۈن ئولتۇرۇپ قاراڭغۇ چۈشۈپتۇ. ئورماندىكى دەرەخلەر شىلدىرلاپ، ھۇۋقۇش ھۇۋلاشقا باشلاپتۇ. قورققى- نىدىن قىزنىڭ جېنى چىقايلا دەپ قاپتۇ. شۇ ئەسنادا ئۇنىڭ كۆزىگە يىراق بىر يەردە پىلدىرلاپ يېنىۋاتقان ئوت كۆرۈ- نۈپتۇ. «ئوت كۆرۈنگەن يەردە چوقۇم ئادەم بار، مەن شۇلار- نىڭ قېشىغا بېرىپ تۈنەي» دەپ ئويلاپتۇ قىز ۋە شۇ تەرەپكە  قاراپ مېڭىپ بىر ئۆينىڭ ئالدىغا كېلىپ قاپتۇ. قىزچاق ئىشىكنى چېكىپتۇ، ئۆينىڭ ئىچىدىن «كىرىڭ！» دېگەن قوپال بىر ئاۋاز ئاڭلىنىپتۇ. قىزچاق قاراڭغۇ دالانغا كى- رىپ، ساراينىڭ ئىشىكىنى چېكىپتىكەن، «ئۇدۇل كىرىۋې- رىڭ» دەپتۇ يەنە ھېلىقى ئاۋاز. قىزچاق ئۆيگە كىرىپ شۇنداق قارىسا، ئاپئاق ساقاللىرى يەرگە تېگەي دەپ قالغان بىر بوۋاي قوللىرى بىلەن ئېڭىكىنى تىرەپ ئولتۇرغۇدەك. ئوچاقنىڭ ئالدىدا بىر مېكىيان، بىر خوراز ۋە بىر تاغىل سىيىر ياتقۇدەك.\n قىزچاق بوۋايغا كەچۈرمىشلىرىنى سۆزلەپ بېرىپ ئۇنىڭدىن ئۆيىدە بىر كېچە قونۇپ كېتىشنى ئىلتىماس قىپتۇ. بوۋاي ھېلىقى ھايۋانلاردىن سوراپتۇ：\n ئەي چىرايلىق مېكىيان، رەڭدار تونلۇق خورازچاق. ئېيتقىنچۇ تاغىل سىيىر، ئۆيدە قونسۇنمۇ قىزچاق؟\n ھايۋانلار تەڭلا： «دوكىس！» دەپ جاۋاب بېرىپتۇ. بۇ سۆز «قوشۇلىمىز！» دېگەن مەنىنى بىلدۈرىدىكەن.\n _ ئۆيىمىزدە نەرسە - كېرەكلەر مولچىلىق. سەن تالا- دىكى ئوچاقتا بىزگە تاماق ئېتىپ بەرگىن، _ دەپتۇ بوۋاي.  \nقىزچاق بۇ يەردە تاماققا كېرەكلىك خۇرۇچلارنىڭ راستتىنلا موللۇقىنى كۆرۈپ، ئوخشىتىپ تاماق ئېتىپتۇ. ئەمما، ئۇ ھېلىقى ھايۋانلارنىڭ ئاچ - توقلۇقىنى خىيالى- غىمۇ كەلتۈرمەپتۇ. ئۇ ئۆزىگە بىر قاچا ئاشنى ئۇسۇپتۇ- دە، ئاپئاق ساقاللىق بوۋاينىڭ يېنىدا ئولتۇرۇپ، تويۇپ كې- كىرگۈچە يەپتۇ. ئاندىن ئۇ：\n — ھېرىپ كەتتىم، يېتىپ ئۇخلىغۇدەك كارىۋات بار - مۇ؟ _ دەپ سوراپتۇ. ھايۋانلار: \nيېدىڭ - ئىچتىڭ، بەتنىيەت، ئۆز قارنىڭنى توقلىدىڭ. ئەمدى نەدە ياتارسەن؟ بىزنى ئويلاپ قويمىدىڭ. \nدەپ جاۋاب بېرىپتۇ. \n-ئۈستۈنكى قەۋەتتىكى ئۆيگە ئىككى كارىۋات قويۇل- غان. سەن چىقىپ كارىۋاتلارنى قېقىشتۇرۇپ، پاكىز كىر- لىكلەرنى سال. مەنمۇ چىقىپ ئۇخلايمەن، _ دەپتۇ بوۋاي.\n  قىزچاق ئۆيگە چىقىپ كارىۋاتلارنى قېقىپ - سۈپۈ- رۈپ، پاكىز كىرلىكلەرنى ساپتۇ. ئاندىن بوۋاينىڭ چىقىشى- نى كۈتمەيلا كارىۋاتقا چىقىپ ئۇيقۇغا كېتىپتۇ. بىردەمدىن كېيىن بوۋاي چىقىپتۇ. ئۇ قولىدىكى چىراغنى يېقىن ئە-كېلىپ قىزغا قاراپتۇ - دە، ئۇنىڭ ئۇخلاپ قالغانلىقىنى كۆرۈپ بېشىنى چايقاپ قويۇپتۇ. ئاندىن گەمىنىڭ قاپقىقىنى ئېچىپلا قىزنى گەمىگە تاشلىۋېتىپتۇ. \nئوتۇنچى ئۆيىگە ناھايىتى كەچ قايتىپتۇ ۋە پۈتۈن بىر كۈن ئاچ قويغانلىقى ئۈچۈن خوتۇنىغا كايىپتۇ.\n _ ۋاي، ياق، _ دەپتۇ خوتۇنى، _ سىزگە تاماقنى چوڭ قىزىمىز ئەكەتكەن. ئۇ يولدىن ئېزىپ قالغان ئوخشاي- دۇ، ئەتە قايتىپ كېلىپ قالار. \nئەتىسى تاڭ يورۇمايلا ئوتۇنچى يەنە ئوتۇنغا مېڭىپتۇ. ئۇ ئايالىغا بۈگۈن تاماقنى ئوتتۇرانچى قىزىدىن ئەۋەتىشنى تاپىلاپتۇ.\n -بۈگۈن مەن يول بويى يېسسىمۇق چېچىپ ماڭاي، _ دەپتۇ ئۇ، _ چۈنكى يېسىمۇق تېرىقتىن چوڭراق، كۆزگە ئاسان چېلىقىدۇ. ئوتتۇرانچى قىزىمىز شۇ يېسىمۇقلارغا قاراپ ماڭسا چوقۇم ئېزىپ قالمايدۇ.\n چۈش بولغاندا ئوتتۇرانچى قىز تاماقنى كۆتۈرۈپ يولغا چىقىپتۇ. ئەمما، ئۇنىڭغا يېسسىمۇقلاردىن بىر تالمۇ ئۇچ- رىماپتۇ. چۈنكى، قۇشلار ئۇلارنىڭمۇ بىر تېلىنى قويماي تېرىپ يەپ بولغانىكەن. شۇڭا، ئوتتۇرانچى قىزمۇ ئېزىپ قاپتۇ. كەچ كىرگەندە ئۇمۇ ھېلىقى بوۋاينىڭ ئۆيىگە كەپتۇ. بوۋاي ئۇنى ئۆيگە كىرگۈزۈپتۇ. ئۇمۇ بوۋايدىن يېگۈدەك نەرسە بىلەن ياتقۇدەك جاي سوراپتۇ. ئاپئاق ساقال بوۋاي يەنە ھېلىقى ھايۋانلاردىن سوراپتۇ：  \nئەي چىرايلىق مېكىيان، رەڭدار تونلۇق خورازچاق. ئېيتقىنچۇ تاغىل سىيىر، ئۆيدە قونسۇنمۇ قىزچاق؟\nدوكىس ！ _ دەپ جاۋاب بېرىپتۇ ھايۋانلار. \nبۇ قىزمۇ تاماقنى ئاچىسىغا ئوخشاش ئوخشىتىپ ئې- تىپتۇ ۋە ھېلىقى ئۈچ بىچارىگە بەرمەيلا بوۋاي بىلەن ئول- تۇرۇپ موكۇلدىتىپ سوقۇپتۇ. ئاندىن يېتىش ئۈچۈن. جاي سوراپتۇ. ھايۋانلار:\n _   يېدىڭ - ئىچتىڭ، بەتنىيەت، ئۆز قارنىڭنى توقلىدىڭ. ئەمدى نەدە ياتارسەن؟ بىزنى ئويلاپ قويمىدىڭ. \nدەپ جاۋاب بېرىپتۇ. \nبۇ قىزچاقمۇ ئۈستۈنكى قەۋەتتىكى ئۆيگە چىقىپ ئا- چىسىغا ئوخشاشلا ئۇخلاپ قاپتۇ. بوۋاي يەنە بېشىنى چاي- قاپتۇ - دە، بۇ قىزنىمۇ گەمىگە تاشلىۋېتىپتۇ. \nئۈچىنچى كۈنى ئەتىگەندە، ئوتۇنچى ئايالىغا： \n بۈگۈن ماڭا تاماقنى كەنجى قىزىمىز ئاپىرىپ بەر-سۇن. ئۇنىڭ ئەزەلدىن قۇلىقى يۇمشاق، كۆڭلى ياخشى. ئۇ ئاچىلىرىغا ئوخشاش داپ داراڭشىغان، ئېشەك ھاڭرىغان يەر- لەردە قاڭقىپ يۈرمەيدۇ، مېنىڭ يېنىمغا تېنىمەي بارالاي- دۇ، _ دەپتۇ. \n_ ئەمدى مۇشۇ ئەڭ ئارزۇلۇق بالىمىزدىنمۇ ئايرىلىپ قالاي دەمسىز؟ _ دەپ ئۇنىماپتۇ ئايالى.\n _ خاتىرجەم بول، خوتۇن، بۇ قىزىمىز بەكمۇ چېچەن، ئۇ ھەرگىزمۇ ئېزىپ كەتمەيدۇ. مەن بۈگۈن يولغا نوقۇت چېچىپ ماڭاي. نوقۇت يېسسىمۇقتىن چوڭراق، كۆزگىمۇ ئوڭاي چېلىقىدۇ. \nكەنجى قىز بىلىكىگە تاماق سېلىنغان سېۋەتنى ئېسىپ يولغا چىقىپتۇ. بۇ چاغدا ئورماندىكى كەپتەرلەر نوقۇتتىن بىرىنىمۇ قويماي پاك - پاكىز تېرىپ يەپ بولغانىكەن. كەنجى قىز قانداق مېڭىشىنى بىلەلمەي گاڭگىراپ قاپتۇ. «بىچارە دادام ئاچ قالىدىغان بولدى، ئۆيگە كېتەلمىسەم ئاق كۆڭۈل ئاپام ئازابلىنىدۇ، ئەمدى قانداق قىلارمەن؟» دەپ ئۇنىڭ تازا بېشى قېتىپتۇ. كەچمۇ كىرىپتۇ. قىزغا يىراقتا ئوت كۆرۈنۈپتۇ. ئۇ پىلدىرلاۋاتقان يورۇققا قاراپ مېڭىپ ھېلىقى ئۆينىڭ ئالدىغا كېلىپ قاپتۇ. ئۇ ئاپئاق ساقال بوۋايغا ئەدەپ بىلەن سالام بېرىپ، بىر كېچە قونۇش ئۈچۈن ئىجازەت سوراپتۇ. ئاپئاق ساقال بوۋاي يەنە:\n ئەي چىرايلىق مېكىيان، رەڭدار تونلۇق خورازچاق.ئېيتقىنچۇ تاغىل سىيىر، ئۆيدە قونسۇنمۇ قىزچاق؟  دەپ ھايۋانلىرىدىن سوراپتۇ.  \n-دوكىس！-دەپ جاۋاب بېرىپتۇ ئۇلار.\nقىزچاق دەرھال ئوچاق بېشىغا ئۆتۈپ خوراز بىلەن مې- كىياننىڭ پارقىراپ تۇرغان پەيلىرىنى سىلاپتۇ. ئالا سىيىر- نىڭ مۈڭگۈزىدىن ئاستا تۇتۇپ ئۇنىڭ پېشانىسىنى سىلاپ قويۇپتۇ. ئۇ بوۋاينىڭ تاپشۇرمىسى بويىچە تەملىك شورپا قىپتۇ. ئۇ بىر قاچا شورپىنى جوزىغا قويۇپلا： «توۋا، مەن ئۆزۈمنىڭ قورسىقى بىلەنلا بولۇپ كېتىپ، بۇ ئاق كۆڭۈل ھايۋانلارنى ئاچ قويغىلى تاس قاپتىمەن ! تالادا شۇنچە جىق نەرسە بولغاندىكىن، مەن دەسلەپ بۇلارنىڭ قورسىقىنى توقلاي» دەپ ئويلاپتۇ. \nئۇ چىقىپ ئارپا ئەكىرىپ مېكىيان بىلەن خورازنىڭ ئالدىغا چېچىپتۇ، بىر قۇچاق ئوت ئەكىرىپ سىيىرغا سې- لىپ بېرىپ：\n _ سۆيۈملۈك ھايۋانلار، تويغۇچە يەڭلار، ئۇسسىساڭلار سۈپسۈزۈك سۇ ئەكىرىپ بېرىمەن، _ دەپتۇ. \nئۇ لىق بىر چېلەك سۇ ئەكىرىپتۇ. مېكىيان بىلەن خوراز چېلەكنىڭ قىرىغا قونۇپ سۇنى قانغۇچە ئىچىپتۇ. تاغىل سىيىرمۇ ئۇسسۇزلۇقىنى قاندۇرۇپتۇ. ئۇ ھايۋانلارنى بېقىپ بولغاندىن كېيىن، ئۈستەلگە كېلىپ ئولتۇرۇپ بوۋاي ئاشۇرۇپ قويغان شورپىنى ئىچىشكە باشلاپتۇ. ئۇزۇن ئۆتمەي مېكىيان بىلەن خوراز بېشىنى قاناتلىرىنىڭ ئىچىگە تىقىپ  مۈگدەشكە باشلاپتۇ. تاغىل سىيىرنىڭمۇ كۆزلىرى يۇمۇلۇپ كېتىپتۇ. \n_ ئەمدى ئۇخلىساق بولار، _ دەپتۇ قىز ۋە ئۈچىدىن سوراپتۇ：  \nئەي چىرايلىق مېكىيان، رەڭدار تونلۇق خورازچاق. ئېيتقىنچۇ تاغىل سىيىر، بولارمۇ ئەمدى ئۇخلىساق؟\nھايۋانلار جاۋاب بېرىپتۇ: \n بوغۇز بەردىڭ يېگىلى، سۇ بەردىڭ سەن ئىچكىلى. بېشىمىزنى سىلىدىڭ، راھەتلىنىپ ئۇخلىغىن.\n  كەنجى قىز ئۈستۈنكى قەۋەتتىكى ئۆيگە چىقىپ مامۇق ياستۇقلارنى قېقىپ، كارىۋاتقا ئاپئاق كىرلىكلەرنى ساپتۇ. ھەممە ئىشنى جاي - جايىدا تۈگىتىپتۇ. ئاندىن بوۋاي ئاپ- ئاق ساقاللىرىنى ساڭگىلىتىپ كارىۋاتقا چىقىپ يېتىپتۇ. كەنجى قىزمۇ يەنە بىر كارىۋاتقا يېتىپلا ئۇخلاپ كېتىپتۇ. كەنجى قىز يېرىم كېچىگىچە خاتىرجەم ئۇخلاپتۇ، يې- رىم كېچىدىن كېيىن ئۆيدىكى تاراق - تۇرۇقتىن ئويغىنىپ كېتىپتۇ： ئۆينىڭ بۇلۇڭلىرىدىن غەلىتە ئاۋازلار ئاڭلىنىپ- تۇ، ئىشىك تاراقشىپ ئېچىلغىنىچە تامغا ئۇرۇلۇپتۇ. تام- تورۇسلار ئۆرۈلۈۋاتقاندەك، پەلەمپەيلەر غۇلاۋاتقاندەك قاراس- قۇرۇس ئاۋازلار ئاڭلىنىپتۇ. ئاندىن گۈلدۈر قىلغان ئاۋاز بىلەن تەڭ خۇددى تورۇس گۈمۈرۈلۈپ چۈشكەندەك سادا چى- قىپتۇ - دە، ئۆينىڭ ئىچى تىمتاس بولۇپ كېتىپتۇ. كەنجى قىزنىڭ ھېچ يېرى يارىلانماپتۇ، ئەكسىچە، ئۇ جىمجىت يات- قان پېتى يەنە ئۇيقۇغا كېتىپتۇ. \nئەتىسى ئەتىگەندە قۇياش ئۆزىنىڭ ئالتۇندەك نۇرىنى چېچىپ قىزنى ئۇيقۇدىن ئويغىتىپتۇ. قىز ئويغىنىپ نېمى- نى كۆرۈپتۇ دېمەمسىلەر؟ ئەيبۇھەنناس، ئۇ ئاجايىپ - غارا- يىپ بېزەلگەن ھەشەمەتلىك بىر سارايدا ياتقۇدەك. ئەتراپىدى- كى ھەممە نەرسە كۆزىنىڭ يېغىنى يېگۈدەك دەرىجىدە ۋال - ۋۇل قىلىپ چاقناپ تۇرغۇدەك. ساراينىڭ تاملىرى يېشىل مەخمەل بىلەن قاپلانغان بولۇپ، ئۈستىگە ئالتۇندىن گۈل چېكىلگەنىكەن. پىل چىشىدىن ياسالغان كارىۋاتنىڭ ئۈس- تىدىكى قىپقىزىل مامۇق يوتقانلار ئوتقاشتەك تاۋلىنىدىكەن. كارىۋاتنىڭ يېنىدىكى ئورۇندۇقتا مەرۋايىتتىن توقۇلغان كەش تۇرغۇدەك. كەنجى قىز ئوڭۇممۇ، چۈشۈممۇ، دەپ ھاڭ - تاڭ بولۇپ قاپتۇ. شۇ ئەسنادا رەتلىك كىيىنگەن ئۈچ دېدەك كىرىپتۇ - دە، ئۇنىڭ ئالدىدا قول باغلاپ تۇرۇپتۇ. \n_ بولدى قايتىڭلار، _ دەپتۇ قىز ئۇلارغا، _ مەن ھازىرلا تۇرۇپ بوۋايغا شورپا قاينىتىمەن. چىرايلىق مېكى- يان، خوراز ۋە تاغىل سىيىرلارغا يەم بېرىمەن. \nئۇ بوۋاي بۇ چاغقا تۇرغاندۇر، دەپ ئويلاپ ياندىكى كارىۋاتقا قاراپتۇ - دە، ئۇنىڭدا ئاپئاق ساقاللىق بوۋاي ئە-مەس، بەلكى ياپياش، چىرايلىق بىر يىگىتنىڭ ياتقانلىقىنى كۆرۈپتۇ. دەل شۇ پەيتتە يىگىت ئويغىنىپ دەپتۇ：\n _ مەن ئەسلىي شاھزادە ئىدىم، قارانىيەت جادۇگەر موماي مېنى ئاپئاق ساقاللىق بوۋايغا ئايلاندۇرۇپ، ئاشۇ قې- لىن ئورمانغا بەند قىلىۋەتكەنىدى. خورازغا، مېكىيانغا ۋە تاغىل سىيىرغا ئايلاندۇرۇۋېتىلگەن ئۈچ خىزمەتكارىمدىن باشقا ھېچكىم ماڭا يېقىن كېلىشكە جۈرئەت قىلالمايتتى. پەقەت ئادەمزاتقىلا ئەمەس، ھايۋانلارغىمۇ كۆيۈنىدىغان، ئۇلارنىڭ ھالىغا يېتىدىغان بىرەر ئاق كۆڭۈل قىز بىز تۇر- غان يەرگە كەلگەندىلا، جادۇگەرنىڭ جادۇسى كاردىن چىقات- تى. ئۇ قىز دەل سىز ئىدىڭىز. تۈنۈگۈن يېرىم كېچىدىن كېيىن سىز بىزنى جادۇدىن ئازاد قىلدىڭىز، قەدىمكى ئور- ماندىكى بۇ كەپە يېڭىۋاشتىن سەلتەنەتلىك ئوردىغا ئايلاندى. ئۇلار ئورۇنلىرىدىن تۇرۇپتۇ. شاھزادە دەرھال خىزمەت- كارلىرىنى مەپىنى قېتىپ بېرىپ قىزنىڭ ئاتا - ئانىسىنى تويغا چىللاپ كېلىشكە بۇيرۇپتۇ. \n_ مېنىڭ ئاچىلىرىم قېنى؟ _ دەپ سوراپتۇ كەنجى قىز.\n _ مەن ئۇلارنى گەمىگە سولاپ قويدۇم. ئەتە ئۇلارنى ئورمانغا ئاپىرىپ ياغاچكۆمۈر كۆيدۈرۈشكە سالماقچىمەن. قاچانكى ئۇلار خاتالىقىنى تونۇپ، ھايۋانلارنى ئاچ قويمايدىغان ھالغا كېلىدىكەن، شۇ چاغدا ئۇلارنى قايتۇرۇپ كېلىمەن، — دەپتۇ شاھزادە.   \nبۈگۈنكى چۆچىكىمىز مۇشۇيەردە ئاخىرلاشتى كىلەركى مەزمۇنىمىزدا: « بۆرە بىلان ئوغلاقلار » دىگەن چۆچەكدىن بەھرىمان بۇلىمىز .ھارمىغايسىلەر! ! ! \n从前有个樵夫，他有三个女儿。一天，他让大女儿送饭到森林，沿路撒小米做标记，但鸟儿把小米吃光了，大女儿迷了路。\n天黑时，她找到一座小屋，屋里有一个白胡子老人和三只动物：母鸡、公鸡和花牛。她借宿做饭，却只顾自己和老人吃喝，完全不管动物。夜里，她被老人扔进了地窖。\n第二天，二女儿送饭，撒的扁豆也被鸟吃光。她做了同样自私的事，也被扔进地窖。\n第三天，小女儿送饭，撒的豌豆同样被鸟吃掉。她也迷路来到小屋。但她先温柔地抚摸动物，做饭时先喂饱它们，最后才自己吃。夜里小屋发出巨响，但她安然入睡。\n第二天醒来，小屋变成了宏伟的宫殿，老人变成了一位英俊的王子。原来王子被女巫施了魔法，只有对人和动物都善良的人才能解救他。王子娶了小女儿，两个自私的姐姐则被送去当烧炭工，直到学会善待动物。",
+        "tags": "格林童话，林中小屋、ormandiki kapa",
+        "link": "",
+        "cover": "https://img0.baidu.com/it/u=4259659061,333524904&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=889",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 3,
+        "title": "گرىم چۆچەكلىرى:بۆرە بىلەن ئوغلاقلار",
+        "cate": "Hekaya",
+        "desc": "بۇرۇننىڭ بۇرۇنىسىدا بىر قېرى ئۆچكە ئۆتكەنىكەن. ئۇنىڭ جېنىدىنمۇ ئەزىز كۆرىدىغان يەتتە ئوغلى بار ئىكەن. بىر كۈنى ئۇ ئورمانغا بېرىپ يېگۈدەك بىرنەرسە تېپىپ كەلمەكچى بوپتۇ. ئۇ يولغا چىقىش ئالدىدا ئوغلاقلىرىغا：\n\n _ جېنىم بالىلىرىم، مەن ئورمانغا كېتىۋاتىمەن، سى- لەر بۆرىدىن ئېھتىيات قىلىڭلار. ناۋادا بۆرە ئۆيگە كىرىۋال- سا سىلەرنى يەۋېتىدۇ. ئۇ ھەر خىل قىياپەتلەرگە كىرىۋېلىپ باشقىلارنى ئالدايدۇ. لېكىن، سىلەر ئۇنىڭ قوپال ئاۋازى بىلەن قاپقارا پۇتىغا قاراپلا بۆرە ئىكەنلىكىنى بىلىۋالالايسىلەر، _ دەپتۇ.\n\n\n _ سۆيۈملۈك ئاپا، بىز چوقۇم ئېھتىيات قىلىمىز، سىز خاتىرجەم كېتىۋېرىڭ، _ دەپتۇ ئوغلاقلار. \n\nقېرى ئۆچكە خاتىرجەم بولۇپ يولىغا راۋان بوپتۇ. ئارىدىن ئۇزۇن ئۆتمەي بىرى ئىشىكنى قېقىپ: \n\n_ ئوماق بالىلىرىم، ئىشىكنى ئېچىڭلار، مەن كەلدىم، سىلەرگە ياخشى نەرسە ئەكەلدىم، _ دەپتۇ.\n\n ئەمما، ئوغلاقلار ئۇنىڭ قوپال ئاۋازىنى ئاڭلاپلا بۆرە ئىكەنلىكىنى بىلىۋاپتۇ.  \n\n_ سەن بىزنىڭ ئاپىمىز ئەمەس، ساڭا ئىشىكنى ئاچ- مايمىز. ئاپىمىزنىڭ ئاۋازى شۇنداق مۇلايىم، يېقىملىق، سېنىڭكىدەك قوپال ئەمەس، سەن دېگەن بۆرە، _ دەپتۇ  \n\nبۆرە يۈگۈرگىنىچە بېرىپ سودىگەردىن ئازراق زاماسكا سېتىۋاپتۇ - دە، ئۇنى يەپ ئاۋازىنى خېلى سىلىقلاشتۇرۇپتۇ، ئاندىن كېلىپ يەنە ئىشىكنى قېقىپتۇ: \n\n_ ئوغلاقلىرىم، ئىشىكنى ئېچىڭلار، مەن كەلدىم، سى- لەرگە ياخشى نەرسە ئەكەلدىم.\n\n ئەمما، ئوغلاقلار ئۇنىڭ دېرىزە تەكچىسىگە ئېلىۋالغان قاپقارا پۇتلىرىغا قاراپلا： \n\n_ ياق، ئىشىكنى ئاچمايمىز، ئاپىمىزنىڭ پۇتى سې- نىڭكىدەك قارا ئەمەس، سەن دېگەن بۆرە، _ دەپتۇ. \n\nبۆرە يۈگۈرگىنىچە بولكىچىنىڭ يېنىغا بېرىپ：\n\n _ پۇتۇم سۈرۈلۈپ قاناپ كەتتى. ئازراق خېمىر چاپلاپ قويساڭ، _ دەپتىكەن، بولكىچى ماقۇل بولۇپ، ئۇنىڭ پۇتىغا ئازراق خېمىر چاپلاپ قويۇپتۇ. \n\nيەنە تۈگمەنچىنىڭ يېنىغا بېرىپ： \n\n_ پۇتۇمغا ئازراق - ئۇن سېپىپ قويساڭ، _ دەپتۇ. ئۇ- نىڭ باشقىلارنى ئالدىماقچى بولۇۋاتقانلىقىنى سەزگەن تۈگمەنچى ئۇنىماپتۇ.\n\n_ سەپمەي باقە قېنى، قوۋۇرغىلىرىڭنى چايناپ پۈر- كۈۋەتمەيدىغان بولسام، _ دەپ ھۆركىرەپتۇ بۆرە. \n\nتۈگمەنچى قورقۇپ كېتىپتۇ ۋە ئۇنىڭ پۇتىنى ئۇن سېپىپ ئاقارتىپ قويۇپتۇ. \n\nشۇنىڭ بىلەن ئالدامچى بۆرە ئوغلاقلارنىڭ ئىشىكىنى يەنە قېقىپتۇ:\n\n _ ئوماق ئوغلاقلىرىم، ئىشىكنى ئېچىڭلار، مەن كەل- دىم، ئورماندىن ياخشى نەرسە ئەكەلدىم.\n\n _ پۇتۇڭنى بىزگە كۆرسىتىپ باق، سەن ئاپىمىزمۇ، ئەمەسمۇ شۇنىڭغا قاراپ بىلىۋالايلى، _ دەپتۇ ئوغلاقلار. \n\nبۆرە پۇتىنى دېرىزە تەكچىسىگە ئاپتۇ. ئوغلاقلار ئۇنىڭ پۇتىنىڭ ئاپئاقلىقىنى كۆرۈپ ئاپىمىز كەپتۇ، دەپ ئويلاپتۇ - دە، ئىشىكنى ئېچىپ ساپتۇ. لېكىن، ئىشىكتىن ئاپىسى ئەمەس، بەلكى بۆرە كىرىپ كەپتۇ. قورقۇپ كەتكەن ئوغلاقلار جېنىنى قۇتقۇزۇش ئۈچۈن ئۆزلىرىنى تەرەپ - تەرەپكە ئېتىشىپتۇ. بىرى ئۈستەلنىڭ ئاستىغا كىرىۋاپتۇ، يەنە بىرى كارىۋاتقا چىقىۋاپتۇ، ئۈچىنچى ئوغلاق ئوچاقنىڭ ئىچىگە مۆكۈنۈپتۇ، تۆتىنچى ئوغلاق ئاشخانىغا كىرىۋاپتۇ، بەشىنچىسى ئىشكاپنىڭ تۆپىسىگە چىقىۋالسا، ئالتىنچىسى كىر يۇيىدىغان داسنىڭ ئاستىغا كىرىۋاپتۇ، يەتتىنچى ئوغلاق بولسا، تام سائىتىنىڭ قېپىغا يوشۇرۇنۇپتۇ. لېكىن، بۆرە ئۇلارغا قىلچىمۇ رەھىم قىلماي ھەممىسىنى يالماپ يۇتۇپتۇ. بۆرە سائەتنىڭ قېپىغا كىرىۋالغان ئەڭ كىچىك ئوغلاقنى كۆرمەي قالغاچقا، پەقەت شۇلا ئامان قاپتۇ. بۆرە قورسىقىنى تويغۇزغاندىن كېيىن ئۆيدىن چىقىپ بىر دەرەخنىڭ سايىسىدە ئۇيقۇغا كېتىپتۇ.\n\n ھايال ئۆتمەي ئانا ئۆچكە ئورماندىن قايتىپتۇ. ئۇ ئۆيگە كىرىپلا نېمىلەرنى كۆرۈپتۇ دېمەمسىلەر؟ ئىشىك داغدام ئوچۇق تۇرغۇدەك. ئۈستەل - ئورۇندۇقلار يەردە قالايمىقان ياتقۇدەك. كىر يۇيىدىغان داسمۇ تېشىلىپ كەتكەن، كارىۋاتتىكى ياستۇق، ئورۇن - كۆرپىلەر ھەريان چېچىلغان. ئۇ يەتتە بالىسىنى ئىزدەپ ھەممە بۇلۇڭ - پۇچقاقلارنى ئاختۇرۇپ چىقىپتۇ، لېكىن تاپالماپتۇ. ئۇ ئوغلاقلىرىنىڭ ئىسمىنى نۆۋەت بىلەن چاقىرىپ بېقىپتۇ، لېكىن ھېچ يەردىن سادا كەلمەپتۇ. ئاخىردا ئۇ ئەڭ كىچىك ئوغلىقىنىڭ ئىسمىنى چاقىرىپتىكەن. \n\n«جېنىم ئاپا، مەن سائەت قېپىنىڭ ئىچىدە» دېگەن ئاۋاز ئارانلا ئاڭلىنىپتۇ. \n\nئانا ئۆچكە ئۇنى سائەت قېپىدىن ئېلىپ يەرگە قويۇپتۇ. ئەڭ كىچىك ئوغلاق ئاپىسىغا، بۆرىنىڭ قانداق كىرگەن- لىكىنى، بىر تۇغقانلىرىنى قانداق يەۋەتكەنلىكىنى ئېقىت- ماي - تېمىتماي سۆزلەپ بېرىپتۇ. سىلەر ئانا ئۆچكىنىڭ بالىلىرىنىڭ دەردىدە قانچىلىك يىغلاپ - قاقشىغىنىنى ئېيتمىساقمۇ بىلىۋالالايسىلەر. \n\nئۇ زار - زار يىغلىغىنىچە سىرتقا قاراپ مېڭىپتۇ، ئەڭ كىچىك ئوغلاقمۇ ئۇنىڭدىن ئايرىلماي كەينىدىن يۈگۈرۈپتۇ. ئۇلار ئوتلاققا كېلىپ، بۆرىنىڭ بىر دەرەخنىڭ سايىسىدە ئۇخلاۋاتقانلىقىنى، ئۇنىڭ تارتقان خورىكىدىن دەرەخمۇ لىڭشىپ كېتىۋاتقانلىقىنى كۆرۈپتۇ. ئانا ئۆچكە بۆرىگە تازا سىنچىلاپ قارىسا، بۆرىنىڭ قورسىقى مىدىرلاپ تۇرغۇدەك.  \n\n«بۆرىگە كەچلىك غىزا بولغان بىچارە بالىلىرىم تېخى تىرىكمۇ نېمە؟» دەپ ئويلاپتۇ ئانا ئۆچكە.\n\n ئوغلاق يۈگۈرگىنىچە ئۆيگە بېرىپ قايچا، يىپ - يىڭنە ئېلىپ كەپتۇ. ئانا ئۆچكە ۋەھشىي بۆرىنىڭ قورسىقىنى يې- رىشىغا بىر ئوغلاق. بېشىنى لىپپىدە چىقىرىپتۇ. بۆرىنىڭ قورسىقىنى تېخىمۇ چوڭراق كېسىپتىكەن، ئىلگىرى - ئاخىر بولۇپ ئالتە ئوغلاق كەينى - كەينىدىن سەكرەپ چى- قىپتۇ، چىققاندىمۇ ساق - سالامەت چىقىپتۇ. چۈنكى، ئېچىرقاپ كەتكەن ئاچ كۆز بۆرە ئۇلارنى چاينىمايلا يۇتۇۋەتكەنىكەن. ئوغلاقلار مېھرىبان ئاپىسىنى قۇچاقلاپ سۆيۈپ، خۇددى بايرام بولغاندەك خۇشاللىققا چۆمۈپتۇ.\n\n _ بالىلىرىم، چاپسان بېرىپ تاش تېرىپ كېلىڭلار. بۇ  ئەبلەخ ئۇخلاۋاتقان چاغدىن پايدىلىنىپ قورسىقىنى تاش بىلەن توشقۇزۇۋېتەيلى، _ دەپتۇ ئانا ئۆچكە.\n\n يەتتە ئوغلاق قىيغىتقىنىچە بېرىپ نۇرغۇن تاش تېرىپ كەپتۇ - دە، بۆرىنىڭ قورسىقىغا پېتىشىچە تىقىپتۇ. ئاندىن ئانا ئۆچكە بۆرىنىڭ قورسىقىنى تىكىۋېتىپتۇ. بۆرە شۇ چاغقىچە ھېچنېمىنى تۇيماي بەخىرامان ئۇخلاۋېرىپتۇ.\n\n بۆرىنىڭ ئۇيقۇسى قېنىپ ئويغىنىپتۇ. ئۇ ئۇسساپ كې- تىپ سۇ ئىچكىلى قۇدۇق بېشىغا بېرىپتۇ. ئۇ ھەر بىر قەدەم ئالغاندا، قورسىقىدىكى تاشلار بىر - بىرىگە ئۇرۇ- لۇپ شاراق - شۇرۇق ئاۋاز چىقىرىدىكەن. بۇنىڭدىن ھەيران بولغان بۆرە دەپتۇ：\n\n قورسىقىمدا نېمىدۇر، \nشاراق - شۇرۇق قىلىدۇ. \nيېگىنىم ئوغلاق دېسەم، \nھەممىسى تاش ئىكەنغۇ ！ \n\nئۇ قۇدۇقنىڭ ئاغزىغا كەپتۇ ۋە سۇ ئىچمەكچى بولۇپ شۇنداق ئېڭىشىپتىكەن، قورسىقىدىكى تاشنىڭ سالمىقى بېسىپ كېتىپ، پولتۇڭڭىدە قىلىپ قۇدۇققا چۈشۈپ كې- تىپتۇ. بۇنى كۆرگەن ئوغلاقلار «بۆرە ئۆلدى ! خوپ بولدى!» دەپ چاۋاك چېلىپ سەكرىشىپتۇ ۋە ئانىسى بىلەن بىللە قۇدۇقنى چۆرگىلەپ ئۇسسۇل ئويناشقا باشلاپتۇ.  \n\n\n\nبۈگۈنكى چۆچىكىمىز مۇشۇيەردە ئاخىرلاشتى كىلەركى مەزمۇنىمىزدا: « برېمېن شەھرىنىڭ سازەندىلىرى » دىگەن چۆچەكدىن بەھرىمان بۇلىمىز .ھارمىغايسىلەر! ! ! \n\n\n狼和七只小山羊\n\n\n从前有只老山羊，她生了七只小山羊，并且像所有母亲爱孩子一样爱它们。一天，它要到森林里去取饲料，于是把七只小山羊都叫过来，对它们说：“亲爱的孩子们，我要到森林里去，你们千万要提防狼。要是让它进了屋，它会把你们连皮带毛通通吃掉的。这个坏蛋常常伪装成别的样子，但是，你们一听它那粗哑的声音，一看它那黑色的脚爪，就能认出它来。”小山羊们说：“好妈妈，我们会当心的，你放心去吧。”老山羊咩咩地叫了几声，便放心地走了。\n\n没过多久，有人敲门，并且喊道：“开门哪，我的好孩子，你们的妈妈回来了，还给你们每个人带了一点东西来。”可是小山羊们一听那粗哑的声音，就知道是狼。“我们不开门，”它们叫道，“你不是我们的妈妈。我们的妈妈声音又细又好听，你的声音却这么粗哑，你是狼！”\n\n于是狼跑到杂货商那里，买了一大块白垩土，吃下去使自己的声音变细了。然后它回来又敲敲门，喊道：“开门哪，我的好孩子，你们的妈妈回来了，给你们每个人都带了点东西来。”可是狼把它的黑爪子搁在了窗台上，小山羊们看见了，便叫道：“我们不开门，我们的妈妈没有你这样的黑脚爪，你是狼！”\n\n于是狼跑到面包师那里，说：“我的脚碰伤了，给我涂点生面团吧。”面包师给它涂上面团后，它又跑到磨坊主那里，说：“给我的脚撒上点白面粉吧。”磨坊主心想：“这狼准是想骗人。”便拒绝了它的要求。可是狼说：“你要是不给我撒，我就把你吃掉！”磨坊主害怕了，只好把它的脚弄成了白色。是啊，人就是这个样子。\n\n现在，这个坏蛋第三次来到小山羊的家门口，敲敲门说：“给我开门哪，孩子们，你们亲爱的妈妈回来了，从森林里给你们每个人都带了一点东西来了。”小山羊们叫道：“先把你的脚伸给我们看看，好让我们知道你是不是我们亲爱的妈妈。”狼把脚伸进窗户，它们看见脚是白色的，便相信它说的是真话，把门打开了。可是进来的是谁呢，正是那只狼！小山羊们吓坏了，想躲起来。第一只跳到桌子底下，第二只跳到床上，第三只跳进炉灶里，第四只跑进厨房，第五只钻进柜子里，第六只藏到洗衣盆下面，第七只藏进了挂钟的钟壳里。但是狼把它们一个个都找了出来，毫不客气地把它们一个一个吞进了喉咙里。只有最小的那只藏在钟壳里的小山羊，没有被狼发现。\n\n狼吃饱以后，便溜走了，来到外面的一块草地上，躺在一棵大树下，开始呼呼大睡起来。\n\n没过多久，老山羊从森林里回来了。啊，它看到了怎样一幅景象啊！房门大敞着，桌子、椅子和凳子都东倒西歪，洗衣盆摔成了碎片，被子和枕头从床上拖到了地上。它找它的孩子们，可是到处都找不见。它挨个叫着它们的名字，可是没有人答应。最后，当它叫到最小的那只时，一个细细的声音传了出来：“亲爱的妈妈，我藏在钟壳里呢。”老山羊把它抱出来，它向妈妈讲述了狼来过了，并且把其他所有的小山羊都吃掉了。你们可以想象，老山羊为它那些可怜的孩子哭得多么伤心啊！\n\n老山羊痛哭着走了出去，最小的山羊也跟着跑了出去。它们来到草地上，看见狼正躺在大树底下打鼾，鼾声响得连树枝都摇动起来。老山羊仔细地打量着它，发现它那鼓鼓的肚子里有什么东西在蠕动、在折腾。“天哪，”它想，“难道我那些被它当作晚餐吞下去的可怜孩子们还活着吗？”于是小山羊连忙跑回家，拿来了剪刀、针和线。老山羊剪开那怪物的大肚皮，刚剪了一刀，就有一只小山羊探出了头；它继续剪下去，六只小山羊便一个个跳了出来，而且全都活着，没有受到一点伤害，因为那怪物太贪婪了，把它们囫囵吞了下去。这真是让人高兴啊！它们拥抱着亲爱的妈妈，高兴得又蹦又跳，就像裁缝举行婚礼那样。\n\n老山羊却说：“现在你们去找些大石头来，趁这坏蛋还在睡觉，我们把它的肚子填满石头。”于是七只小山羊飞快地搬来了许多石头，把石头塞进狼的肚子里，能塞多少就塞多少。然后老山羊又飞快地把狼的肚皮缝了起来。狼一点也没有察觉，连动都没动一下。\n\n狼终于睡醒了，站起身，因为肚子里的石头让它口渴得要命，所以它想到井边去喝水。它刚迈步走，肚子里的石头就互相碰撞，发出咣当咣当的响声。它叫道：\n\n“什么东西在我肚子里\n咣当咣当地响？\n我以为是六只小羊，\n可听起来全是石头样。”\n\n它走到井边，弯腰想喝水，沉重的石头把它拽了下去，它掉进了深深的井里，悲惨地淹死了。七只小山羊看见了，便跑过来，大声喊道：“狼死了！狼死了！”它们高兴地和妈妈一起围着水井跳起舞来。",
+        "tags": "格林童话、狼和七只小山羊、bora bilan oglaklar",
+        "link": "",
+        "cover": "https://img0.baidu.com/it/u=2965814536,3312049170&fm=253&fmt=auto&app=120&f=JPEG?w=500&h=667",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 4,
+        "title": "برېمېن شەھرىنىڭ سازەندىلىرى",
+        "cate": "Hekaya",
+        "desc": "بۇرۇنقى زاماندا بىر ئېشەك بولغانىكەن. ئۇ ئېشەك ھاردىم - ئاچتىم دېمەي، تاغار - تاغار ئۈگۈتنى تۈگمەنگە ئاپىرىپ تارتىپ كېلىدىكەن. نەدە ئېغىر ئىش بولسا، شۇنى قىلىدىكەن. شۇنداق قىلىپ يۈرۈپ ئايلار ئۆتۈپتۇ، ئېشەكمۇ يىلسايىن ماغدۇرىدىن كېتىپتۇ. ئاخىرىغا بېرىپ ئىگىسىگە ئەسقاتمايدىغان ھالغا چۈشۈپ قاپتۇ. ئىگىسى ئۇنى ئېغىلدىن ھەيدەپ چىقىپ ئۆلتۈرۈۋەتمەكچى بوپتۇ. بۇنىڭ شەپىسىنى سېزىپ قالغان ئېشەك برېمېن شەھىرىگە قېچىپ بېرىپ سازەندە بولماقچى بوپتۇ. ئۇ مېڭىپ - مېڭىپ بىر يەرگە كەلگەندە، يولدا ئەسنەپ ياتقان بىر تايغانغا يولۇقۇپتۇ. تايغان چارچاپ ھالىدىن كەتكەنىكەن.\n\n _ تايغان ئاداش، نېمىشقا ئەسنەپ ياتىسەن؟ _ دەپ سوراپتۇ ئېشەك.\n\n\n _ گەپ قىلما، ئېشەكباي، _ دەپتۇ تايغان ھەسرەت بىلەن، _ قېرىدىم - چىرىدىم، كۈچۈمدىن قېلىپ ئوۋغا يارىماس بولۇپ قالدىم. ئىگەم مېنى ئۇرۇپ ئۆلتۈرۈۋەتمەكچى بولۇۋىدى، ئۆيدىن قېچىپ چىقتىم. ئەمدى جېنىمنى قانداق بېقىشنى بىلمەي بېشىم قېتىپ مۇشۇنداق ئەسنەپ يېتىپتىمەن.\n\n _ ماڭا قارا، _ دەپتۇ ئېشەك، _ مەن برېمېن شەھىرىگە بېرىپ سازەندە بولماقچى. يۈر مەن بىلەن، سەنمۇ سازەندە بولغىن. مەن چالغۇ چالاي، سەن ناغرا چال. \n\nتايغان ماقۇل بولۇپ ئۇنىڭ كەينىدىن مېڭىپتۇ. ئانچە ئۇزۇن ماڭماي ئۇلارغا يول بويىدا غەمگە چۆكۈپ ئولتۇرغان بىر مۈشۈك ئۇچراپتۇ. \n\n-مۈشۈكباي، سېنىڭ بېشىڭغا قانداق كۈن چۈشتى؟ _ دەپ سوراپتۇ ئېشەك.\n\n _ ھاياتىم قىلنىڭ ئۈستىدە تۇرغاندا كۆڭلۈمگە نېمە سىغسۇن؟ يېشىم بىر يەرگە بېرىپ، چىشلىرىم گاللىشىپ قالغاچقا چاشقان تۇتالمايدىغان، ئەتىدىن كەچكىچە ئوچاقنىڭ يېنىدا خورەك تارتىپ ئۇخلايدىغان بولۇپ قالغانىدىم. ئۆي ئىگىسى ئايال مېنى تۇنجۇقتۇرۇپ ئۆلتۈرۈۋەتمەكچى بولدى. قېچىپ چىقىشنىغۇ قېچىپ چىقتىم. بىراق نەگە بېرىپ، نەدە تۇرۇشۇمنى بىلەلمەي بېشىم قېتىۋاتىدۇ، _ دەپتۇ مۈشۈك ئۇلۇغ - كىچىك تىنىپ. \n\n_ بىز بىلەن بىرگە برېمېن شەھىرىگە بېرىپ سازەندە بولغىن. سەن كېچىسى ساز چالالايسەن ئەمەسمۇ. \n\nمۈشۈك بۇ مەسلىھەتنى لايىق تېپىپ ئۇلارغا قېتىلىپ مېڭىپتۇ، جان بېقىش ئۈچۈن ئۆز يۇرتلىرىدىن ئايرىلغان بۇ ئۈچ مۇساپىر يولدا بىر جاڭزىنىڭ ئالدىدىن ئۆتۈپتۇ. قارىسا، بىر خوراز جېنىنىڭ بارىچە چىللاۋاتقۇدەك. \n_ نېمانداق ئادەمنىڭ قورققۇسى كەلگۈدەك چىلايسەن؟— دەپ سوراپتۇ ئېشەك. \n\n_ ئەتە يەكشەنبە كۈنى ئۆيگە مېھمان كەلمەكچى. باغرى تاش ئايال خوجايىن مېنى مېھمانلارغا شورپا قىلىپ بەرمەكچى بولۇۋېتىپتۇ. ئۇ مېنى ئۆلتۈرۈشكە ئاشپەز خوتۇننى  بۇيرۇدى. ئاشپەز خوتۇن بۈگۈن ئاخشام كاللامنى ئالىدۇ. شۇڭا، ئۆلۈش ئالدىدا قانغۇچە چىللىۋالاي دەيمەن، _ دەپتۇ خوراز. \n\n_ ھەي قىزىل تاج، شۇمۇ گەپ بولدىمۇ؟ بىز بىلەن بىللە برېمېن شەھىرىگە بار. ئۇ يەردە ئۆلۈمدىن ئەۋزەلرەك بىر يول تېپىلىپ قالار. سېنىڭ ئاۋازىڭ ياخشى، بىز بىلەن بىللە ئويۇن قويساڭ تازا قاملىشىدۇ، _ دەپتۇ ئېشەك. \n\nبۇ گەپ خورازغا خوپ يېقىپتۇ. شۇنىڭ بىلەن تۆتى يولغا راۋان بوپتۇ. \n\nبرېمېن شەھىرى يىراق ئىكەن. ئۇلار ھەرقانچە تېز ماڭسىمۇ ئۇ يەرگە شۇ كۈنىلا يېتىپ بارالمايدىكەن. شۇڭا، ئۇلار ئورماندا تۈنىمەكچى بوپتۇ. ئېشەك بىلەن تايغان بىر تۈپ دەرەخنىڭ ئاستىدا يېتىپتۇ. مۈشۈك دەرەخنىڭ ئاچى- مىقىغا چىقىۋاپتۇ. خوراز ئەڭ بىخەتەر، دەپ دەرەخنىڭ ئۇچىغا چىقىپ يېتىپتۇ. ئۇلار ئۇخلاشتىن ئىلگىرى خوراز ئەتراپنى كۆزىتىپ يىراقتا پىلدىرلاۋاتقان ئوتنى كۆرۈپتۇ - دە، ئەتراپتا ئۆي بار ئىكەنلىكىدىن ھەمراھلىرىنى خەۋەردار قىپتۇ. \n\n_ ئەمىسە، بىز شۇ يەرگە بېرىپ تۈنەيلى، بۇ جايىمىز تازا ئەپلەشمىدى، _ دەپتۇ ئېشەك. ئۇ يەردە ئاز - تولا گۆشى بار سۆڭەك ئۇچراپ قالسا ئەجەب ئەمەس، دەپ ئويلاپ- تۇ تايغان ۋە ئۇ يەرگە بېرىشقا چىن كۆڭلىدىن رازى بوپتۇ. شۇنىڭ بىلەن ئۇلار ئوت كۆرۈنۈۋاتقان يەرگە قاراپ مېڭىپتۇ. ئوت ئۇلارغا بارغانسېرى يورۇق كۆرۈنۈشكە باشلاپتۇ . ئاخىر ئۇلار چىراغ يېنىپ تۇرغان بىر ئۆيگە كېلىپ قاپتۇ . ئۆيدە قاراقچىلار بار ئىكەن . ئېشەك ھەممىسىدىن ئېگىز بولغاچقا ، ئۆيگە دېرىزىدىن ماراپتۇ .\n\n _ ئېشەك ، نېمىنى كۆردۇڭ ؟  _ دەپ سوراپتۇ خوراز .\n\n  _ نېمىنى كۆردۈڭ دەمسىنا ؟  _ دەپتۇ ئېشەك ،  _ ئۈستەلگە ھەر خىل ياخشى تائاملار بىلەن ئېسىل ھاراقلار توشۇپ كېتىپتۇ ، قاراقچىلار ھەدەپ قورساق تويدۇرۇش بىلەن ئاۋارە .\n\n _  شۇ نەرسىلەرنىڭ ھەممىسى بىزنىڭ بولسىچۇ  ،  _ دەپتۇ خوراز .\n\n _ ئوھوي ، راست ، راست دەيسەن ، بىزمۇ ئاشۇ داستىخانغا داخىل بولساق ھە،  _ دەپتۇ ئېشەك .\n\n ئۇلار قاراقچىلارنى قانداق قىلىپ قوغلىۋېتىش ھەققىدە مەسلىھەتكە چۈشۈپتۇ ، ئاخىر ياخشى بىر چارە ئويلاپ تې - پىپتۇ : ئېشەك ئالدىنقى پۇتلىرىنى دېرىزە تەكچىسىگە قويىدىغان ، تايغان ئېشەكنىڭ دۈمبىسىگە ، مۈشۈك تايغاننىڭ دۈمبىسىگە چىقىدىغان ، خوراز مۈشۈكنىڭ بېشىغا قونىدىغان بوپتۇ . ئۇلار تەييارلىقنى پۈتتۈرگەندىن كېيىن بىرلا بەلگە بىلەن تەڭ نېمە ئىش قىپتۇ دېمەمسىلەر ؟ ئېشەك ھاڭراپتۇ ، مۈشۈك مىياڭلاپتۇ ، خوراز چىللاپتۇ ، تايغان قاۋاپتۇ . ئۇلار ئاشۇنداق شاۋقۇن  - سۈرەن بىلەن دېرىزىنىڭ ئەينەكلىرىنى جاراڭشىتىپ سۇندۇرۇپ ئۆيگە باستۇرۇپ كىرىپتۇ . بۇ ئاۋازلاردىن قورقۇپ يۈرىكى يېرىلىپ كەتكىلى تاس قالغان قاراقچىلار جىن  - ئالۋاستىلار كەلگەن ئوخشايدۇ ، دەپ ئۆلەر  - تىرىلىشىگە باقماي ئورمانغا قاراپ قېچىپتۇ . شۇنىڭ بىلەن بۇ تۆت ھەمراھ داستىخاندا ئولتۇرۇپ ، نازۇنېمەتلەرنى خۇددى بىرەر ئاي ئاچ قالغاندەك ئىشتىھا بىلەن يېيىشكە باشلاپتۇ . \n\nتۆت سازەندە قورساقلىرىنى توقلىغاندىن كېيىن چىراغنى ئۆچۈرۈپتۇ  - دە ، ھەرقايسىسى ئۆگەنگەن خۇيى بو - يىچە ئۆزىگە ئەپلىك جاينى تېپىپ تاتلىق ئۇيقۇغا كېتىپتۇ . ئېشەك قىغ دۆۋىسىنىڭ تۆپىسىدە ، تايغان ئىشىكنىڭ كەينىدە ، مۈشۈك ئوچاقتىكى ئىسسىق كۈلنىڭ ئۈستىدە ، خوراز لەمپىدە يېتىپ شېرىن چۈشلىرىنى باشلاپتۇ . چۈنكى ، ئۇلار نۇرغۇن يول يۈرۈپ ھېرىپ كەتكەن  - دە .\n\n يېرىم كېچىدىن ئاشقاندا قاراقچىلار ئۆينىڭ قاراڭغۇ ھەم تىنپتىنچ تۇرغانلىقىنى بايقاپ قاپتۇ .\n\n _ ئەمدى قورقمىساقمۇ بولغۇدەك ،  _ دەپتۇ قاراق - چىلارنىڭ باشلىقى ۋە بىر قاراقچىنى بېرىپ ئەھۋال ئىگىلەپ كېلىشكە ئەۋەتىپتۇ . قاراقچى ئۆينىڭ يېنىغا كەپتۇ ، ھېچ - قانداق سادانىڭ يوقلۇقىغا قاراپ خاتىرجەم بوپتۇ . ئاندىن چىراغنى ياندۇرماقچى بولۇپ ئاشخانىغا كىرىپتۇ  - دە ، مۈشۈكنىڭ قاراڭغۇدا پارقىراپ تۇرغان كۆزىنى چوغ دەپ ئويلاپ ، قولىدىكى گۈڭگۈرتنى ئۇنىڭغا شۇنداق تەگكۈزۈپتىكەن ، چاقچاق بىلەن ئېپى كېلىشمەيدىغان مۈشۈك ئېتىلىپلا ئۇنىڭ يۈزىنى مورلاپ قىيما  - چىيما قىلىۋېتىپتۇ . قاراقچى بەكمۇ قورقۇپ كېتىپتۇ . ئۇ ئارقا ئىشىكتىن قېچىپ چىقىپ كەتمەكچى بوپتىكەن . ئىشىكنىڭ كەينىدە ياتقان تايغان كاپلا قىلىپ ئۇنىڭ پۇتىدىن ئاپتۇ . ئۇ ئالمان  - تالمان قېچىپ ھويلىغا چىقىپتىكەن ، قىغنىڭ تۆپىسىدە ياتقان ئېشەك ئۇنى كېلىشتۈرۈپ بىرنى تېپىپتۇ . بۇ گۈلدۈر - غاراستىن ئويغىنىپ كەتكەن خوراز  « قى  - قى  - قىق » قىلىپ بار ئاۋازى بىلەن چىللاپتۇ .\n\n قاراقچى قورقۇنچتا ئالدى  - كەينىگە قارىماي قېچىپتۇ ۋە بېرىپ باشلىقىغا :  \n\n_ يارەببىم ، ئۇ يەردە بەكمۇ ياۋۇز بىر جادۇگەر بار ئىكەن ئەمەسمۇ ، ئۇ پىشقىرغىنىچە ماڭا ئېتىلىپ ، ئۇزۇن تىرناقلىرى بىلەن مورلاپ يۈزۈمنى تىتىۋەتتى . ئىشىك تۈۋىدە تۇرغان بىرى پاچىقىمغا پىچاق سالدى ؛ ھويلىدا ياتقان قاپقارا غەلىتە بىر مەخلۇق توقماق بىلەن بېشىمغا ئۇردى ؛ ئۆگزىدە ياتقان بىر سوتچى ：  « بۇ خۇنپەرنى دەرھال تۇتۇڭلار » دەپ توۋلىدى . شۇنىڭ بىلەن مەن ئالدى  - كەينىمگە قارىماي قېچىپ كەلدىم ،  _ دەپتۇ .\n\n شۇنىڭدىن ئېتىبارەن قاراقچىلار ئۇ ئۆيگە دەسسەشكە جۈرئەت قىلالماپتۇ . برېمېن شەھىرىنىڭ تۆت سازەندىسى باشقا ھېچ يەرگە بارماي شۇ يەردە خۇشال  - خۇرام ياشاپتۇ . ئۇلارنىڭ ئىچىدە ھەممىدىن ئۇزاق ياشاپ ،كىشىلەرگە بۇ چۆچەكنى ئېيتىپ بەرگىنى تېخى ھاياتمىش .\n\nبۈگۈنكى چۆچىكىمىز مۇشۇيەردە ئاخىرلاشتى كىلەركى مەزمۇنىمىزدا: « ئەتىرگۈل مەلىكە » دىگەن چۆچەكدىن بەھرىمان بۇلىمىز .ھارمىغايسىلەر! ! ! \n\n\n\n从前有一头驴，它每天驮麦子去磨坊，干了很多年重活。后来它老了，没力气了，主人就想把它杀掉。驴发现不对劲，就偷偷逃走了。它想去不莱梅城当个乐师。\n\n走了一会儿，驴在路上遇到一条猎狗，狗正趴在地上喘粗气。驴问：\"狗老弟，你怎么啦？\"狗说：\"我老了，打不了猎了，主人要打死我，我就逃出来了。可我不知道去哪儿好。\"驴说：\"跟我去不莱梅当乐师吧！我弹琴，你打鼓。\"狗很高兴，就跟驴走了。\n\n走着走着，它们看见路边蹲着一只猫，愁眉苦脸的。驴问：\"猫老弟，你怎么啦？\"猫说：\"我老了，抓不动老鼠了，女主人要淹死我，我逃出来了，可不知道去哪儿。\"驴说：\"跟我们一起去不莱梅当乐师吧！你会夜间音乐。\"猫觉得不错，就跟它们走了。\n\n三个伙伴路过一个院子，看见一只公鸡站在大门上拼命叫。驴问：\"公鸡老弟，你怎么叫得这么响？\"公鸡说：\"明天来客人，女主人要把我炖成鸡汤！厨娘今晚就要砍我的头，我趁现在还活着，使劲叫几声。\"驴说：\"跟我们去不莱梅吧！你嗓子这么好，跟我们一起演出准热闹！\"公鸡高兴地答应了。于是四个好朋友一起上路了。\n\n他们走了一天，天黑了，还没到不莱梅，只好在树林里过夜。驴和狗躺在大树下，猫爬到树枝上，公鸡飞到最高的树顶上。公鸡往四周一看，发现远处有灯光，就叫起来：\"那边有房子！\"驴说：\"我们去那儿过夜吧！\"大家就往亮光处走去。\n\n原来那是一座房子，里面住着一群强盗，正围着一桌好吃好喝的大吃大喝呢！四个伙伴馋坏了，可怎么才能进去呢？它们想了个好主意：驴把前蹄搭在窗台上，狗跳到驴背上，猫爬到狗身上，公鸡飞到猫头上。然后它们一起大叫起来——\n\n驴\"唔昂唔昂\"地吼，狗\"汪汪汪\"地叫，猫\"喵呜喵呜\"地喊，公鸡\"喔喔喔\"地啼。窗玻璃哗啦啦全碎了！强盗们听见这可怕的怪声，以为妖怪来了，吓得拔腿就跑，全逃进树林里去了。\n\n四个伙伴这才跳进屋里，围着桌子饱饱地吃了一顿。吃饱后，它们各自找地方睡觉：驴睡在草堆上，狗睡在门后面，猫蜷在暖暖的灶台边，公鸡飞到了房梁上。\n\n半夜里，强盗头子派一个小强盗回来看情况。小强盗悄悄摸进厨房，黑漆漆的，他看见两团亮光——那是猫的眼睛！他以为是炭火，划了根火柴凑过去。猫\"喵\"地扑上去，把他的脸抓花了！小强盗吓得往后门跑，门后的狗跳起来咬住他的腿。他连滚带爬逃到院子里，驴又狠狠踢了他一脚。公鸡也在房梁上\"喔喔喔\"地大叫，好像在喊：\"抓住他！抓住他！\"\n\n小强盗没命地跑回去，哆哆嗦嗦地说：\"那屋里有个可怕的女巫抓我的脸，门口有人拿刀砍我的腿，院子里有个大怪物用棍子打我，屋顶上还有个法官在喊抓人！太可怕了！\"\n\n从那以后，强盗们再也不敢回那座房子了。四个乐师就高高兴兴地住下来，再也不去不莱梅了。它们一直快快乐乐地生活在一起。\n\n据说，它们中间最长寿的那位，到现在还活着呢——因为它把这个故事讲给了所有人听呀！",
+        "tags": "格林童话、不莱梅的乐师、biremin xahrining sazandiliri",
+        "link": "",
+        "cover": "https://img0.baidu.com/it/u=31536227,1712464577&fm=253&fmt=auto&app=120&f=JPEG?w=500&h=897",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 5,
+        "title": "گرىم چۆچەكلىرى:ئەتىرگۈل  مەلىكە",
+        "cate": "Hekaya",
+        "desc": "بۇرۇننىڭ بۇرۇنىسىدا بىر پادىشاھ بىلەن خانىش ئۆتكە- نىكەن. ئۇلار پەرزەنتسىزلىك ئوتىدا ئۆرتىنىدىكەن، ئۇلار ئولتۇرسا-قويسا پەرزەنتلىك بولۇشنىڭ غېمىدە ئىكەن. بىر كۈنى خانىش يۇيۇنۇۋاتسا، سۇدىن بىر پاقا چىقىپ شۇنداق دەپتۇ：\n\n _ نەچچە ۋاقىتتىن بېرى تىلىگەن تىلىكىڭلارغا يېتى- دىغان بولدۇڭلار. بىر يىلغا قالماي سىز بىر قىز تۇغىسىز. \n\n\nپاقىنىڭ دېگىنى راست بولۇپ چىقىپتۇ. خانىش ئاي دېسە ئاي ئەمەس، كۈن دېسە كۈن ئەمەس چىرايلىق بىر قىز تۇغۇپتۇ. پادىشاھ خۇشاللىقىدىن قىلىدىغانغا قىلىق تاپالماي قاپتۇ - دە، قىزى ئۈچۈن كاتتا زىياپەت ئۆتكۈزۈپ بەرمەك- چى بوپتۇ. ئۇ بۇ زىياپەتكە ئۇرۇق - تۇغقان، ئەل - ئاغىنى- لىرىنى چاقىرتىپلا قالماي، قىزىمغا ياخشى تىلەكلەرنى تى- لىسۇن دەپ ھۆكۈما ئاياللارنىمۇ چاقىرىپتۇ. بۇ ئەلدە ھۆكۈما ئايالدىن ئون ئۈچى بار ئىكەن. لېكىن، ئوردىدا ئۇلارغا تاماق بەرگۈدەك ئالتۇن تاۋاقتىن ئاران ئون ئىككى- سى بار ئىكەن. شۇڭا، پادىشاھ ھۆكۈما ئاياللارنىڭ ئون ئىككىسىنى چاقىرىپ، بىرىنى ئايرىپ قويۇشقا مەجبۇر بوپتۇ.\n\nكاتتا زىياپەت باشلىنىپتۇ. زىياپەت ئاخىرلىشاي دېگەن- دە، ئايال ھۆكۈمالار قىزچاققا كىشىنىڭ خىيالىغىمۇ كەل- مەيدىغان ئېسىل سوۋغاتلارنى سوۋغا قىلىشقا باشلاپتۇ： بىرىنچى ئايال ئۇنىڭغا ئەدەپ - ئەخلاقنى سوۋغا قىپتۇ. ئىككىنچىسى گۈزەللىكنى، ئۈچىنچىسى تۈگىمەس بايلىقنى، قالغانلىرى كىشىلەر ئارمان قىلىدىغان، ئەمما يېتەلمەيدىغان نەرسىلەرنى سوۋغا قىپتۇ. ئون بىرىنچى ھۆكۈما ئايال بوۋاقنى مۇبارەكلەپ تۇرۇشىغا، ئون ئۈچىنچى ھۆكۈما ئايال ئوردىغا شاپاشلاپ كىرىپ كەپتۇ. ئۇ پادىشاھنىڭ ئۆزىنى قاتاردىن چۈشۈرۈپ قويغىنى ئۈچۈن ئۆچ ئالماق بولۇپ كەل- گەنىكەن. ئۇ ئۇيان - بۇيان قارىماي، ھېچكىمگىمۇ گەپ قىلماي، ئۇدۇل كەلگىنىچە زىياپەت زالىنىڭ ئوتتۇرىسىدا توختاپ ۋارقىراپتۇ： \n\n_ مەلىكە ئون بەش ياشقا كىرگەندە، ئۇرچۇققا تېگىپ يىقىلىپ ئۆلىدۇ ! \n\nئۇ سۆزىنى تۈگىتىپلا ئالدى - كەينىگە قارىماي غۇيۇلداپ چىقىپ كېتىپتۇ. بۇ چاغدا بوۋاقنى مۇبارەكلەشكە ئۈلگۈرمىگەن ئون ئىككىنچى ھۆكۈما ئايال ئوتتۇرىغا چى- قىپتۇ. ئۇ بايىقى ھۆكۈما ئايالنىڭ جادۇسىنى يوق قىلىۋې- تەلمەيدىكەن، ئەمما ئۇنى سەل ئاجىزلاشتۇرالايدىكەن.\n\n _ مەلىكە يىقىلىپ چۈشۈپ ئۆلمەيدۇ، ئەمما شۇ يى- قىلغىنىچە يۈز يىل ئۇخلايدۇ، _ دەپتۇ ئۇ. \n\nپادىشاھ جېنىدىنمۇ ئارتۇق كۆرىدىغان قىزىنىڭ پېشكەللىككە ئۇچرىشىدىن ئەنسىرەپ، دۆلەتتىكى ئۇرچۇقلارنىڭ ھەممىسىنى يىغىپ كۆيدۈرۈۋېتىڭلار، دەپ پەرمان چۈشۈرۈپتۇ. ئايال ھۆكۈمالارنىڭ قىلغان سوۋغاتلىرى مەلىكىنىڭ جىسمىغا مۇجەسسەم بولۇپ ئۆز كارامىتىنى كۆرسىتىشكە باشلاپتۇ： ئۇ شۇنچىلىك ساھىبجا- مال، ئەقىللىق، مۇلايىم ۋە ئەدەپ - ئەخلاقلىق چوڭ بوپتۇ. شۇڭا، ئۇنىڭغا ھەممە ئادەم ئامراق ئىكەن.\n\n ئۇ دەل ئون بەش ياشقا كىرگەن كۈنى، پادىشاھ بىلەن خانىش سىرتقا چىقىپ كېتىپ ئوردىدا مەلىكە يالغۇز قاپتۇ. ئۇ زېرىكىپ كېتىپ ئوردىنى ئۆزى يالغۇز ئارىلاشقا باشلاپ- تۇ. توساتتىن قەدىمكى بىر قوڭغۇراق راۋىقىنىڭ يېنىغا كېلىپ قاپتۇ - دە، ئايلانما پەلەمپەي بىلەن راۋاقنىڭ ئۈس- تىگە چىقىپ، بىر كىچىك ئىشىكنىڭ ئالدىغا كەپتۇ. مەلى- كە قارىسا ئىشىككە داتلىشىپ كەتكەن بىر قۇلۇپ سېلىنغان بولۇپ، ئاچقۇچ قۇلۇپنىڭ تۆشۈكىدە تۇرغۇدەك. قىز ئاچ-  \nقۇچنى تولغاپتىكەن، كىچىك ئىشىك ئېچىلىپتۇ. مەلىكە ئۆينىڭ ئىچىگە كىرىپتۇ. ئۇ يەردە بىر موماي يىپ ئېگىرىپ ئولتۇرغۇدەك. \n\nموما، قانداق ئەھۋالىڭىز، بۇ يەردە نېمە ئىش قىلىپ ئولتۇرىسىز؟ _ دەپ سوراپتۇ مەلىكە.\n\n＿ يىپ ئېگېرىۋاتىمەن، قىزىم — دەپتۇ موماي.\n\n ___ قانداق نەرسە بۇ، ئەجەپ قىزىق چۆرگىلەيدىكىنا؟ _ دەپتۇ مەلىكە ۋە ئۇرچۇقنى ئېلىپ يىپ ئېگىرمەكچى بوپتۇ. \n\nئۇ قولىنى ئۇرچۇققا تەگكۈزۈشىگە جادۇ ئۆز كارامىتىنى كۆرسىتىپتۇ، ئۇرچۇق مەلىكىنىڭ قولىنى تېشىۋېتىپتۇ. \n\nمەلىكە شۇ يەردىكى كارىۋاتقا يىقىلغان پېتى ئۇيقۇغا كېتىپتۇ. بۇ ئۇيقۇ پۈتۈن ئوردىدىكىلەرگە يۇقۇپتۇ. پادىشاھ بىلەن خانىش ئوردىغا قايتىپ كېلىپ تەختتە ئولتۇرۇشىغا ئۇيقۇ بېسىپ ئۇخلاپ قاپتۇ. باشقا ئادەملەرمۇ ئۇلارغا ئوخشاشلا قىسمەتكە ئۇچراپتۇ. ئېغىلدىكى ئات، ھويلىدىكى ئىت، ئۆگزىدىكى كەپتەر، تامدىكى چىۋىنلاردىن تارتىپ ئوچاقتا كۆيۈۋاتقان ئوتقىچە قاتتىق ئۇيقۇغا كېتىپتۇ. قازاندىكى مايدا پاژىلداپ قورۇلۇۋاتقان گۆشمۇ قورۇلۇشتىن توختاپتۇ. ئاشخانىدىكى بىر بالا خاتا ئىش قىلىپ قويغانىكەن، ئاشپەز ئۇنىڭ چېچىدىن ئالماقچى بولۇپ قولىنى كۆ تۈرگەن پېتى ئۇخلاپ قاپتۇ. چىقىۋاتقان شامالمۇ توختاپ دەرەخ يۇپۇرماقلىرى تىمتاسلىققا چۈمۈپتۇ.\n\nئوردىنىڭ ئەتراپىدا ئەتىرگۈل ئۆسۈپ كېتىپتۇ. ئوردىنى چۆرىدەپ ئەتىرگۈل قاشاسى ھاسىل بوپتۇ. بۇ ئەتىرگۈل- لەر يىلدىن - يىلغا ئاينىپ، ئاخىر ئوردا كۆرۈنمىگۈدەك دەرىجىدە ئېگىزلەپتۇ. ھەتتا ئۆگزىدىكى بايراقمۇ كۆرۈنمەي قاپتۇ. شۇنىڭ بىلەن بۇ ئەلدە ئۇيقۇدا ياتقان گۈزەل ئەتىر- گۈل مەلىكە (پۇقرالار مەلىكىنى شۇنداق ئاتىشىدىكەن) توغرىسىدىكى ئاجايىپ رىۋايەت ئېغىزدىن ئېغىزغا كۆچۈپ \nيۈرىدىغان بوپتۇ. بۇ يەرگە تەرەپ - تەرەپتىن شاھزادىلەر كېلىدىكەن. ئۇلار ئەتىرگۈل قاشاسىنى بۆسۈپ ئۆتۈپ ئور- دىغا كىرمەكچى بولىدىكەنۇ، مەقسىتىنى ئىشقا ئاشۇرالماي كەينىگە يېنىشقا مەجبۇر بولىدىكەن. چۈنكى، ئەتىرگۈللەر مەھكەم گىرەلىشىۋېلىپ ئۇلارنى ئۆتكۈزمەيدىكەن.\n\n نۇرغۇن يىللار ئۆتۈپ بۇ ئەلگە بىر شاھزادە كېلىپ قاپتۇ. ئۇ بىر ئاقساقالدىن ئەتىرگۈل قاشاسى، قاشا ئىچىدىكى ئوردا، ئوردىدا يۈز يىلدىن بېرى ئۇخلاپ ياتقان ئەتىر- گۈل مەلىكە، پادىشاھ بىلەن خانىش ۋە باشقىلار توغرىسىدىكى رىۋايەتنى ئاڭلاپتۇ. ئاقساقال ئۆز زامانىسىدا بوۋىسىدىن نۇرغۇن شاھزادىلەرنىڭ قاشادىن ئۆتۈپ ئوردىغا كىرمەكچى بولغىنىنى، بىراق ئەتىرگۈل قاشاسىنىڭ ئۇ شاھزادىلەرنى ئۆتكۈزمىگەنلىكىنىمۇ ئاڭلىغانىكەن.\n\n -قورقمايمەن، -دەپتۇ شاھزادە، -مەن ئوردىغا كىرىپ گۈزەل ئەتىرگۈل مەلىكىنى كۆرىمەن. \n\nياخشى نىيەتلىك ئاقساقال ھەرقانچە نەسىھەت قىلىپمۇ شاھزادىنى نىيىتىدىن ياندۇرالماپتۇ.\n\n بۇ چاغدا يۈز يىل توشۇپ، ئەتىرگۈل مەلىكىنىڭ ئوي- غىنىدىغان ۋاقتىمۇ بولۇپ قالغانىكەن. شاھزادە ئەتىرگۈل قاشاسىنىڭ يېنىغا بېرىپتىكەن، پورەكلەپ ئېچىلىپ كەتكەن چىرايلىق ئەتىرگۈللەر ئۆزلۈكىدىن ئىككى تەرەپكە يېتىپ ئۇنىڭغا يول ئېچىپ بېرىپتۇ. شاھزادە ئۆتۈپ كەتكەندىن كېيىن يەنە قايتىدىن ئەتىرگۈل قاشاسىغا ئايلىنىپتۇ.  \n\nشاھزادە ئوردا ئىچىگە كىرىپ شۇنداق قارىسا، ئات بىلەن ئالا ئىت يەردە يېتىپ، ئۆگزىدىكى كەپتەر تۇمشۇقىنى قانى- تىنىڭ ئاستىغا تىقىپ ئۇخلاۋاتقۇدەك. ئۆينىڭ ئىچىگە كى- رىپ قارىغۇدەك بولسا، چىۋىنلار تامغا چاپلاشقان پېتى، ئاشخانىدىكى ئۇستام بالىنى ئۇرۇش ئۈچۈن قولىنى كۆتۈر- گەن پېتى ئۇخلاۋاتقانمىش، خىزمەتكار ئايالمۇ قارا خورازنى يۇڭداۋاتقىنىچە ئۇخلاپ قاپتۇدەك. شاھزادە يەنىمۇ ئىچكىرى- لەپ ئوردىغا كىرىپتۇ. قارىسا بۇ يەردىمۇ پۈتۈن ئادەم ئۇخلاۋاتقان، پادىشاھ بىلەن خانىشمۇ تەختنىڭ ئۈستىدە ئۇخلاپ ياتقانمىش. شاھزادە ئوردىنىڭ ئىچكىرىسىگە قاراپ مېڭىۋېرىپتۇ. ئەتراپ شۇنچىلىك جىمجىت ئىكەنكى، شاھزا- دىنىڭ تىنىقىمۇ ئۆزىگە ئاڭلىنىپ تۇرىدىكەن. ئاخىردا  شاھزادە قوڭغۇراق راۋىقىنىڭ ئالدىغا كەپتۇ ۋە ئەتىرگۈل مەلىكە ياتقان ئۆينىڭ ئىشىكىنى ئېچىپ كىرىپتۇ. كارىۋاتتا ياتقان ئەتىرگۈل مەلىكە شۇنداق چىرايلىق ئىكەنكى، شاھزادە ئۇنىڭدىن كۆزىنى ئۈزەلمەي قاپتۇ. ئۇ ئېڭىشىپ ئەتىر- گۈل مەلىكىنى سۆيۈپتۇ. \n\nشاھزادىنىڭ سۆيۈشى بىلەن تەڭ ئەتىرگۈل مەلىكە كۆزىنى ئېچىپ شاھزادىگە مېھىر بىلەن قاراپتۇ. ئىككىيلەن قول تۇتۇشقان پېتى قوڭغۇراق راۋىقىدىن پەسكە چۈشۈپتۇ. بۇ چاغدا پادىشاھ، خانىش ۋە ئوردىدىكى ھەممە ئادەم ئويغىنىپ، بىر - بىرىگە چەكچەيگىنىچە قاراپ قېلىشىپتۇ. ھويلىدىكى ئات ئويغىنىپ سىلكىنىپتۇ، ئىتمۇ قۇيرۇقىنى شىپاڭشىتىپ ئويناقلاشقا باشلاپتۇ، ئۆگزىدىكى كەپتەرلەرمۇ تۇمشۇقىنى قانىتىنىڭ ئاستىدىن چىقىرىپ ئۆپچۆرىگە قاراپتۇ ۋە دالىغا قاراپ ئۇچۇپ كېتىپتۇ. تامدىكى چىۋىنلارمۇ مىدىراپتۇ. ئوچاقتىكى ئوت يالقۇنجاپ كۆيۈپ، گۆشمۇ پاژىلداپ قورۇلۇشقا باشلاپتۇ. ئاشپەز ئۇستام بالىنىڭ كاچىتىغا بىرنى ساپتىكەن، ئۇ ۋارقىراپ يىغلاپ كېتىپتۇ. خىزمەتكار ئايال خورازنى يۇڭداپ بوپتۇ. شاھزادە بىلەن ئەتىرگۈل مەلىكە ناھايىتى داغدۇغىلىق توي مۇراسىمى ئۆتكۈزۈپتۇ. ئۇلار تا قېرىپ ئۆلگۈچە بەختلىك، خۇشال - خۇرام ياشاپتۇ.  \n\n\n从前有位国王和王后，他们一直没有孩子，心里非常渴望能有一个。一次，王后正在沐浴，一只螃蟹从水里爬到岸上，说：“你的愿望很快就会实现，你将生下一个女儿。”这话果然应验了。国王为公主的降生高兴极了，下令举行盛大的庆典，并邀请了国内的仙女们。因为他只有十二个金盘子，所以有十三位仙女，只能不请其中一位。\n\n仙女们来到庆典上，在宴会结束时为公主送上祝福：第一位送美德，第二位送美貌，其他的依次送上了世上一切珍贵美好的东西。正当第十一位仙女刚说出她的祝福时，那没被邀请的第十三位仙女怒气冲冲地闯了进来，喊道：“因为你们没有请我，所以我要告诉你们：你们的女儿在十五岁那年，会被纺锤刺伤，倒地而死！”父母惊恐万分，但第十二位仙女还有一个祝福要说，她说：“这不会成为死亡，她只会沉睡百年。”\n\n国王仍希望能救他亲爱的孩子，于是下令全国所有的纺锤全部销毁。公主渐渐长大，美丽非凡。一天，她正好满十五岁，国王和王后外出了，宫殿里只剩她一人。她四处随意闲逛，最后来到一座古老的塔楼前。一道狭窄的楼梯通向上面，她好奇心起，便爬了上去，来到一扇小门前，门里插着一把黄色的钥匙。她转动钥匙，门一下子开了，里面是一间小屋，坐着一位老太婆在纺麻线。公主很喜欢这位老太婆，便和她聊起天来，说自己也想试试纺线，便从她手中拿过纺锤。可她刚碰到纺锤，就被刺伤了手，立刻倒在地上，沉沉睡去。\n\n就在这一刻，国王带着全体朝臣回来了，于是所有的一切都开始入睡：马厩里的马、屋顶上的鸽子、院子里的狗、墙上的苍蝇，甚至连灶膛里噼啪燃烧的火都静了下来，沉沉睡去。锅里的肉不再滋滋作响，厨师松开了正揪着的厨房小伙计的头发，女仆也丢下了手里正在拔毛的鸡，睡着了。整座王宫四周长起了一道荆棘篱笆，越长越高，最后把整个宫殿都遮住了，什么也看不见。\n\n听到美丽玫瑰公主传说的王子们纷纷前来，想救出她，但他们都无法穿过那道篱笆——荆棘仿佛像手一样紧紧握在一起，不让他们通过。\n\n\n许多年过去了，一天，又有一位王子来到这个国家。他听一位老人讲起玫瑰篱笆的故事——说篱笆后面有一座王宫，宫里有一位美若天仙的公主，名叫玫瑰公主，她已经沉睡百年，国王、王后和所有朝臣也都陪着她一起沉睡着。老人还听祖父说过，已经有许多王子试图穿过篱笆，都被荆棘缠住，没能进去。\n\n年轻的王子说：“我不怕，我要进去看看美丽的玫瑰公主。”\n\n不管好心的老人怎么劝阻，王子都不听。\n\n这时，百年之期恰好已满，玫瑰公主苏醒的时刻到了。王子走到玫瑰篱笆前，只见篱笆上开满了美丽硕大的玫瑰花，它们自动向两边分开，为他让出一条路。他走过去后，玫瑰篱笆又在他身后合拢成一道密实的屏障。\n\n王子走进王宫，看见马厩里的马和院子里的猎狗都躺着睡觉；屋顶上的鸽子把嘴藏在翅膀下，也在睡。他走进屋内，墙上的苍蝇一动不动；厨房里，厨师还举着手要打那个小伙计，女仆还坐在那里拔鸡毛，都像雕像一样睡着。王子继续往里走，只见整个大殿里的人都睡在地上，国王和王后也高高地睡在王座之上。\n\n四周静得出奇，连他自己的呼吸声都听得清清楚楚。最后，他来到那座古塔前，推开玫瑰公主所在房间的小门。她正躺在床上，美得令人惊叹，王子目不转睛地看着她，情不自禁地俯下身，吻了她。\n\n这一吻，玫瑰公主立刻睁开眼睛，温柔地注视着王子。两人手牵着手走下塔楼。这时，国王、王后和所有朝臣都醒了过来，互相惊奇地打量着。马厩里的马站起来抖了抖身子；猎狗摇着尾巴欢跳起来；屋顶上的鸽子把嘴从翅膀下拿出来，环顾四周，飞向了田野；墙上的苍蝇嗡嗡地飞动起来；厨房里的火又熊熊燃烧起来，肉又滋滋地煎了起来；厨师打了小伙计一个耳光，小伙计疼得哇哇叫；女仆拔完了鸡毛。\n\n王子和玫瑰公主举行了盛大隆重的婚礼，他们幸福快乐地生活，一直到老。",
+        "tags": "格林童话、玫瑰公主（睡美人）、atirgul malika",
+        "link": "",
+        "cover": "https://b0.bdstatic.com/ugc/0Tpqf2KWpvPexScrLA6iXA8e5f1b947145b4b715094be026516416.jpg",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    },
+    {
+        "id": 6,
+        "title": "گرىم چۆچەكلىرى: بۇلبۇل تۇمشۇق پادىشاھ",
+        "cate": "Hekaya",
+        "desc": "بۇرۇننىڭ بۇرۇنىسىدا، بىر پادىشاھنىڭ ئاجايىپ چىرايلىق، ئەمما بەكمۇ تەكەببۇر بىر قىزى بار ئىكەن. ئۇ ئۆزىگە ئۆيلىنىش تەلىپىنى قويغان يىگىتلەرنىڭ ھېچقايسىسىغا نەزىرىنىمۇ سېلىپ باقمايدىكەن. ئۇ كەلگەن يىگىتلەرنى ياراتماي قايتۇرۇۋەتكەننى ئاز دەپ، ئۇلارغا ھەر خىل لەقەملەرنى قويۇپ مازاق قىلىدىكەن. بىر قېتىم پادىشاھ كاتتا زىياپەت ئۇيۇشتۇرۇپ قىزغا كۆزى چۈشكەن يىگىتلەرنىڭ ھەممىسىنى ئوردىسىغا يىغىپتۇ. يىگىتلەر مەرتىۋىسى بويىچە قاتارغا تىزىلىپتۇ. ئەڭ ئالدىدا پادىشاھلار، ئۇلارنىڭ كەينىدە گېرىتسوگ، ماركىز، گراف، بارونلار، ئەڭ ئاخىرىدا ئاقسۆڭەكلەر تۇرۇپتۇ. مەلىكە قاتار تۇرغانلارنى بىر باشتىن كۆرۈپ چىقىپتۇ. شۇنىڭدىمۇ ھەممىسىدىن بىرەر - يېرىم ئېۋەن تېپىپ ئۇلارنى ياراتماپتۇ. ئۇ بىرىنچى يىگىتنى «بەك سېمىز، كاۋا قورساق ئىكەن» دېسە، ئىككىنچىسىنى «ئۇ- زۇنتۇرا بىر نېمە ئىكەن، يول ماڭسا سۇۋادان تېرەكتەك لىڭشىيدىكەن»؛ ئۈچىنچىسىنى «پاكار ھەم سېمىز ئىكەن، بۇنداقلار زېرەك كەلمەيدۇ»؛ تۆتىنچىسىنى «چىرايى ئۆلۈكنىڭكىدەك تاتىراڭغۇ ئىكەن»؛ بەشىنچىسىنى «كۈركە توخۇدەك قىپقىزىل ئىكەن» دەپتۇ. ئالتىنچىسىنىڭ قەددى- قامىتى دېگەندەك رۇس ئەمەس ئىكەن، مەلىكە ئۇنى： «ئوچاق بېشىدا تۇرۇپ قالغان ھۆل ياغاچ ئىكەن» دەپتۇ. \nمەلىكە ھەممە ئادەمنىڭ ئەيىبىنى ئېچىپ مازاق قىلى- ۋېرىپتۇ. بولۇپمۇ ئەڭ ئالدىدا تۇرغان، ئېڭىكى سەل قىڭ- غىر، ئەمما ئاق كۆڭۈل بىر پادىشاھنى بەكرەك زاڭلىق قى- لىپ كۈلۈپتۇ：\n _ ۋاي توۋا قىپتىمەن، ئۇنىڭ ئېڭىكى بۇلبۇلنىڭ تۇمشۇقىغا ئوخشايدىكىنە، ھا... ھا...  \n\nشۇنىڭدىن ئېتىبارەن بۇ پادىشاھقا «بۇلبۇل تۇمشۇق پادىشاھ» دەپ لەقەم سىڭىپ قاپتۇ. ياشانغان پادىشاھ قىزىنىڭ ھاكاۋۇرلۇقتىن ئۆزىنى بىلەلمەيۋاتقانلىقىنى، شۇنچە لايىقنىڭ بىرەرىنىمۇ ياراتمايۋاتقانلىقىنى كۆرۈپ دەرغەزەپكە كەپتۇ - دە، خەپ، سېنى ئىشىك ئالدىغا سەدىقە تىلەپ كەلگەن تىلەمچىگە بېرىۋەتمىسەم، دەپ قەسەم قىلىۋېتىپتۇ.\n بىرنەچچە كۈندىن كېيىن كوچىمۇكوچا ساز چېلىپ تىلەمچىلىك قىلىدىغان بىر تىلەمچى ئوردىنىڭ دېرىزىسى تۈۋىدە ناخشا ئېيتىپ سەدىقە تىلەپتۇ.\n بۇنى ئاڭلىغان پادىشاھ تىلەمچىنى چاقىرىپ كىرىشكە بۇيرۇپتۇ. ئۈستۋېشى جالدۇر - جۇلدۇر ۋە مەينەت تىلەمچى پادىشاھ بىلەن مەلىكىنىڭ ئالدىغا كېلىپ ناخشا ئېيتىپ بېرىپتۇ ۋە سەدىقە سوراپتۇ. \n_ ناخشاڭ مېنى بەكمۇ مەپتۇن قىلدى، شۇڭا قىزىمنى ساڭا بېرىمەن، _ دەپتۇ پادىشاھ. \nمەلىكە بۇنى ئاڭلاپ قاتتىق چۆچۈپ كېتىپتۇ ۋە ئۇنداق قىلماڭ، دەپ دادىسىغا يېلىنىپتۇ. ئەمما، پادىشاھ: \n_ مەن سېنى تىلەمچىگە بېرىمەن، دەپ قەسەم ئىچكەن، قەسىمىمدىن يېنىۋالسام بولمايدۇ، _ دەپ ئۆز گېپىدە چىڭ تۇرۇۋاپتۇ.\n مەلىكىنىڭ ھەرقانچە ئۇنىمىغىنىغا قارىماي، پادىشاھ  ئۇلارنىڭ تويىنى قىلىپ قويۇپتۇ. تويدىن كېيىن پادىشاھ قىزىنى ئالدىغا چاقىرتىپ：\n _ سەن ئەمدى تىلەمچىنىڭ ئايالى، ئوردىدا تۇرىۋەرسەڭ قاملاشمايدۇ. شۇڭا، ئوردىدىن چىقىپ كېتىپ ئېرىڭ بىلەن كۈنۈڭنى كۈن ئەت، _ دەپتۇ. \nتىلەمچى ئۇنى يېتىلىگەن پېتى ئوردىدىن ئاچىقىپ كې- تىپتۇ. مەلىكىمۇ ئىلاجسىز ئۇنىڭ كەينىدىن مېڭىپتۇ. ئۇلار يۈرۈپتۇ، يۈرۈپتۇ، يۈرگەندىمۇ مول يۈرۈپتۇ. بىر كۈنلەردە قېلىن ئورمانغا يېتىپ كەپتۇ. \n_ پاھ، بۇ گۈزەل ئورمان كىمنىڭ؟ _ دەپ سوراپتۇ مەلىكە.\n _ بۇلبۇل تۇمشۇق پادىشاھنىڭ، سەن ئۇنىڭغا تەگكەن بولساڭ، بۇ ئورمان سېنىڭ بولاتتى.\n _ ئاھ ، مەندەك مەزلۇمە ئاجىز بەندەڭگە ئىچىڭ ئاغرىسۇن، مېنى بۇلبۇل تۇمشۇق پادىشاھقا نېسىپ قىلغايسەن، _ دەپ ئاھ ئۇرۇپتۇ مەلىكە. \nئۇزۇن ئۆتمەي ئۇلار بىر يايلاقتىن ئۆتۈپتۇ. مەلىكە يەنە:\n _ بۇ ياپيېشىل گۈزەل يايلاق كىمنىڭكى؟ _ دەپ سوراپتىكەن، تىلەمچى：\n _ بۇلبۇل تۇمشۇق پادىشاھنىڭ. ئۇنىڭغا تەگكەن بول- ساڭ، بۇ يايلاق سېنىڭ بولاتتى، _ دەپ جاۋاب بېرىپتۇ.  \n_ ئاھ ، مەندەك ئاجىز بەندەڭگە رەھىم قىلغايسەن. مېنى بۇلبۇل تۇمشۇق پادىشاھقا ئاتا قىلغايسەن!\n ئۇلار يەنە مېڭىپ بىر چوڭ شەھەرگە يېتىپ كەپتۇ. \n_ بۇ گۈزەل شەھەر كىمگە تەئەللۇق؟ _ دەپ سوراپتۇ مەلىكە. \n_ بۇلبۇل تۇمشۇق پادىشاھقا، ئۇنىڭغا تەگكەن بولساڭ، بۇ شەھەر سېنىڭ بولاتتى. \n_ ئاھ ، مېنى كەچۈرگىن، مېنى بۇلبۇل تۇمشۇق پادىشاھقا خوتۇن قىلغىن !\n بۇ گەپلەرنى ئاڭلىغان تىلەمچى خاپا بولۇپ: \n_ ھە دېسە باشقا بىر ئەرنىڭ خوتۇنى بولسام، دەپ يۈ- رىسەنغۇ، ئاچچىقىمنى كەلتۈرۈپ. مەن سېنى خارلاۋاتمايد غاندىمەن؟ _ دەپتۇ.\n ئۇلار ئاخىر بىر كىچىك كەپنىڭ ئالدىغا كېلىپ توختاپتۇ.\n _ ۋاي  نېمانچىۋالا كىچىك كەپە بۇ، بۇ قايسى بىچارىنىڭ كەپىسىدۇر؟_ دەپ سوراپتۇ مەلىكە ھەيرانلىق بىلەن.\n _ مېنىڭ كەپەم، بۇنىڭدىن كېيىن ئىككىمىز مۇشۇ كەپىدە ئۆي تۇتىمىز. \nمەلىكە كەپنىڭ ئىشىكىدىن ئېڭىشىپ كىرىشكە مەجبۇر بوپتۇ. ئۇ ئىشىكتىن كىرىپلا：\n-خىزمەتكار قېنى؟-دەپ سوراپتۇ.   \n_ نېمە؟ خىزمەتكار دېدىڭمۇ؟ خىزمەتكار نېمە قىلىدۇ بۇ يەردە، لازىم بولسا ئۆزۈڭ قوپۇپ قىلىسەن. دەرھال ئوت ياق، ئاندىن سۇ ئەكېلىپ ئاش ئەت. ھېرىپ ھالىم قالمىدى، _ دەپتۇ تىلەمچى.\n ئۆمرىدە ئوچاقنىڭ ئالدىغا كېلىپ باقمىغان مەلىكە ئاش ئېتىشنى ھېچ ئەپلەشتۈرەلمەپتۇ. ئاشنى تىلەمچى ئۆزى ئەتمەكتىن باشقا ئامال قالماپتۇ. ئۇ بىرنېمىلەرنى قىلىپ ئاشنى ئېتىپتۇ. ئۇلار قورساقلىرى ئاران - ئاران تويغۇدەك ئازغىنە ئاشنى يەپ ئۇخلاپتۇ. ئەتىسى ئەتىگىنى تىلەمچى  ئۇنى ئۆي ئىشلىرىنى قىل، دەپ تۈرتۈپ ئويغىتىۋېتىپتۇ. ئۇلار شۇنچە غورىگىل تۇرمۇش كەچۈرسىمۇ، بىرنەچچە كۈندىن كېيىن يېمەك - ئىچمىكى ئۈزۈلۈپ قاپتۇ.\n _ خوتۇن، _ دەپتۇ ئېرى، _ يېتىپ يېسە تاغمۇ توشىمايدۇ، سەن سېۋەت توقۇپ ساتقىن.\n ئۇ چىقىپ سۆگەت تاللىرىنى كېسىپ كەپتۇ. مەلىكە بۇ تاللاردا سېۋەت توقۇشقا باشلاپتۇ. بىراق قاتتىق سۆگەت تاللىرى ئۇنىڭ يۇمشاق قوللىرىنى تىلىۋېتىپتۇ. بۇنى كۆر- گەن ئېرى: \n_ بۇ ئىشنى قىلالمىغۇدەكسەن. ياخشىسى، چاق ئېگىر، _ دەپتۇ. \nمەلىكە چاق ئېگىرىشكە ئولتۇرۇپتىكەن، چاقنىڭ شانىسى ئۇنىڭ يۇمران بارماقلىرىنى كېسىپ قانىتىۋېتىپتۇ.\n بۇنى كۆرگەن ئېرى: \n _ قولۇڭدىن ھېچ ئىش كەلمەيدىغان خوتۇن ئىكەنسەن، ئىسىت، سېنى ئالمىساممۇ بوپتىكەن. ئەمدى مەن ساپالچىلىق قىلاي، مەن پىشۇرغان ساپال قاچىلارنى بازارغا ئاپىرىپ سات، _ دەپتۇ.\n«ۋاي شورۇم قۇرۇسۇن. دادامنىڭ دۆلىتىدىن كەلگەنلەر كۆرۈپ قالسا نېمىمۇ دەپ كېتەر - ھە؟» دەپ ئويلاپتۇ مەلىكە. \nلېكىن، مۇشۇنداق جان باقماي ئامال يوق ئىكەن. بول-  مىسا ئەر - خوتۇن ئىككىيلەن ئاچلىقتىن ئۆلۈپ قالىدى- كەن. دەسلەپتە مەلىكىنىڭ چىرايىغا مەھلىيا بولغان خې- رىدارلار ئۇنىڭ كوزا - كومۇلىرىنى ئېلىپ، قانچە پۇل دې- سە شۇنچە پۇل بېرىپتۇ. ھەتتا پۇل بېرىپ ھېچنېمە ئالماي كەتكەنلەرمۇ بوپتۇ. مەلىكە ۋە ئۇنىڭ ئېرى شۇ پۇللارغا تايىنىپ كۈن ئاپتۇ. ئارىدىن ئۇزۇن ئۆتمەي مەلىكىنىڭ ئې- رى يەنە بىرمۇنچە ساپال قاچىلارنى ئەكېلىپ مەلىكىنى سېتىپ كېلىشكە بۇيرۇپتۇ. مەلىكە بازارنىڭ چېتىدە يايما ئېچىپ ساپال قاچىلارنى سېتىشقا باشلاپتۇ. شۇ ئەسنادا، خۇددى ئاسماندىن چۈشكەندەكلا، بىر مەست چەۋەنداز ئېتىنى چاپتۇرغىنىچە كېلىپ مەلىكىنىڭ ساپال قاچىلىرىنى ئېتىغا دەسسىتىپ كۇكۇم - تالقان قىلىۋېتىپتۇ. مەلىكە خاپىچىلىقتا يىغلىۋېتىپتۇ.\n «ئاھ تەڭرىم! _ دەپتۇ ئۇ، _ مەن شۇنچىۋالا بىتەلەيمۇ ！ئەمدى ئېرىمدىن تىل - ئاھانەت ئاڭلايدىغان بولدۇم !» \nمەلىكە ئۆيگە كېلىپ بولغان ۋەقەنى ئېرىگە سۆزلەپ بېرىپتۇ.\n _ ماۋۇ پالاكەتچىلىكنى كۆرمەمدىغان. كىم سېنى بازارنىڭ چېتىدە ئولتۇرۇپ سودا قىل، دېدى؟ يىغلاشتىن باشقا ھېچنېمىنى بىلمەيدىغان خوتۇن ئىكەنسەن. مەن پادى- شاھنىڭ ئوردىسىغا بېرىپ ئاشخانىغا خىزمەتكار ئالامسىلەر، دەپ سورىغانىدىم. ئۇلار سېنىڭ ئاشخانىدا ئىشلىشىڭگە ئۇنىدى. خىزمىتىڭنىڭ بەدىلىگە قورسىقىڭنى باقىدىغان بولدى، _ دەپتۇ ئېرى. \nشۇنداق قىلىپ مەلىكە ئاشخانىدا يۈگۈر - يېتىم ئىش قىلىدىغان خىزمەتكارغا ئايلىنىپتۇ. ئۇ ئاشقان - تاشقان تاماقلارنى ياغاچتىن ياسالغان قاچىلارغا سېلىپ كىيىمىنىڭ ئىچىگە ئېسىۋالىدىكەن ۋە ئۇنى ئۆيىگە ئەكېتىپ قورسىقى- نى باقىدىكەن.\n بىر كۈنى پادىشاھنىڭ چوڭ ئوغلىنىڭ تويى بوپتۇ. بى- چارە مەلىكە توي كۆرۈش ئۈچۈن شاھ دەرۋازىسىنىڭ ئالدىدا تەلمۈرۈپ تۇرۇپتۇ. قارىسا ئوردا ئىچى ئاجايىپ بېزەلگەن، ھەر خىل زىبۇزىننەتلەرنى تاقىغان، بىر - بىرىدىن پۇزۇر كىيىنگەن مېھمانلار ئايىغى ئۈزۈلمەي كېلىپ تۇرغۇدەك. بۇنى كۆرگەن مەلىكىنىڭ ئىچى ئېچىشىپ، ئۆز تەقدىرىدىن زارلىنىپتۇ. ئۆزىنىڭ مۇشۇ خورلۇققا، مۇشۇنداق يوقسۇز- لۇققا چۈشۈپ قېلىشىغا سەۋەبچى بولغان تەكەببۇرلۇقىغا لەنەتلەر ياغدۇرۇپتۇ. زىياپەتكە توشۇلۇۋاتقان نازۇنېمەتلەرنىڭ پۇرىقىدىن مەلىكە بىھوش بوپتۇ. مۇلازىملار بەزىدە ئۇنىڭغا ئېشىپ قالغان سەي - تاماقلاردىن ئانچە - مۇنچە بېرىپ قويىدىكەن. مەلىكە ئۇنى ئۆيىگە ئاپىرىپ يېيىش ئۈچۈن ياغاچ قاچىلىرىغا قۇيۇۋالىدىكەن. شۇ ئەسنادا، مامۇق، تاۋار- دۇردۇن، زەرلەرگە پۈركىنىپ، بوينىغا ئالتۇن زەنجىر ئاسقان شاھزادە مەلىكە تۇرغان يەرگە كېلىپ قاپتۇ.  \nئۇ بۇ ساھىبجامال قىزنىڭ بوسۇغا سىرتىدا تۇرغانلىقىنى كۆرۈپ ئۇنى تانسىغا تەكلىپ قىپتۇ. لېكىن، مەلىكە شاھزادىنىڭ تەكلىپىنى رەت قىپتۇ ھەم بەكمۇ چۆچۈپ كې- تىپتۇ. چۈنكى، مەلىكىنىڭ ئالدىدا تۇرغان كىشى قانداقتۇر بىر شاھزادە ئەمەس، بەلكى بۇرۇن ئۇنىڭغا ئۆيلىنىش تەك- لىپىنى قويغان، ئەمما مەلىكە ئۇنى مازاق قىلىپ كۈلگەن ھېلىقى بۇلبۇل تۇمشۇق پادىشاھ ئىكەن. بۇلبۇل تۇمشۇق پادىشاھ مەلىكىنىڭ ئۇنىمىغىنىغا قارىماي يېتىلەپ زالغا ئەكىرىپتۇ.\n تانسا ئويناۋېتىپ، مەلىكىنىڭ ياغاچ قاچىلىرىنى ئې- سىۋالغان شوينىسى ئۈزۈلۈپ كېتىپتۇ. ئاشقان - تاشقان سەي - تاماقلار ھەريان چېچىلىپتۇ. بۇنى كۆرگەنلەر ئۈچى- يى ئۈزۈلگۈچە كۈلۈشۈپتۇ. بىچارە مەلىكىگە ئاسمان يىراق، يەر قاتتىق تۇيۇلۇپتۇ. مەلىكە ئالدى - كەينىگە قارىماي قېچىپتىكەن، پەلەمپەيدە ئۇنىڭغا بىر يىگىت يېتىشىۋېلىپ ئالدىنى توسۇپتۇ. مەلىكە شۇنداق قارىسا، ئالدىدا يەنىلا شۇ بۇلبۇل تۇمشۇق پادىشاھ تۇرغۇدەك. ئۇ مەلىكىگە مۇلايىملىق بىلەن: \n_ قورقماڭ، مەن سىز بىلەن ھېلىقى ئەسكى كەپىدە بىللە ياشاۋاتقان تىلەمچى بولىمەن. مەن سىزنى چىن قەلبىمدىن ياخشى كۆرگەنلىكىم ئۈچۈن تىلەمچى قىياپىتىگە كىرىۋالغانىدىم. ساپال قاچىلىرىڭىزنى ئاتقا دەسسىتىۋەتكەن ھېلىقى چەۋەندازمۇ مەن. مېنىڭ بۇنداق قىلىشىمدىكى سەۋەب، سىزنىڭ ھېچكىمنى ئۆزىڭىزگە تەڭ قىلمايدىغان مىجەزىڭىزنى تۈزىتىش، مېنى مازاق قىلغان چاغدىكى تەكەببۇرلۇقىڭىز ئۈچۈن سىزنى توۋا قىلدۇرۇش ئىدى، - دەپتۇ. \n_ مەن ناھايىتى چوڭ سەۋەنلىك ئۆتكۈزدۈم. مەن سىزگە لايىق ئەمەس، _ دەپ يىغلاپ كېتىپتۇ مەلىكە. \n پادىشاھ ئۇنىڭغا：  \n_ بولدى، كۆڭلىڭىزنى بۇزماڭ، ئۆتكەن ئىشقا سالاۋات. ھازىر بىز توي مەرىكىمىزنى خۇشال - خۇرام ئۆت- كۈزەيلى، _ دەپتۇ.\n كېنىزەكلەر كېلىپ مەلىكىگە گۈزەل لىباسلارنى كىي- دۈرۈپتۇ. مەلىكىنىڭ دادىسىمۇ تويغا كەپتۇ. پۈتۈن خالايىق توي تەنتەنىسىگە چۆمۈپتۇ. مەلىكە بىلەن پادىشاھنىڭ ھەقىقىي بەختى ۋە خۇشاللىقى مانا ئەمدى باشلىنىپتۇ. \n\nبۈگۈنكى چۆچىكىمىز مۇشۇيەردە ئاخىرلاشتى كىلەركى مەزمۇنىمىزدا: « ئالتۇن پەيلىك غاز » دىگەن چۆچەكدىن بەھرىمان بۇلىمىز .ھارمىغايسىلەر! ! ! \n\n从前有一位国王，他有个女儿长得美丽无比，却骄傲自大，目中无人，谁也不配做她丈夫。她把求婚者一个个全都回绝，还对他们百般挖苦嘲笑。\n一次，国王大摆宴席，邀请远近所有前来求婚的男子。来宾按身份地位排成长队：先是各国国王，随后公爵、侯爵、伯爵、骑士。公主从队伍前面走过，对每个人都能挑出毛病。这个太胖 ——“酒桶！” 她说；那个太高 ——“竹竿，走路晃晃悠悠！”第三个太矮 ——“矮冬瓜，笨手笨脚！”第四个脸色惨白 ——“活死人！”第五个满脸通红 ——“火公鸡！”第六个腰背不直 ——“窑里没干透的木头！”\n\n就这样，她人人都挑剔，嘲笑得最厉害的是一位模样和善的国王。这位国王下巴稍稍向前突出。“瞧啊！” 公主高声取笑，“他的下巴活像画眉鸟的嘴！” 打那以后，大家便叫他画眉嘴国王。\n\n老国王看见女儿一味嘲弄别人，勃然大怒，发誓要把她嫁给第一个上门乞讨的乞丐。\n\n几天之后，一个沿街卖唱的乞丐来到王宫窗下唱歌，乞求施舍。国王听见歌声，立刻派人传乞丐进来。乞丐衣衫褴褛，肮脏不堪。国王对他说：“昨天我立下誓言，要把女儿嫁给第一个来这里的乞丐。你就是他，准备举行婚礼吧！”\n\n公主惊恐万分，哭着哀求父亲，可国王毫不动摇：“我发过誓，必须兑现！” 婚礼很快举办完毕。婚宴结束，国王告诉女儿：“你丈夫是乞丐，王宫不再是你的家，跟着他走吧。”\n\n乞丐牵着公主离开王宫。他们走到一片大森林，公主问：“这片美丽的森林是谁的？”“它属于画眉嘴国王，要是你当初嫁给他，森林就是你的。”“唉，我真蠢！当初我要是嫁给画眉嘴国王多好！”\n\n接着他们来到一片草原，公主又问：“这片绿油油的草原是谁的？”“属于画眉嘴国王，要是你当初嫁给他，草原就是你的。”“唉，我真蠢！当初我要是嫁给画眉嘴国王多好！”\n\n随后他们走到一座繁华的大城市。公主问：“这座漂亮的城市是谁的？”“属于画眉嘴国王，要是你当初嫁给他，城市就是你的。”公主满心悔恨：“唉，我当初真不该嘲笑画眉嘴国王！”\n\n终于，两人来到一间狭小破旧的茅屋。“这就是我的家，” 乞丐说，“快进去。”公主必须弯腰才能钻进低矮的小门。“仆人在哪儿？” 她问道。“哪有什么仆人，” 乞丐回答，“凡事你得自己动手。快生火烧水，准备晚饭。”\n\n公主根本不会生火做饭，乞丐只好亲自忙活。晚饭十分简陋。第二天一早，乞丐就把她叫醒，逼着她做家务。\n\n几天过后，家里存粮吃光了。丈夫说：“老婆，咱们坐吃山空不行，你来编筐谋生吧。”他砍来柳枝，公主开始编筐。粗硬的枝条划破她娇嫩的双手，鲜血直流。“看来不行，” 丈夫说，“还是纺线试试。”她坐下纺线，粗糙纱线勒得手指伤口更多。“你什么活儿都干不了！” 丈夫说，“我打算做陶器买卖，你去集市叫卖锅碗瓢盆。”\n\n公主心里害怕：“要是我父亲王国里的熟人赶集看见我卖陶器，一定会笑话我！” 可没有别的出路。起初生意尚可，人们见她容貌好看，愿意买她的东西。赚到一点钱后，丈夫又购进大批陶器。公主坐在集市角落摆摊。忽然，一个醉酒骑兵策马直冲过来，所有陶器全被踏得粉碎。公主失声痛哭。“哭有什么用！” 丈夫说，“我看你实在做不了买卖。我去王宫打听好了，厨房缺一名女佣，你去做工，管吃住。”\n\n就这样，公主成了王宫厨娘。她听从厨师差遣，干最脏最累的活。两边衣兜各装一只小陶罐，收集残羹剩饭，带回家和丈夫充饥。\n\n不久，王宫举办王子大婚庆典。可怜的女佣悄悄站在大厅门外观望。大厅灯火辉煌，宾客衣着华美。她回想自己从前的身份，痛恨曾经的傲慢，落到如今穷困屈辱的地步。佳肴香气飘来，仆人偶尔丢给她一点剩菜，她小心装进陶罐。\n\n\n这时，盛装的王子走入大厅。公主抬头一看，正是画眉嘴国王！王子径直走来，拉住她的手邀请跳舞。公主惊慌躲闪，羞愧得无地自容。她拼命挣脱，可王子不肯放手。拉扯之间，衣兜系带断裂，陶罐落地碎裂，汤水剩饭洒了一地。宾客哄堂大笑，纷纷嘲弄她。公主只想找地缝钻进去，飞奔逃出大厅。\n\n她跑下楼梯，却被画眉嘴国王拦住。国王温和地对她说：“别害怕，我和那个茅屋乞丐、集市上踏碎陶器的骑兵，都是同一个人。我因为爱你，才乔装考验你；一切磨难，都是为了磨去你的傲气，惩罚你当初对我的羞辱。”\n\n公主泪流满面：“我犯下天大过错，不配做你的妻子！”画眉嘴国王说：“苦难已经结束。过去的事一笔勾销，现在我们举办真正的婚礼。”\n\n侍女们为她换上华贵礼服。她的父王与满朝大臣也赶来，祝福她和画眉嘴国王。盛大的婚礼正式开始，举国欢庆。",
+        "tags": "格林童话、画眉嘴国王、bulbul tumxuk padixah",
+        "link": "",
+        "cover": "https://img0.baidu.com/it/u=1730312465,1986717126&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=710",
+        "bookFile": "",
+        "audioFile": "",
+        "isTop": false,
+        "topOrder": 0
+    }
+];
 
         function goToBookshelf(){
             document.getElementById('welcomePage').classList.add('hidden');
@@ -856,6 +1420,7 @@
             const logoutBtn = document.getElementById('logoutBtn');
             const uploadBtn = document.getElementById('uploadBtn');
             const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
             const carouselEditBtn = document.getElementById('carouselEditBtn');
             const bookshelf = document.getElementById('bookshelf');
             const uploadToggleBox = document.getElementById('uploadToggleBox');
@@ -864,6 +1429,7 @@
             if(logoutBtn) logoutBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
             if(uploadBtn) uploadBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
             if(exportBtn) exportBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
+            if(importBtn) importBtn.style.display = isAdminLogin ? 'inline-block' : 'none';
             if(carouselEditBtn) carouselEditBtn.style.display = isAdminLogin ? 'block' : 'none';
             if(bookshelf) bookshelf.classList.toggle('admin-btns-show', isAdminLogin);
             if(uploadToggleBox) uploadToggleBox.style.display = isAdminLogin ? 'block' : 'none';
@@ -1009,14 +1575,292 @@
             });
         }
 
+        function loadBooks(){
+            const saved = localStorage.getItem('allBooks');
+            if(!saved) return;
+            try{
+                const parsed = JSON.parse(saved);
+                if(Array.isArray(parsed) && parsed.every(b => b && typeof b.id === 'number' && typeof b.title === 'string')){
+                    allBooks = parsed;
+                } else {
+                    console.warn('[loadBooks] localStorage 中的 allBooks 格式非法，已回退到默认数据');
+                }
+            }catch(e){
+                console.warn('[loadBooks] localStorage 数据解析失败：', e.message);
+            }
+        }
+
+        // ============ 导入 / 导出 ============
+
+        // 校验导入数据结构，返回 { ok:bool, books:welcomeData:..., warnings:[], error?:string }
+        function validateImportData(raw){
+            const warnings = [];
+            // 允许纯数组（即之前导出的 allBooks 直接粘贴）
+            if(Array.isArray(raw)){
+                if(!raw.every(b => b && typeof b.id === 'number' && typeof b.title === 'string' && typeof b.cate === 'string')){
+                    return { ok:false, error:'数组中的每一项必须包含 id(数字)、title(文本)、cate(文本)' };
+                }
+                return { ok:true, books: raw, welcomeData: null, warnings };
+            }
+            if(!raw || typeof raw !== 'object'){
+                return { ok:false, error:'不是合法的 JSON 对象或数组' };
+            }
+            // 新版导出格式：{ books, welcomeData, carousel, exportTime }
+            const hasBooks = Array.isArray(raw.books);
+            if(!hasBooks){
+                return { ok:false, error:'缺少 books 数组。正确格式：{ "books": [...], "welcomeData": {...} }' };
+            }
+            const badIdx = raw.books.findIndex(b => !b || typeof b.id !== 'number' || typeof b.title !== 'string' || typeof b.cate !== 'string');
+            if(badIdx >= 0){
+                return { ok:false, error:`第 ${badIdx} 本书格式非法，必须包含 id(数字)、title(文本)、cate(文本)` };
+            }
+            let welcomeResult = null;
+            if(raw.welcomeData){
+                const wd = raw.welcomeData;
+                if(!wd.books || !Array.isArray(wd.books)){
+                    warnings.push('welcomeData 缺少 books 数组，将使用默认欢迎页数据');
+                } else {
+                    welcomeResult = Object.assign({}, wd, {
+                        books: wd.books,
+                        topLabel: typeof wd.topLabel === 'string' ? wd.topLabel : '',
+                        pageTitle: typeof wd.pageTitle === 'string' ? wd.pageTitle : '',
+                        metaInfo: (Array.isArray(wd.metaInfo) ? wd.metaInfo : [typeof wd.metaInfo === 'string' ? wd.metaInfo : '']).filter(Boolean)
+                    });
+                }
+            }
+            return { ok:true, books: raw.books, welcomeData: welcomeResult, carousel: Array.isArray(raw.carousel) ? raw.carousel : null, warnings };
+        }
+
+        function buildExportObject(){
+            const snapshot = {};
+            snapshot.version = 2;
+            snapshot.generateAt = new Date().toISOString();
+            snapshot.comment = '部署到源码的位置提示：欢迎页数据 welcomeData 替换 index.html 中 "// 默认欢迎页配置" 后的 welcomeData = {...}；书籍数据 books 替换 index.html 中 "let allBooks = [" 后的数组；轮播图默认值在 loadCarouselData() 里 renderCarousel([...]) 中的数组';
+            snapshot.injectLocation = {
+                welcomeData_hint: '搜索：// 默认欢迎页配置 → 替换其后的 welcomeData = { 到 }; 整段',
+                allBooks_hint: '搜索：let allBooks = [  → 只替换 [ 到 ]; 之间的数组内容',
+                carousel_hint: '搜索：loadCarouselData → 找到 renderCarousel([ 后替换 [ 到 ]) 的数组'
+            };
+            snapshot.books = allBooks;
+            snapshot.welcomeData = welcomeData;
+            snapshot.carousel = slides;
+            return snapshot;
+        }
+
         function exportData(){
-            const data = { books: allBooks, welcomeData: welcomeData, exportTime: new Date().toISOString() };
+            const data = buildExportObject();
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url; a.download = `hekaya-backup-${new Date().toLocaleDateString()}.json`;
             a.click(); URL.revokeObjectURL(url);
-            showToast('📥 数据已导出', 'success');
+
+            // 同时弹出代码视图，告诉用户要替换源码的哪个位置
+            setTimeout(() => showExportGuide(data), 300);
+        }
+
+        function showExportGuide(data){
+            const booksStr = JSON.stringify(data.books, null, 4);
+            const welcomeStr = JSON.stringify(data.welcomeData, null, 4);
+            const carouselStr = JSON.stringify(data.carousel, null, 4);
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = function(e){ if(e.target === modal) return; };
+
+            modal.innerHTML = `
+                <div class="dataio-modal">
+                    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
+                    <h2>📥 数据备份 & 部署说明</h2>
+                    <div class="dataio-tip">
+                        <strong>✅ 已导出 JSON 文件到下载目录</strong><br>
+                        下面分 3 段显示了要粘贴到 <code>index.html</code> 源码中的数据。
+                        <strong>每段都清楚地标注了在代码里搜索的关键词和具体行号</strong>，
+                        复制后粘贴到对应位置就不会再出现“网页打不开”的情况。
+                    </div>
+
+                    <p><strong>① 欢迎页数据</strong>（共 ${welcomeData.books ? welcomeData.books.length : 0} 个封面）</p>
+                    <div class="dataio-tip" style="background:rgba(0,184,148,0.08);border-color:rgba(0,184,148,0.25);">
+                        在 <code>index.html</code> 中搜索文字：<code>默认欢迎页配置</code><br>
+                        替换 <code>welcomeData = {...</code> 这一整段（从 <code>{</code> 到 <code>};</code> 末尾的分号）
+                    </div>
+                    <textarea id="exp_welcome" readonly>${escapeHtml(welcomeStr)}</textarea>
+                    <div class="dataio-actions">
+                        <button class="btn-common btn-outline btn-sm" onclick="copyText(this, 'exp_welcome', '欢迎页数据')">📋 复制欢迎页</button>
+                    </div>
+
+                    <p style="margin-top:22px;"><strong>② 书架书籍数据</strong>（共 ${data.books.length} 本书）</p>
+                    <div class="dataio-tip" style="background:rgba(9,132,227,0.08);border-color:rgba(9,132,227,0.25);">
+                        在 <code>index.html</code> 中搜索文字：<code>let allBooks = [</code><br>
+                        只替换 <code>[</code> 到 <code>];</code> 之间的数组内容，千万不要删除行首的 <code>let allBooks = </code> 和行尾的 <code>;</code>
+                    </div>
+                    <textarea id="exp_books" readonly>${escapeHtml(booksStr)}</textarea>
+                    <div class="dataio-actions">
+                        <button class="btn-common btn-outline btn-sm" onclick="copyText(this, 'exp_books', '书籍数据')">📋 复制书籍数据</button>
+                    </div>
+
+                    <p style="margin-top:22px;"><strong>③ 轮播图数据</strong>（共 ${slides.length} 张）</p>
+                    <div class="dataio-tip" style="background:rgba(253,203,110,0.1);border-color:rgba(253,203,110,0.3);">
+                        在 <code>index.html</code> 中搜索文字：<code>loadCarouselData</code><br>
+                        找到 <code>renderCarousel([...</code> 这一行，把其中的数组从 <code>[</code> 到 <code>])</code> 之间的内容替换为下面的数据。<br>
+                        <em>提示：如果您不打算修改轮播默认值（靠管理员登录后在页面上编辑即可），可跳过本段。</em>
+                    </div>
+                    <textarea id="exp_carousel" readonly>${escapeHtml(carouselStr)}</textarea>
+                    <div class="dataio-actions">
+                        <button class="btn-common btn-outline btn-sm" onclick="copyText(this, 'exp_carousel', '轮播数据')">📋 复制轮播</button>
+                        <button class="btn-common btn-primary" onclick="this.closest('.modal-overlay').remove()">完成</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function copyText(btn, textareaId, name){
+            const ta = document.getElementById(textareaId);
+            if(!ta) return;
+            try{
+                navigator.clipboard.writeText(ta.value).then(() => {
+                    showToast(`✅ ${name} 已复制到剪贴板`, 'success');
+                    btn.textContent = `✅ ${name} 已复制`;
+                    setTimeout(() => { btn.textContent = `📋 复制${name === '欢迎页数据' ? '欢迎页' : name === '书籍数据' ? '书籍数据' : '轮播'}`; }, 1800);
+                }).catch(() => { ta.select(); document.execCommand('copy'); showToast(`✅ ${name} 已复制`, 'success'); });
+            }catch(e){ ta.select(); document.execCommand('copy'); showToast(`✅ ${name} 已复制`, 'success'); }
+        }
+
+        function openImportModal(){
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = function(e){ if(e.target === modal) return; };
+
+            modal.innerHTML = `
+                <div class="dataio-modal">
+                    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
+                    <h2>📤 导入数据</h2>
+                    <div class="dataio-tip">
+                        <strong>导入前会严格校验格式。</strong><br>
+                        只要校验不通过，页面原有数据绝对不会被改动，因此不可能出现"网页打不开"的情况。<br>
+                        您可以：粘贴 JSON 文本 <em>或</em> 直接选择之前导出的 .json 文件。
+                    </div>
+
+                    <label style="font-size:14px; color:var(--text-color); font-weight:600;">方式一：选择 .json 文件</label>
+                    <div style="margin:8px 0 18px;">
+                        <button class="btn-common btn-outline dataio-btn-file">
+                            📎 选择导出的备份文件
+                            <input type="file" accept="application/json,.json" onchange="onImportFileSelect(this)">
+                        </button>
+                    </div>
+
+                    <label style="font-size:14px; color:var(--text-color); font-weight:600;">方式二：粘贴 JSON 文本</label>
+                    <textarea id="import_textarea" placeholder="把导出的 JSON 粘贴到这里。支持：完整备份 {books,welcomeData,carousel} 或只粘贴书籍数组 [...]"></textarea>
+
+                    <div class="dataio-actions">
+                        <button class="btn-common btn-outline btn-sm" onclick="previewImport()">🔍 先校验（不导入）</button>
+                        <button class="btn-common btn-primary" onclick="applyImport()">✅ 校验并导入</button>
+                    </div>
+
+                    <div class="dataio-result" id="import_result"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function onImportFileSelect(input){
+            const file = input.files && input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const ta = document.getElementById('import_textarea');
+                if(ta) ta.value = e.target.result;
+                showToast('已读取文件，点击"先校验"或"校验并导入"', 'info');
+            };
+            reader.onerror = () => showToast('文件读取失败', 'error');
+            reader.readAsText(file, 'utf-8');
+        }
+
+        function parseAndValidateImport(){
+            const ta = document.getElementById('import_textarea');
+            const text = (ta && ta.value || '').trim();
+            const resultBox = document.getElementById('import_result');
+            if(!text){
+                if(resultBox){
+                    resultBox.classList.add('show');
+                    resultBox.innerHTML = `<div class="dataio-row"><span class="bad">❌ 错误：</span>请先粘贴 JSON 或选择 .json 文件</div>`;
+                } else {
+                    showToast('请先粘贴 JSON 或选择文件', 'error');
+                }
+                return null;
+            }
+            let parsed;
+            try{
+                parsed = JSON.parse(text);
+            }catch(e){
+                const errPos = e.message.match(/position\s+(\d+)/);
+                let tip = '';
+                if(errPos){
+                    const pos = parseInt(errPos[1]);
+                    const before = text.slice(Math.max(0,pos-30), pos);
+                    const after  = text.slice(pos, Math.min(text.length, pos+30));
+                    tip = `<br>出错位置附近：<div class="dataio-copy-preview">${escapeHtml(before)}<span class="mark">【这里】</span>${escapeHtml(after)}</div>`;
+                }
+                if(resultBox){
+                    resultBox.classList.add('show');
+                    resultBox.innerHTML = `<div class="dataio-row"><span class="bad">❌ JSON 格式错误：</span>${escapeHtml(e.message)}</div>${tip}`;
+                } else {
+                    showToast('JSON 格式错误：' + e.message, 'error');
+                }
+                return null;
+            }
+            const check = validateImportData(parsed);
+            if(resultBox){
+                resultBox.classList.add('show');
+                if(check.ok){
+                    let html = `<div class="dataio-row"><span class="ok">✅ 格式校验通过</span></div>`;
+                    html += `<div class="dataio-row">📚 书籍数量：<strong>${check.books.length}</strong> 本</div>`;
+                    html += `<div class="dataio-row">🎨 分类数量：<strong>${new Set(check.books.map(b => b.cate)).size}</strong> 个</div>`;
+                    html += `<div class="dataio-row">👋 欢迎页：${check.welcomeData ? `<span class="ok">✅ 有效（${check.welcomeData.books.length} 个封面）</span>` : '⚠️ 未包含，保留当前不变'}</div>`;
+                    html += `<div class="dataio-row">🖼 轮播图：${check.carousel ? `<span class="ok">✅ 有效（${check.carousel.length} 张）</span>` : '⚠️ 未包含，保留当前不变'}</div>`;
+                    if(check.warnings.length){
+                        html += `<div class="dataio-row" style="color:var(--info);">⚠️ 提示：${check.warnings.map(escapeHtml).join('；')}</div>`;
+                    }
+                    resultBox.innerHTML = html;
+                } else {
+                    resultBox.innerHTML = `<div class="dataio-row"><span class="bad">❌ 校验失败：</span>${escapeHtml(check.error)}</div><div class="dataio-row" style="color:var(--sub-text);font-size:12px;">（数据未导入，当前内容不会有任何变化）</div>`;
+                }
+            }
+            return check.ok ? { data: parsed, summary: check } : null;
+        }
+
+        function previewImport(){
+            parseAndValidateImport();
+        }
+
+        function applyImport(){
+            const res = parseAndValidateImport();
+            if(!res) return;
+            const { data, summary } = res;
+
+            if(!confirm(`即将导入：\n  📚 ${summary.books.length} 本书籍\n  🎨 ${new Set(summary.books.map(b=>b.cate)).size} 个分类\n  ${summary.welcomeData ? '👋 含欢迎页数据' : '👋 欢迎页保留不变'}\n  ${summary.carousel ? '🖼 含轮播图' : '🖼 轮播图保留不变'}\n\n旧数据会被覆盖，确定继续？`)) return;
+
+            allBooks = summary.books;
+            saveBooks();
+
+            if(summary.welcomeData){
+                welcomeData = summary.welcomeData;
+                try{ localStorage.setItem(WELCOME_STORAGE_KEY, JSON.stringify(welcomeData)); }catch(e){}
+            }
+            if(summary.carousel){
+                try{ localStorage.setItem('carouselData', JSON.stringify(summary.carousel)); }catch(e){}
+                renderCarousel(summary.carousel);
+            }
+
+            updateWelcomePage();
+            renderBooks();
+            updateRealStats();
+
+            const modal = document.querySelector('.modal-overlay:last-child');
+            if(modal) modal.remove();
+
+            showToast(`✅ 导入成功！共 ${summary.books.length} 本书`, 'success');
         }
 
         
