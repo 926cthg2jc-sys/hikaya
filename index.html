@@ -184,7 +184,7 @@
         .sort-box{ display:flex; justify-content:center; margin-bottom:20px; }
         #sortSelect{ padding:10px 20px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-md); color:var(--text-color); font-size:14px; cursor:pointer; outline:none; }
         
-        .bookshelf{ display:grid; grid-template-columns:repeat(6, 1fr); gap:20px; padding:0; max-width:1200px; margin:0 auto; }
+        .bookshelf{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:20px; padding:0; max-width:1200px; margin:0 auto; }
         .book-card{ background:var(--card-bg); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); transition:var(--transition-normal); position:relative; cursor:pointer; }
         .book-card:hover{ transform:translateY(-8px); box-shadow:var(--shadow-hover); }
         .book-card.top{ border:2px solid var(--primary); }
@@ -216,7 +216,7 @@
         #uploadToggle:hover{ border-color:var(--primary); color:var(--primary); }
         .hide-upload{ display:none; }
         
-        .empty-tip{ text-align:center; padding:80px 20px; color:var(--sub-text); font-size:18px; }
+        .empty-tip{ text-align:center; padding:80px 20px; color:var(--sub-text); font-size:18px; display:flex; flex-direction:column; align-items:center; gap:15px; }
         
         .read-page{
             position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh;
@@ -238,7 +238,7 @@
         .read-cate{ font-size:14px; color:var(--primary); padding:5px 14px; background:rgba(108,92,231,0.1); border-radius:var(--radius-md); display:inline-block; margin-bottom:15px; font-weight:500; }
         .read-tags{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:10px 0 15px; }
         .read-tag{ font-size:12px; color:var(--primary); padding:4px 10px; background:rgba(108,92,231,0.08); border-radius:var(--radius-md); font-weight:500; }
-        .read-desc{ font-size:16px; color:var(--text-color); line-height:1.8; margin:20px 0; padding:15px; background:rgba(141,110,99,0.05); border-radius:var(--radius-md); direction:rtl; text-align:justify; unicode-bidi:plaintext; }
+        .read-desc{ font-size:16px; color:var(--text-color); line-height:1.8; margin:20px 0; padding:15px; background:rgba(141,110,99,0.05); border-radius:var(--radius-md); text-align:justify; }
         .read-actions{ display:flex; gap:18px; justify-content:center; margin:25px 0; flex-wrap:wrap; }
         .read-btn{ padding:14px 28px; border-radius:var(--radius-xl); background:var(--primary-gradient); color:white; border:none; cursor:pointer; font-size:15px; transition:all 0.3s; font-weight:500; min-width:150px; display:flex; align-items:center; justify-content:center; gap:8px; }
         .read-btn:hover{ transform:translateY(-3px); box-shadow:0 6px 15px rgba(0,0,0,0.2); }
@@ -353,7 +353,6 @@
         .back-to-top:hover{ transform:translateY(-3px) scale(1.1); }
 
         /* 空状态优化 */
-        .empty-tip{ display:flex; flex-direction:column; align-items:center; gap:15px; }
         .empty-tip .empty-icon{ font-size:48px; opacity:0.5; }
         .empty-tip .empty-action{
             padding:10px 24px; background:var(--primary-gradient); color:#fff;
@@ -362,17 +361,18 @@
         }
         .empty-tip .empty-action:hover{ transform:translateY(-2px); box-shadow:var(--shadow-hover); }
 
-        /* 收藏标记 */
+        /* 收藏标记（所有读者可见）*/
         .fav-badge{
-            position:absolute; top:10px; right:52px; width:35px; height:35px;
+            position:absolute; top:10px; right:10px; width:35px; height:35px;
             border:none; border-radius:50%; font-size:16px; cursor:pointer;
-            background:rgba(255,255,255,0.9); display:none;
-            align-items:center; justify-content:center;
+            background:rgba(255,255,255,0.9);
+            display:flex; align-items:center; justify-content:center;
             transition:var(--transition-fast); z-index:3;
         }
         .fav-badge.active{ background:rgba(253,121,168,0.9); color:#fff; }
-        .admin-btns-show .fav-badge{ display:flex; }
-        .book-card.favorited{ box-shadow:0 0 0 2px var(--secondary-gradient); }
+        /* 管理员模式下收藏按钮左移，给置顶按钮腾位 */
+        .admin-btns-show .fav-badge{ right:52px; }
+        .book-card.favorited{ box-shadow:0 0 0 2px #fd79a8; }
 
         /* 封面预览大图 */
         .cover-preview-overlay{
@@ -518,8 +518,8 @@
             .welcome-book-cover{ width:100px; height:145px; }
             .welcome-input-row{ flex-direction:column; }
             .header{ padding:15px 20px; flex-direction:column; gap:15px; }
-            .bookshelf{ grid-template-columns:repeat(3, 1fr); gap:15px; max-width:100%; }
-            .book-cover{ height:220px; }
+            .bookshelf{ grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:15px; max-width:100%; }
+            .book-cover{ height:200px; }
             .search-box{ padding:0 10px; }
             .site-footer{ margin:20px auto 0; }
             .footer-inner{ padding:16px 20px; }
@@ -690,7 +690,7 @@
             <div id="readCate" class="read-cate"></div>
             <div class="read-meta" id="readMeta"></div>
             <div id="readTags" class="read-tags"></div>
-            <div id="readDesc" class="read-desc"></div>
+            <div id="readDesc" class="read-desc" dir="auto"></div>
             <div class="read-actions">
                 <button class="read-btn" id="readLinkBtn" onclick="openBookLink()">🔗 打开阅读链接</button>
             </div>
@@ -772,12 +772,14 @@
         function renderWelcomeBooks(books){
             const shuffled = [...books].sort(() => Math.random() - 0.5);
             const displayed = shuffled.slice(0, 4);
-            document.getElementById('welcomeBooksContainer').innerHTML = displayed.map(book => `<div class="welcome-book-cover" onclick="openBookLink('${book.link}')"><img src="${book.cover}" alt="${escapeHtml(book.title)}"></div>`).join('');
+            document.getElementById('welcomeBooksContainer').innerHTML = displayed.map(book => `<div class="welcome-book-cover" onclick='openBookLink(${JSON.stringify(book.link || "").replace(/'/g, "&#39;")})'><img src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title || '')}" onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22200%22><rect fill=%22%232a4535%22 width=%22140%22 height=%22200%22/><text x=%2270%22 y=%22105%22 text-anchor=%22middle%22 fill=%22%236b8e7b%22 font-size=%2236%22>📚</text></svg>'"></div>`).join('');
         }
         
+        // 统一入口：欢迎页封面传 link 参数；阅读页按钮不传参时用 currentBook
         function openBookLink(link){
-            if(link && link.trim()){
-                window.open(link, '_blank');
+            const url = (link && link.trim()) ? link.trim() : (currentBook && currentBook.link);
+            if(url){
+                window.open(url, '_blank');
             }else{
                 goToBookshelf();
             }
@@ -795,8 +797,7 @@
             const metaInfoList = Array.isArray(welcomeData.metaInfo) ? welcomeData.metaInfo : [welcomeData.metaInfo];
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
-            modal.onclick = function(e){ if(e.target === modal) return; };
-            
+
             const metaHtml = metaInfoList.map((m,i) => `<div class="welcome-meta-item"><input type="text" value="${escapeHtml(m)}" onchange="updateMetaInfo(${i}, this.value)"><button class="welcome-remove-btn" onclick="removeMetaInfo(${i})">×</button></div>`).join('');
             const booksHtml = welcomeData.books.map((b,i) => `<div class="welcome-preview-item" onclick="selectWelcomeBookPreview(${i})"><img src="${b.cover}" alt="${escapeHtml(b.title)}"><button class="welcome-edit-btn" onclick="event.stopPropagation();openEditBookModal(${i})">✏️</button><button class="welcome-remove-btn" onclick="event.stopPropagation();removeWelcomeBook(${i})">×</button><div class="welcome-link-info">${escapeHtml(b.link || '(无链接)')}</div></div>`).join('');
             
@@ -916,10 +917,10 @@
                 desc: document.getElementById('book-desc').value.trim(),
                 tags: document.getElementById('book-tags').value.trim(),
                 link: document.getElementById('book-link').value.trim(),
-                cover: document.getElementById('book-cover').value.trim() || 'https://via.placeholder.com/150x240?text=Cover',
+                cover: document.getElementById('book-cover').value.trim() || '',
                 bookFile: '', audioFile: '', isTop: false, topOrder: 0
             });
-            saveBooks(); renderBooks();
+            saveBooks(); renderBooks(); renderCategoryTabs();
             updateRealStats();
             document.getElementById('book-title').value = ''; document.getElementById('book-category').value = '';
             document.getElementById('book-desc').value = ''; document.getElementById('book-tags').value = '';
@@ -927,21 +928,26 @@
             toggleUploadBox(); showToast('✅ 书籍添加成功！', 'success');
         }
 
-        function saveBooks(){ localStorage.setItem('allBooks', JSON.stringify(allBooks)); }
-        function loadBooks(){ const saved = localStorage.getItem('allBooks'); if(saved) allBooks = JSON.parse(saved); }
+        function saveBooks(){ try{ localStorage.setItem('allBooks', JSON.stringify(allBooks)); }catch(e){ showToast('❌ 保存失败：存储空间不足', 'error'); } }
 
         function deleteBook(id){
             if(!confirm('确定要删除这本书吗？')) return;
             allBooks = allBooks.filter(b => b.id !== id);
-            saveBooks(); renderBooks(); updateRealStats(); showToast('🗑️ 书籍已删除', 'info');
+            saveBooks(); renderBooks(); renderCategoryTabs(); updateRealStats(); showToast('🗑️ 书籍已删除', 'info');
         }
 
         function openEditModal(id){
             const book = allBooks.find(b => b.id === id);
             if(!book) return;
+            // 分类下拉：预设分类 + 已有书籍中的自定义分类
+            const knownCats = ['Roman', 'Hekaya', 'Rasimlik', 'Adibiy Aser', 'Awazlik', 'Yazmilar'];
+            const cats = [...new Set([...knownCats, ...allBooks.map(b => b.cate).filter(Boolean)])];
+            const catOptions = cats.map(c =>
+                `<option value="${escapeHtml(c)}" ${book.cate === c ? 'selected' : ''}>${CATEGORY_ICONS[c] || '📚'} ${escapeHtml(c)}</option>`
+            ).join('');
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
-            modal.innerHTML = `<div class="edit-modal"><button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2>✏️ 编辑书籍</h2><div class="form-group"><input type="text" id="edit-title" value="${escapeHtml(book.title)}" placeholder="书名"></div><div class="form-group"><select id="edit-category"><option value="Roman" ${book.cate==='Roman'?'selected':''}>Roman</option><option value="Hekaya" ${book.cate==='Hekaya'?'selected':''}>Hekaya</option><option value="Rasimlik" ${book.cate==='Rasimlik'?'selected':''}>Rasimlik</option><option value="Adibiy Aser" ${book.cate==='Adibiy Aser'?'selected':''}>Adibiy Aser</option><option value="Awazlik" ${book.cate==='Awazlik'?'selected':''}>Awazlik</option><option value="Yazmilar" ${book.cate==='Yazmilar'?'selected':''}>Yazmilar</option></select></div><div class="form-group"><textarea id="edit-desc" placeholder="简介">${escapeHtml(book.desc)}</textarea></div><div class="form-group"><input type="text" id="edit-tags" value="${escapeHtml(book.tags)}" placeholder="标签"></div><div class="form-group"><input type="text" id="edit-link" value="${escapeHtml(book.link)}" placeholder="链接"></div><div class="form-group"><input type="text" id="edit-cover" value="${escapeHtml(book.cover)}" placeholder="封面链接"></div><button class="btn-common btn-primary" onclick="saveEdit(${book.id})">✅ 保存修改</button></div>`;
+            modal.innerHTML = `<div class="edit-modal"><button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button><h2>✏️ 编辑书籍</h2><div class="form-group"><input type="text" id="edit-title" value="${escapeHtml(book.title)}" placeholder="书名"></div><div class="form-group"><select id="edit-category">${catOptions}</select></div><div class="form-group"><textarea id="edit-desc" placeholder="简介">${escapeHtml(book.desc)}</textarea></div><div class="form-group"><input type="text" id="edit-tags" value="${escapeHtml(book.tags)}" placeholder="标签"></div><div class="form-group"><input type="text" id="edit-link" value="${escapeHtml(book.link)}" placeholder="链接"></div><div class="form-group"><input type="text" id="edit-cover" value="${escapeHtml(book.cover)}" placeholder="封面链接（留空显示默认封面）"></div><button class="btn-common btn-primary" onclick="saveEdit(${book.id})">✅ 保存修改</button></div>`;
             document.body.appendChild(modal);
         }
 
@@ -953,22 +959,29 @@
             book.desc = document.getElementById('edit-desc').value.trim();
             book.tags = document.getElementById('edit-tags').value.trim();
             book.link = document.getElementById('edit-link').value.trim();
-            book.cover = document.getElementById('edit-cover').value.trim() || 'https://via.placeholder.com/150x240?text=Cover';
-            saveBooks(); renderBooks(); updateRealStats();
+            book.cover = document.getElementById('edit-cover').value.trim() || '';
+            saveBooks(); renderBooks(); renderCategoryTabs(); updateRealStats();
             document.querySelector('.modal-overlay').remove();
             showToast('✅ 修改成功！', 'success');
         }
 
         let currentBook = null;
+        const READ_COVER_FALLBACK = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22350%22 height=%22450%22><rect fill=%22%23e8e8e8%22 width=%22350%22 height=%22450%22/><text x=%22175%22 y=%22225%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2248%22>📚</text></svg>';
         function openReadPage(book){
             currentBook = book;
             const coverImg = document.getElementById('readCover');
-            coverImg.src = book.cover;
-            coverImg.onerror = () => { coverImg.src = 'https://via.placeholder.com/350x450?text=Cover'; };
+            coverImg.onerror = function(){ this.onerror = null; this.src = READ_COVER_FALLBACK; };
+            coverImg.src = book.cover || READ_COVER_FALLBACK;
             document.getElementById('readTitle').innerText = book.title;
             document.getElementById('readCate').innerText = book.cate;
             document.getElementById('readDesc').innerText = book.desc || '📋 无简介';
-            
+
+            // 字数统计 + 预计阅读时间
+            const charCount = (book.desc || '').length;
+            const readMinutes = Math.max(1, Math.ceil(charCount / 300));
+            const metaEl = document.getElementById('readMeta');
+            if(metaEl) metaEl.textContent = `📝 ${charCount} 字 · ⏱️ 约 ${readMinutes} 分钟`;
+
             const tagsContainer = document.getElementById('readTags');
             tagsContainer.innerHTML = '';
             if(book.tags){
@@ -979,18 +992,88 @@
                     tagsContainer.appendChild(tagEl);
                 });
             }
-            
+
             const linkBtn = document.getElementById('readLinkBtn');
             linkBtn.style.display = book.link ? 'flex' : 'none';
-            
+
+            // 收藏按钮状态
+            const favBtn = document.getElementById('readFavBtn');
+            if(favBtn){
+                const fav = isFavorite(book.id);
+                favBtn.textContent = fav ? '❤️ 已收藏' : '🤍 收藏';
+                favBtn.classList.toggle('fav-active', fav);
+            }
+
             document.getElementById('readPage').classList.add('show');
         }
         function closeReadPage(){
             document.getElementById('readPage').classList.remove('show');
         }
-        function openBookLink(){
-            if(!currentBook || !currentBook.link) return;
-            window.open(currentBook.link, '_blank');
+
+        // ===== 收藏功能（读者可用，localStorage 存储）=====
+        function getFavorites(){
+            try{ return JSON.parse(localStorage.getItem('favorites') || '[]'); }catch(e){ return []; }
+        }
+        function isFavorite(id){ return getFavorites().includes(id); }
+        function toggleFavorite(id){
+            let favs = getFavorites();
+            if(favs.includes(id)){
+                favs = favs.filter(f => f !== id);
+                showToast('🤍 已取消收藏', 'info');
+            }else{
+                favs.push(id);
+                showToast('❤️ 已收藏', 'success');
+            }
+            try{ localStorage.setItem('favorites', JSON.stringify(favs)); }catch(e){}
+            renderBooks();
+        }
+        function toggleFavCurrent(){
+            if(!currentBook) return;
+            toggleFavorite(currentBook.id);
+            const favBtn = document.getElementById('readFavBtn');
+            if(favBtn){
+                const fav = isFavorite(currentBook.id);
+                favBtn.textContent = fav ? '❤️ 已收藏' : '🤍 收藏';
+                favBtn.classList.toggle('fav-active', fav);
+            }
+        }
+
+        // ===== 封面预览大图 =====
+        function previewCover(src){
+            if(!src) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'cover-preview-overlay';
+            overlay.innerHTML = `<img src="${escapeHtml(src)}" alt="封面预览">`;
+            overlay.onclick = () => overlay.remove();
+            document.body.appendChild(overlay);
+        }
+
+        // ===== 分享功能 =====
+        function shareCurrentBook(){
+            if(!currentBook) return;
+            const text = `📚 ${currentBook.title} — Hekaya小故事`;
+            const url = currentBook.link || location.href;
+            if(navigator.share){
+                navigator.share({ title: currentBook.title, text: text, url: url }).catch(() => copyShareLink(text, url));
+            }else{
+                copyShareLink(text, url);
+            }
+        }
+        function copyShareLink(text, url){
+            const full = `${text}\n${url}`;
+            if(navigator.clipboard){
+                navigator.clipboard.writeText(full).then(() => showToast('✅ 已复制分享链接', 'success'))
+                    .catch(() => fallbackCopy(full));
+            }else{
+                fallbackCopy(full);
+            }
+        }
+        function fallbackCopy(text){
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try{ document.execCommand('copy'); showToast('✅ 已复制分享链接', 'success'); }
+            catch(e){ showToast('复制失败，请手动复制', 'error'); }
+            ta.remove();
         }
 
         function openLoginModal(){
@@ -1066,8 +1149,10 @@
         function renderBooks(){
             const shelf = document.getElementById('bookshelf');
             if(!shelf) return;
-            const activeCate = document.querySelector('.tab.active').dataset.cate;
-            const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            const activeTab = document.querySelector('.tab.active');
+            const activeCate = activeTab ? activeTab.dataset.cate : 'all';
+            const searchInput = document.getElementById('searchInput');
+            const searchText = searchInput ? searchInput.value.toLowerCase().trim() : '';
             
             let filteredBooks = allBooks.filter(book => {
                 const excludeFromAll = activeCate === 'all' && (book.cate === 'Yazmilar' || book.cate === 'Yzamlilar');
@@ -1082,17 +1167,19 @@
             if(resultCount) resultCount.textContent = searchText ? `🔍 搜索 "${searchText}" 找到 ${filteredBooks.length} 本书` : '';
             
             if(filteredBooks.length === 0){
-                shelf.innerHTML = '<div class="empty-tip">📚 暂无匹配书籍</div>';
+                shelf.innerHTML = `<div class="empty-tip"><div class="empty-icon">📚</div><div>暂无匹配书籍</div>${searchText ? '<button class="empty-action" onclick="clearSearch()">🗑️ 清空搜索</button>' : ''}</div>`;
                 return;
             }
-            
+
             if(activeCate === 'Yazmilar'){
                 renderYazmilar(filteredBooks, shelf);
             }else{
+                const fallbackCover = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22240%22><rect fill=%22%23e8e8e8%22 width=%22150%22 height=%22240%22/><text x=%2275%22 y=%22120%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2232%22>📚</text></svg>";
                 const fragment = document.createDocumentFragment();
                 filteredBooks.forEach(book => {
                     const card = document.createElement('div');
-                    card.className = `book-card ${book.isTop ? 'top' : ''}`;
+                    const isFav = isFavorite(book.id);
+                    card.className = `book-card ${book.isTop ? 'top' : ''} ${isFav ? 'favorited' : ''}`;
                     card.onclick = () => openReadPage(book);
                     const topTag = isAdminLogin && book.isTop ? '<div class="top-tag">📌 置顶</div>' : '';
                     const topBtnText = book.isTop ? '🔽' : '🔼';
@@ -1100,13 +1187,24 @@
                     const topBtnHtml = isAdminLogin ? `<button class="${topBtnClass}" onclick="event.stopPropagation();toggleTop(${book.id})">${topBtnText}</button>` : '';
                     const delBtnHtml = isAdminLogin ? `<button class="del-btn" onclick="event.stopPropagation();deleteBook(${book.id})">🗑️</button>` : '';
                     const editBtnHtml = isAdminLogin ? `<button class="edit-card-btn" onclick="event.stopPropagation();openEditModal(${book.id})">✏️</button>` : '';
-                    card.innerHTML = `${topTag}<img class="book-cover lazy-img" data-src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" onerror="this.src='https://via.placeholder.com/150x240?text=Cover'"><div class="book-info"><div class="book-title">${escapeHtml(book.title)}</div><div class="book-cate">${escapeHtml(book.cate)}</div></div>${topBtnHtml}${delBtnHtml}${editBtnHtml}`;
+                    const favBtnHtml = `<button class="fav-badge ${isFav ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite(${book.id})" title="收藏">${isFav ? '❤️' : '🤍'}</button>`;
+                    const coverAttrs = book.cover
+                        ? `class="book-cover lazy-img" data-src="${escapeHtml(book.cover)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackCover}'"`
+                        : `class="book-cover" src="${fallbackCover}"`;
+                    card.innerHTML = `${topTag}<img ${coverAttrs} alt="${escapeHtml(book.title)}"><div class="book-info"><div class="book-title">${escapeHtml(book.title)}</div><div class="book-cate">${escapeHtml(book.cate)}</div></div>${favBtnHtml}${topBtnHtml}${delBtnHtml}${editBtnHtml}`;
                     fragment.appendChild(card);
                 });
                 shelf.innerHTML = '';
                 shelf.appendChild(fragment);
                 initLazyLoad();
             }
+        }
+
+        // 清空搜索
+        function clearSearch(){
+            const input = document.getElementById('searchInput');
+            if(input) input.value = '';
+            renderBooks();
         }
 
         function renderYazmilar(books, container){
@@ -1160,6 +1258,42 @@
                     renderBooks();
                 });
             });
+        }
+
+        // 分类标签从书籍数据动态生成，保留当前选中项
+        const CATEGORY_ICONS = { 'all': '📚', 'Roman': '📖', 'Hekaya': '🎭', 'Rasimlik': '🎨', 'Adibiy Aser': '✍️', 'Awazlik': '🎵', 'Yazmilar': '📝' };
+        function renderCategoryTabs(){
+            const container = document.querySelector('.category-tabs');
+            if(!container) return;
+            const activeTab = document.querySelector('.tab.active');
+            const activeCate = activeTab ? activeTab.dataset.cate : 'all';
+            const knownOrder = ['all', 'Roman', 'Hekaya', 'Rasimlik', 'Adibiy Aser', 'Awazlik', 'Yazmilar'];
+            // 预设分类 + 书籍中出现的自定义分类（去重合并）
+            const dataCats = allBooks.map(b => b.cate).filter(Boolean);
+            const categories = [...new Set([...knownOrder, ...dataCats])];
+            categories.sort((a, b) => {
+                const ia = knownOrder.indexOf(a), ib = knownOrder.indexOf(b);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+            // 当前选中的分类已不存在（如其中的书被全部删除）时回退到"全部"
+            const selectedCate = categories.includes(activeCate) ? activeCate : 'all';
+            container.innerHTML = categories.map(cate =>
+                `<button class="tab ${cate === selectedCate ? 'active' : ''}" data-cate="${escapeHtml(cate)}">${CATEGORY_ICONS[cate] || '📚'} ${cate === 'all' ? '全部' : escapeHtml(cate)}</button>`
+            ).join('');
+            initTab();
+            syncUploadCategoryOptions(categories);
+        }
+
+        // 上传表单的分类下拉框与数据同步
+        function syncUploadCategoryOptions(categories){
+            const select = document.getElementById('book-category');
+            if(!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">🏷️ 选择分类 *</option>' +
+                categories.filter(c => c !== 'all').map(c =>
+                    `<option value="${escapeHtml(c)}">${CATEGORY_ICONS[c] || '📚'} ${escapeHtml(c)}</option>`
+                ).join('');
+            select.value = currentVal;
         }
 
         function loadBooks(){
@@ -1379,7 +1513,6 @@
 
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
-            modal.onclick = function(e){ if(e.target === modal) return; };
 
             modal.innerHTML = `
                 <div class="dataio-modal">
@@ -1443,7 +1576,6 @@
         function openImportModal(){
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
-            modal.onclick = function(e){ if(e.target === modal) return; };
 
             modal.innerHTML = `
                 <div class="dataio-modal">
@@ -1567,6 +1699,7 @@
             }
 
             updateWelcomePage();
+            renderCategoryTabs();
             renderBooks();
             updateRealStats();
 
@@ -1578,9 +1711,9 @@
 
         
 
-        function nextSlide(){ currentSlide = (currentSlide + 1) % slides.length; updateCarousel(); }
-        function prevSlide(){ currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateCarousel(); }
-        function goToSlide(index){ currentSlide = index; updateCarousel(); }
+        function nextSlide(){ if(slides.length === 0) return; currentSlide = (currentSlide + 1) % slides.length; updateCarousel(); }
+        function prevSlide(){ if(slides.length === 0) return; currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateCarousel(); }
+        function goToSlide(index){ if(slides.length === 0) return; currentSlide = index; updateCarousel(); }
 
         function updateCarousel(){
             const carousel = document.getElementById('carousel');
@@ -1774,7 +1907,7 @@
             loadWelcomeData();
             loadCarouselData();
             updateWelcomePage();
-            initTab();
+            renderCategoryTabs();
             initLazyLoad();
             initSiteStats();
             renderBooks();
@@ -1844,7 +1977,15 @@
         let carouselTimer = null;
 
         function startCarousel(){
+            if(carouselTimer) clearInterval(carouselTimer);
             carouselTimer = setInterval(nextSlide, 5000);
+            // 鼠标悬停时暂停轮播，移出恢复
+            const container = document.querySelector('.carousel-container');
+            if(container && !container.dataset.pauseBound){
+                container.addEventListener('mouseenter', stopCarousel);
+                container.addEventListener('mouseleave', startCarousel);
+                container.dataset.pauseBound = '1';
+            }
         }
 
         function stopCarousel(){
@@ -1854,6 +1995,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             startCarousel();
+
+            // 返回顶部按钮：滚动超过 400px 显示
+            const backBtn = document.getElementById('backToTop');
+            if(backBtn){
+                window.addEventListener('scroll', () => {
+                    backBtn.classList.toggle('show', window.scrollY > 400);
+                }, { passive: true });
+            }
         });
 
         document.addEventListener('keydown', (e) => {
